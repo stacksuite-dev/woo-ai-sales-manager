@@ -1820,13 +1820,20 @@
 		
 		if (entityType && entityType !== state.entityType) {
 			state.entityType = entityType;
+			state.isAgentMode = (entityType === 'agent');
 			updateEntityTabs();
 			populateEntitySelector();
 			updateQuickActionsVisibility();
 			updateEmptyState();
+			
+			// If agent mode, activate immediately
+			if (entityType === 'agent') {
+				selectAgent();
+				return;
+			}
 		}
 		
-		// Focus the selector
+		// Focus the selector (for product/category modes)
 		elements.entitySelect.focus();
 	}
 
