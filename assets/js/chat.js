@@ -10,16 +10,23 @@
 	// Chat state
 	const state = {
 		sessionId: null,
-		entityType: 'product', // 'product' or 'category'
+		entityType: 'product', // 'product' | 'category' | 'agent'
 		selectedProduct: null,
 		selectedCategory: null,
+		isAgentMode: false,
 		products: [],
 		categories: [],
 		messages: [],
 		pendingSuggestions: {},
 		isLoading: false,
 		balance: 0,
-		storeContext: {}
+		storeContext: {},
+		// Attachment state
+		pendingAttachments: [],
+		maxAttachments: 5,
+		maxFileSize: 7 * 1024 * 1024, // 7MB
+		maxImageSize: 1024 * 1024, // 1MB - resize images larger than this
+		allowedMimeTypes: ['image/png', 'image/jpeg', 'image/webp', 'image/heic', 'image/heif', 'application/pdf']
 	};
 
 	// DOM Elements
@@ -37,12 +44,14 @@
 		// Quick actions
 		quickActionsProduct: null,
 		quickActionsCategory: null,
+		quickActionsAgent: null,
 		
 		// Entity panels
 		entityPanel: null,
 		entityEmpty: null,
 		productInfo: null,
 		categoryInfo: null,
+		agentInfo: null,
 		
 		// Pending changes
 		pendingSummary: null,
@@ -137,12 +146,14 @@
 		// Quick actions
 		elements.quickActionsProduct = $('#wooai-quick-actions-product');
 		elements.quickActionsCategory = $('#wooai-quick-actions-category');
+		elements.quickActionsAgent = $('#wooai-quick-actions-agent');
 		
 		// Entity panels
 		elements.entityPanel = $('#wooai-entity-panel');
 		elements.entityEmpty = $('#wooai-entity-empty');
 		elements.productInfo = $('#wooai-product-info');
 		elements.categoryInfo = $('#wooai-category-info');
+		elements.agentInfo = $('#wooai-agent-info');
 		
 		// Pending changes
 		elements.pendingSummary = $('#wooai-pending-summary');
@@ -164,6 +175,11 @@
 		
 		// Welcome cards
 		elements.welcomeCards = $('.wooai-welcome-cards');
+		
+		// Attachment elements
+		elements.attachButton = $('#wooai-attach-button');
+		elements.fileInput = $('#wooai-file-input');
+		elements.attachmentPreviews = $('#wooai-attachment-previews');
 	}
 
 	/**
@@ -238,6 +254,14 @@
 	 * Populate entity selector based on current entity type
 	 */
 	function populateEntitySelector() {
+		if (state.entityType === 'agent') {
+			// Agent mode doesn't need entity selector
+			elements.entitySelect.empty().hide();
+			return;
+		}
+		
+		elements.entitySelect.show();
+		
 		if (state.entityType === 'category') {
 			populateCategorySelector();
 		} else {
@@ -269,6 +293,9 @@
 		
 		// Quick actions - Category
 		elements.quickActionsCategory.on('click', '[data-action]', handleCategoryQuickAction);
+		
+		// Quick actions - Agent
+		elements.quickActionsAgent.on('click', '[data-action]', handleAgentQuickAction);
 
 		// New chat
 		elements.newChatButton.on('click', handleNewChat);
@@ -312,10 +339,269 @@
 		
 		// Welcome context hint
 		$('#wooai-welcome-setup-context').on('click', openContextPanel);
+		
+		// Attachment handling
+		elements.attachButton.on('click', function() {
+			elements.fileInput.click();
+		});
+		elements.fileInput.on('change', handleFileSelect);
+		elements.attachmentPreviews.on('click', '.wooai-attachment-remove', handleRemoveAttachment);
+		
+		// Drag and drop
+		setupDragAndDrop();
+		
+		// Paste handling for images
+		elements.messageInput.on('paste', handlePaste);
 	}
 
 	/**
-	 * Handle entity tab click (switch between Products/Categories)
+	 * Handle file selection from input
+	 */
+	function handleFileSelect(e) {
+		const files = Array.from(e.target.files || []);
+		processFiles(files);
+		// Reset input so same file can be selected again
+		e.target.value = '';
+	}
+
+	/**
+	 * Handle removing an attachment
+	 */
+	function handleRemoveAttachment(e) {
+		const index = $(e.currentTarget).closest('.wooai-attachment-preview').data('index');
+		state.pendingAttachments.splice(index, 1);
+		updateAttachmentPreviews();
+	}
+
+	/**
+	 * Handle paste event for images
+	 */
+	function handlePaste(e) {
+		const clipboardData = e.originalEvent.clipboardData;
+		if (!clipboardData || !clipboardData.items) return;
+
+		const items = Array.from(clipboardData.items);
+		const imageItems = items.filter(item => item.type.startsWith('image/'));
+		
+		if (imageItems.length > 0) {
+			e.preventDefault();
+			const files = imageItems.map(item => item.getAsFile()).filter(Boolean);
+			processFiles(files);
+		}
+	}
+
+	/**
+	 * Setup drag and drop for attachments
+	 */
+	function setupDragAndDrop() {
+		const $dropZone = $('.wooai-chat-input');
+		
+		$dropZone.on('dragenter dragover', function(e) {
+			e.preventDefault();
+			e.stopPropagation();
+			$(this).addClass('wooai-drag-over');
+		});
+
+		$dropZone.on('dragleave drop', function(e) {
+			e.preventDefault();
+			e.stopPropagation();
+			$(this).removeClass('wooai-drag-over');
+		});
+
+		$dropZone.on('drop', function(e) {
+			const files = Array.from(e.originalEvent.dataTransfer.files || []);
+			processFiles(files);
+		});
+	}
+
+	/**
+	 * Process selected/dropped/pasted files
+	 */
+	function processFiles(files) {
+		if (!files || files.length === 0) return;
+
+		// Check max attachments
+		const remainingSlots = state.maxAttachments - state.pendingAttachments.length;
+		if (remainingSlots <= 0) {
+			showNotice('Maximum ' + state.maxAttachments + ' files allowed per message', 'error');
+			return;
+		}
+
+		const filesToProcess = files.slice(0, remainingSlots);
+
+		filesToProcess.forEach(function(file) {
+			// Validate file type
+			if (!state.allowedMimeTypes.includes(file.type)) {
+				showNotice('File type not supported: ' + file.name, 'error');
+				return;
+			}
+
+			// Validate file size
+			if (file.size > state.maxFileSize) {
+				showNotice('File too large: ' + file.name + ' (max ' + Math.round(state.maxFileSize / 1024 / 1024) + 'MB)', 'error');
+				return;
+			}
+
+			// Process the file
+			if (file.type.startsWith('image/') && file.size > state.maxImageSize) {
+				// Resize large images
+				resizeImage(file).then(function(resizedFile) {
+					addAttachment(resizedFile);
+				}).catch(function(err) {
+					console.error('Image resize failed:', err);
+					// Fall back to original
+					addAttachment(file);
+				});
+			} else {
+				addAttachment(file);
+			}
+		});
+	}
+
+	/**
+	 * Add an attachment to pending list
+	 */
+	function addAttachment(file) {
+		fileToBase64(file).then(function(base64Data) {
+			state.pendingAttachments.push({
+				file: file,
+				filename: file.name,
+				mime_type: file.type,
+				data: base64Data,
+				preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : null
+			});
+			updateAttachmentPreviews();
+		}).catch(function(err) {
+			console.error('Failed to read file:', err);
+			showNotice('Failed to read file: ' + file.name, 'error');
+		});
+	}
+
+	/**
+	 * Convert file to base64
+	 */
+	function fileToBase64(file) {
+		return new Promise(function(resolve, reject) {
+			const reader = new FileReader();
+			reader.onload = function() {
+				// Remove data URL prefix to get pure base64
+				const base64 = reader.result.split(',')[1];
+				resolve(base64);
+			};
+			reader.onerror = reject;
+			reader.readAsDataURL(file);
+		});
+	}
+
+	/**
+	 * Resize image if too large (browser-side)
+	 */
+	function resizeImage(file) {
+		return new Promise(function(resolve, reject) {
+			const img = new Image();
+			img.onload = function() {
+				// Calculate new dimensions (max 1920px on longest side)
+				const maxDim = 1920;
+				let width = img.width;
+				let height = img.height;
+
+				if (width > maxDim || height > maxDim) {
+					if (width > height) {
+						height = Math.round((height / width) * maxDim);
+						width = maxDim;
+					} else {
+						width = Math.round((width / height) * maxDim);
+						height = maxDim;
+					}
+				}
+
+				// Create canvas and resize
+				const canvas = document.createElement('canvas');
+				canvas.width = width;
+				canvas.height = height;
+				const ctx = canvas.getContext('2d');
+				ctx.drawImage(img, 0, 0, width, height);
+
+				// Convert to blob
+				canvas.toBlob(function(blob) {
+					if (blob) {
+						// Create new file with same name
+						const resizedFile = new File([blob], file.name, {
+							type: 'image/jpeg',
+							lastModified: Date.now()
+						});
+						resolve(resizedFile);
+					} else {
+						reject(new Error('Failed to create blob'));
+					}
+				}, 'image/jpeg', 0.85);
+			};
+			img.onerror = reject;
+			img.src = URL.createObjectURL(file);
+		});
+	}
+
+	/**
+	 * Update attachment previews UI
+	 */
+	function updateAttachmentPreviews() {
+		const $container = elements.attachmentPreviews;
+		$container.empty();
+
+		if (state.pendingAttachments.length === 0) {
+			$container.hide();
+			elements.attachButton.find('.wooai-attachment-count').remove();
+			return;
+		}
+
+		state.pendingAttachments.forEach(function(attachment, index) {
+			const isImage = attachment.mime_type.startsWith('image/');
+			const isPdf = attachment.mime_type === 'application/pdf';
+
+			let previewHtml = '<div class="wooai-attachment-preview" data-index="' + index + '">';
+			
+			if (isImage && attachment.preview) {
+				previewHtml += '<img src="' + attachment.preview + '" alt="' + escapeHtml(attachment.filename) + '">';
+			} else if (isPdf) {
+				previewHtml += '<div class="wooai-attachment-preview__icon"><span class="dashicons dashicons-pdf"></span></div>';
+			} else {
+				previewHtml += '<div class="wooai-attachment-preview__icon"><span class="dashicons dashicons-media-default"></span></div>';
+			}
+
+			previewHtml += '<div class="wooai-attachment-preview__name">' + escapeHtml(truncate(attachment.filename, 15)) + '</div>';
+			previewHtml += '<button type="button" class="wooai-attachment-remove" title="Remove"><span class="dashicons dashicons-no-alt"></span></button>';
+			previewHtml += '</div>';
+
+			$container.append(previewHtml);
+		});
+
+		$container.show();
+
+		// Update attachment count on button
+		let $count = elements.attachButton.find('.wooai-attachment-count');
+		if ($count.length === 0) {
+			$count = $('<span class="wooai-attachment-count"></span>');
+			elements.attachButton.append($count);
+		}
+		$count.text(state.pendingAttachments.length);
+	}
+
+	/**
+	 * Clear all pending attachments
+	 */
+	function clearAttachments() {
+		// Revoke object URLs to prevent memory leaks
+		state.pendingAttachments.forEach(function(attachment) {
+			if (attachment.preview) {
+				URL.revokeObjectURL(attachment.preview);
+			}
+		});
+		state.pendingAttachments = [];
+		updateAttachmentPreviews();
+	}
+
+	/**
+	 * Handle entity tab click (switch between Products/Categories/Agent)
 	 */
 	function handleEntityTabClick(e) {
 		const $tab = $(e.currentTarget);
@@ -325,6 +611,7 @@
 		
 		// Switch entity type
 		state.entityType = newType;
+		state.isAgentMode = (newType === 'agent');
 		
 		// Update tabs UI
 		updateEntityTabs();
@@ -332,7 +619,7 @@
 		// Clear current selection
 		clearEntity();
 		
-		// Populate selector with new entity type
+		// Populate selector with new entity type (or hide for agent)
 		populateEntitySelector();
 		
 		// Update quick actions visibility
@@ -340,6 +627,11 @@
 		
 		// Update empty state text and icon
 		updateEmptyState();
+		
+		// If agent mode, activate immediately
+		if (state.isAgentMode) {
+			selectAgent();
+		}
 	}
 
 	/**
@@ -354,12 +646,16 @@
 	 * Update quick actions visibility based on entity type
 	 */
 	function updateQuickActionsVisibility() {
-		if (state.entityType === 'category') {
-			elements.quickActionsProduct.hide();
+		elements.quickActionsProduct.hide();
+		elements.quickActionsCategory.hide();
+		elements.quickActionsAgent.hide();
+		
+		if (state.entityType === 'agent') {
+			elements.quickActionsAgent.show();
+		} else if (state.entityType === 'category') {
 			elements.quickActionsCategory.show();
 		} else {
 			elements.quickActionsProduct.show();
-			elements.quickActionsCategory.hide();
 		}
 	}
 
@@ -370,7 +666,10 @@
 		const $icon = $('#wooai-empty-icon');
 		const $text = $('#wooai-empty-text');
 		
-		if (state.entityType === 'category') {
+		if (state.entityType === 'agent') {
+			$icon.attr('class', 'dashicons dashicons-superhero-alt');
+			$text.text(wooaiChat.i18n.agentReady || 'AI Agent ready to help with marketing');
+		} else if (state.entityType === 'category') {
 			$icon.attr('class', 'dashicons dashicons-category');
 			$text.text(wooaiChat.i18n.selectCategory || 'Select a category to view details');
 		} else {
@@ -417,6 +716,7 @@
 	function selectProduct(product) {
 		state.selectedProduct = product;
 		state.selectedCategory = null;
+		state.isAgentMode = false;
 		updateProductPanel(product);
 		enableInputs();
 
@@ -425,6 +725,7 @@
 		elements.entityEmpty.hide();
 		elements.productInfo.show();
 		elements.categoryInfo.hide();
+		elements.agentInfo.hide();
 
 		// Create new session for this product
 		createSession(product, 'product');
@@ -436,6 +737,7 @@
 	function selectCategory(category) {
 		state.selectedCategory = category;
 		state.selectedProduct = null;
+		state.isAgentMode = false;
 		updateCategoryPanel(category);
 		enableInputs();
 
@@ -444,9 +746,30 @@
 		elements.entityEmpty.hide();
 		elements.productInfo.hide();
 		elements.categoryInfo.show();
+		elements.agentInfo.hide();
 
 		// Create new session for this category
 		createSession(category, 'category');
+	}
+
+	/**
+	 * Select agent mode (store-wide marketing operations)
+	 */
+	function selectAgent() {
+		state.selectedProduct = null;
+		state.selectedCategory = null;
+		state.isAgentMode = true;
+		enableInputs();
+
+		// Hide welcome, show agent info
+		elements.chatWelcome.hide();
+		elements.entityEmpty.hide();
+		elements.productInfo.hide();
+		elements.categoryInfo.hide();
+		elements.agentInfo.show();
+
+		// Create new session for agent mode
+		createSession(null, 'agent');
 	}
 
 	/**
@@ -481,7 +804,9 @@
 	 * Clear entity selection
 	 */
 	function clearEntity() {
-		if (state.entityType === 'category') {
+		if (state.entityType === 'agent') {
+			clearAgent();
+		} else if (state.entityType === 'category') {
 			clearCategory();
 		} else {
 			clearProduct();
@@ -517,6 +842,22 @@
 		elements.categoryInfo.hide();
 		elements.entityEmpty.show();
 		elements.categoryPendingSummary.hide();
+
+		disableInputs();
+		showWelcomeMessage();
+	}
+
+	/**
+	 * Clear agent mode
+	 */
+	function clearAgent() {
+		state.isAgentMode = false;
+		state.sessionId = null;
+		state.messages = [];
+		state.pendingSuggestions = {};
+
+		elements.agentInfo.hide();
+		elements.entityEmpty.show();
 
 		disableInputs();
 		showWelcomeMessage();
@@ -658,11 +999,26 @@
 		clearMessages();
 
 		const sessionData = {
-			entity_type: entityType || state.entityType,
-			title: entityType === 'category' ? entity.name : entity.title
+			entity_type: entityType || state.entityType
 		};
 
-		if (entityType === 'category') {
+		// Handle different entity types
+		if (entityType === 'agent') {
+			sessionData.title = 'Marketing Agent';
+			// Include store context for agent mode
+			if (state.storeContext && Object.keys(state.storeContext).length > 0) {
+				const filteredContext = {};
+				for (const [key, value] of Object.entries(state.storeContext)) {
+					if (value !== '' && value !== null && value !== undefined) {
+						filteredContext[key] = value;
+					}
+				}
+				if (Object.keys(filteredContext).length > 0) {
+					sessionData.store_context = filteredContext;
+				}
+			}
+		} else if (entityType === 'category') {
+			sessionData.title = entity.name;
 			sessionData.category_id = String(entity.id);
 			sessionData.category_data = {
 				id: String(entity.id),
@@ -677,7 +1033,20 @@
 				seo_title: entity.seo_title,
 				meta_description: entity.meta_description
 			};
+			// Include store context if available
+			if (state.storeContext && Object.keys(state.storeContext).length > 0) {
+				const filteredContext = {};
+				for (const [key, value] of Object.entries(state.storeContext)) {
+					if (value !== '' && value !== null && value !== undefined) {
+						filteredContext[key] = value;
+					}
+				}
+				if (Object.keys(filteredContext).length > 0) {
+					sessionData.store_context = filteredContext;
+				}
+			}
 		} else {
+			sessionData.title = entity.title;
 			sessionData.product_id = String(entity.id);
 			sessionData.product_data = {
 				id: String(entity.id),
@@ -694,18 +1063,17 @@
 				image_url: entity.image_url,
 				status: entity.status
 			};
-		}
-
-		// Include store context if available (filter out empty values)
-		if (state.storeContext && Object.keys(state.storeContext).length > 0) {
-			const filteredContext = {};
-			for (const [key, value] of Object.entries(state.storeContext)) {
-				if (value !== '' && value !== null && value !== undefined) {
-					filteredContext[key] = value;
+			// Include store context if available
+			if (state.storeContext && Object.keys(state.storeContext).length > 0) {
+				const filteredContext = {};
+				for (const [key, value] of Object.entries(state.storeContext)) {
+					if (value !== '' && value !== null && value !== undefined) {
+						filteredContext[key] = value;
+					}
 				}
-			}
-			if (Object.keys(filteredContext).length > 0) {
-				sessionData.store_context = filteredContext;
+				if (Object.keys(filteredContext).length > 0) {
+					sessionData.store_context = filteredContext;
+				}
 			}
 		}
 
@@ -785,24 +1153,42 @@
 		setLoading(true);
 		elements.messageInput.val('');
 
-		// Add user message to UI immediately
-		addMessage({
+		// Capture attachments before clearing
+		const attachments = state.pendingAttachments.map(function(a) {
+			return {
+				filename: a.filename,
+				mime_type: a.mime_type,
+				data: a.data
+			};
+		});
+
+		// Add user message to UI immediately (with attachment indicators)
+		const messageData = {
 			id: 'temp-' + Date.now(),
 			role: 'user',
 			content: content,
-			created_at: new Date().toISOString()
-		});
+			created_at: new Date().toISOString(),
+			attachments: attachments.length > 0 ? attachments : undefined
+		};
+		addMessage(messageData);
+
+		// Clear attachments after capturing
+		clearAttachments();
 
 		// Show thinking indicator
 		showThinking();
 
-		// Use SSE for streaming response
+		// Build request data
 		const requestData = {
 			content: content
 		};
 
 		if (quickAction) {
 			requestData.quick_action = quickAction;
+		}
+
+		if (attachments.length > 0) {
+			requestData.attachments = attachments;
 		}
 
 		// Try SSE first, fall back to regular request
@@ -1041,10 +1427,35 @@
 	}
 
 	/**
+	 * Handle agent quick action button click
+	 */
+	function handleAgentQuickAction(e) {
+		const action = $(e.currentTarget).data('action');
+		if (!action || !state.isAgentMode) return;
+
+		const actionMessages = {
+			'create_campaign': 'Help me create a marketing campaign for my store',
+			'social_content': 'Generate social media content for my store products',
+			'email_campaign': 'Create an email marketing campaign',
+			'generate_image': 'Help me create a marketing image',
+			'store_analysis': 'Analyze my store and suggest improvements',
+			'bulk_optimize': 'Suggest bulk optimization strategies for my products'
+		};
+
+		const message = actionMessages[action] || 'Help with marketing';
+		sendMessage(message, action);
+	}
+
+	/**
 	 * Handle new chat button
 	 */
 	function handleNewChat() {
-		if (state.entityType === 'category' && state.selectedCategory) {
+		if (state.isAgentMode) {
+			state.pendingSuggestions = {};
+			updatePendingSummary();
+			clearPendingChanges();
+			createSession(null, 'agent');
+		} else if (state.entityType === 'category' && state.selectedCategory) {
 			state.pendingSuggestions = {};
 			updatePendingSummary();
 			clearPendingChanges();
@@ -1437,6 +1848,19 @@
 
 		const $message = $(html);
 
+		// Add attachment indicators for user messages
+		if (message.attachments && message.attachments.length > 0) {
+			let attachmentHtml = '<div class="wooai-message__attachments">';
+			message.attachments.forEach(function(att) {
+				const isImage = att.mime_type && att.mime_type.startsWith('image/');
+				const isPdf = att.mime_type === 'application/pdf';
+				const icon = isImage ? 'dashicons-format-image' : (isPdf ? 'dashicons-pdf' : 'dashicons-media-default');
+				attachmentHtml += '<span class="wooai-message__attachment"><span class="dashicons ' + icon + '"></span>' + escapeHtml(att.filename) + '</span>';
+			});
+			attachmentHtml += '</div>';
+			$message.find('.wooai-message__content').prepend(attachmentHtml);
+		}
+
 		if (isStreaming) {
 			$message.addClass('wooai-message--streaming');
 			$message.attr('data-streaming', 'true');
@@ -1822,13 +2246,86 @@
 	}
 
 	/**
+	 * Save AI-generated image to WordPress media library
+	 * @param {string} imageData - Base64 encoded image data (with or without data URL prefix)
+	 * @param {string} filename - Suggested filename for the image
+	 * @param {string} title - Optional title for the media item
+	 * @returns {Promise} - Resolves with attachment data or rejects with error
+	 */
+	function saveGeneratedImage(imageData, filename, title) {
+		return new Promise(function(resolve, reject) {
+			$.ajax({
+				url: wooaiChat.ajaxUrl,
+				type: 'POST',
+				data: {
+					action: 'wooai_save_generated_image',
+					nonce: wooaiChat.nonce,
+					image_data: imageData,
+					filename: filename || 'ai-generated-image.png',
+					title: title || ''
+				},
+				success: function(response) {
+					if (response.success) {
+						showNotice(response.data.message || 'Image saved to media library', 'success');
+						resolve(response.data);
+					} else {
+						showNotice(response.data.message || 'Failed to save image', 'error');
+						reject(new Error(response.data.message || 'Failed to save image'));
+					}
+				},
+				error: function(xhr) {
+					var message = 'Failed to save image';
+					if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
+						message = xhr.responseJSON.data.message;
+					}
+					showNotice(message, 'error');
+					reject(new Error(message));
+				}
+			});
+		});
+	}
+
+	/**
+	 * Get store summary for agent context
+	 * @returns {Promise} - Resolves with store summary data
+	 */
+	function getStoreSummary() {
+		return new Promise(function(resolve, reject) {
+			$.ajax({
+				url: wooaiChat.ajaxUrl,
+				type: 'POST',
+				data: {
+					action: 'wooai_get_store_summary',
+					nonce: wooaiChat.nonce
+				},
+				success: function(response) {
+					if (response.success) {
+						resolve(response.data);
+					} else {
+						reject(new Error(response.data.message || 'Failed to get store summary'));
+					}
+				},
+				error: function(xhr) {
+					var message = 'Failed to get store summary';
+					if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
+						message = xhr.responseJSON.data.message;
+					}
+					reject(new Error(message));
+				}
+			});
+		});
+	}
+
+	/**
 	 * Enable input elements
 	 */
 	function enableInputs() {
 		elements.messageInput.prop('disabled', false);
 		elements.sendButton.prop('disabled', false);
 		
-		if (state.entityType === 'category') {
+		if (state.entityType === 'agent') {
+			elements.quickActionsAgent.find('button').prop('disabled', false);
+		} else if (state.entityType === 'category') {
 			elements.quickActionsCategory.find('button').prop('disabled', false);
 		} else {
 			elements.quickActionsProduct.find('button').prop('disabled', false);
@@ -1843,6 +2340,7 @@
 		elements.sendButton.prop('disabled', true);
 		elements.quickActionsProduct.find('button').prop('disabled', true);
 		elements.quickActionsCategory.find('button').prop('disabled', true);
+		elements.quickActionsAgent.find('button').prop('disabled', true);
 	}
 
 	/**
@@ -1850,7 +2348,7 @@
 	 */
 	function setLoading(loading) {
 		state.isLoading = loading;
-		const hasEntity = state.entityType === 'category' ? state.selectedCategory : state.selectedProduct;
+		const hasEntity = state.isAgentMode || (state.entityType === 'category' ? state.selectedCategory : state.selectedProduct);
 		elements.sendButton.prop('disabled', loading || !hasEntity);
 		elements.messageInput.prop('disabled', loading || !hasEntity);
 

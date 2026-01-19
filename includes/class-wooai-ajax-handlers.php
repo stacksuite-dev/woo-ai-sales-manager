@@ -66,6 +66,10 @@ class WooAI_Ajax_Handlers {
 
 		// Balance sync action
 		add_action( 'wp_ajax_wooai_sync_balance', array( $this, 'handle_sync_balance' ) );
+
+		// Agent mode actions
+		add_action( 'wp_ajax_wooai_save_generated_image', array( $this, 'handle_save_generated_image' ) );
+		add_action( 'wp_ajax_wooai_get_store_summary', array( $this, 'handle_get_store_summary' ) );
 	}
 
 	/**
@@ -783,5 +787,264 @@ class WooAI_Ajax_Handlers {
 		update_option( 'wooai_balance', $balance );
 
 		wp_send_json_success( array( 'balance' => $balance ) );
+	}
+
+	/**
+	 * Handle save generated image to media library
+	 * Used by agent mode to save AI-generated marketing images
+	 */
+	public function handle_save_generated_image() {
+		// Use chat nonce
+		if ( ! check_ajax_referer( 'wooai_chat_nonce', 'nonce', false ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid security token.', 'woo-ai-sales-manager' ) ) );
+			return;
+		}
+
+		if ( ! current_user_can( 'upload_files' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'woo-ai-sales-manager' ) ) );
+			return;
+		}
+
+		$image_data = isset( $_POST['image_data'] ) ? $_POST['image_data'] : '';
+		$filename   = isset( $_POST['filename'] ) ? sanitize_file_name( $_POST['filename'] ) : 'ai-generated-image.png';
+		$title      = isset( $_POST['title'] ) ? sanitize_text_field( $_POST['title'] ) : '';
+
+		if ( empty( $image_data ) ) {
+			wp_send_json_error( array( 'message' => __( 'No image data provided.', 'woo-ai-sales-manager' ) ) );
+			return;
+		}
+
+		// Handle base64 encoded data
+		if ( strpos( $image_data, 'data:image/' ) === 0 ) {
+			// Extract mime type and base64 data
+			preg_match( '/data:image\/(\w+);base64,(.+)/', $image_data, $matches );
+			if ( count( $matches ) !== 3 ) {
+				wp_send_json_error( array( 'message' => __( 'Invalid image data format.', 'woo-ai-sales-manager' ) ) );
+				return;
+			}
+			$extension   = $matches[1];
+			$image_data  = $matches[2];
+			
+			// Update filename extension if needed
+			$filename = preg_replace( '/\.[^.]+$/', '.' . $extension, $filename );
+		}
+
+		// Decode base64
+		$decoded = base64_decode( $image_data );
+		if ( false === $decoded ) {
+			wp_send_json_error( array( 'message' => __( 'Failed to decode image data.', 'woo-ai-sales-manager' ) ) );
+			return;
+		}
+
+		// Verify it's a valid image
+		$finfo = new finfo( FILEINFO_MIME_TYPE );
+		$mime  = $finfo->buffer( $decoded );
+
+		$allowed_mimes = array( 'image/jpeg', 'image/png', 'image/gif', 'image/webp' );
+		if ( ! in_array( $mime, $allowed_mimes, true ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid image type.', 'woo-ai-sales-manager' ) ) );
+			return;
+		}
+
+		// Get WordPress upload directory
+		$upload_dir = wp_upload_dir();
+		if ( ! empty( $upload_dir['error'] ) ) {
+			wp_send_json_error( array( 'message' => $upload_dir['error'] ) );
+			return;
+		}
+
+		// Generate unique filename
+		$unique_filename = wp_unique_filename( $upload_dir['path'], $filename );
+		$upload_path     = $upload_dir['path'] . '/' . $unique_filename;
+
+		// Save the file
+		$saved = file_put_contents( $upload_path, $decoded );
+		if ( false === $saved ) {
+			wp_send_json_error( array( 'message' => __( 'Failed to save image file.', 'woo-ai-sales-manager' ) ) );
+			return;
+		}
+
+		// Prepare attachment data
+		$attachment = array(
+			'post_mime_type' => $mime,
+			'post_title'     => ! empty( $title ) ? $title : pathinfo( $unique_filename, PATHINFO_FILENAME ),
+			'post_content'   => '',
+			'post_status'    => 'inherit',
+		);
+
+		// Insert attachment
+		$attachment_id = wp_insert_attachment( $attachment, $upload_path );
+		if ( is_wp_error( $attachment_id ) ) {
+			wp_delete_file( $upload_path );
+			wp_send_json_error( array( 'message' => $attachment_id->get_error_message() ) );
+			return;
+		}
+
+		// Generate attachment metadata
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+		$metadata = wp_generate_attachment_metadata( $attachment_id, $upload_path );
+		wp_update_attachment_metadata( $attachment_id, $metadata );
+
+		wp_send_json_success( array(
+			'message'       => __( 'Image saved to media library.', 'woo-ai-sales-manager' ),
+			'attachment_id' => $attachment_id,
+			'url'           => wp_get_attachment_url( $attachment_id ),
+			'edit_url'      => admin_url( 'upload.php?item=' . $attachment_id ),
+		) );
+	}
+
+	/**
+	 * Handle get store summary
+	 * Used by agent mode to get store statistics for context
+	 */
+	public function handle_get_store_summary() {
+		// Use chat nonce
+		if ( ! check_ajax_referer( 'wooai_chat_nonce', 'nonce', false ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid security token.', 'woo-ai-sales-manager' ) ) );
+			return;
+		}
+
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'woo-ai-sales-manager' ) ) );
+			return;
+		}
+
+		// Get product counts
+		$product_counts = wp_count_posts( 'product' );
+		$total_products = isset( $product_counts->publish ) ? (int) $product_counts->publish : 0;
+		$draft_products = isset( $product_counts->draft ) ? (int) $product_counts->draft : 0;
+
+		// Get category count
+		$category_count = wp_count_terms( array(
+			'taxonomy'   => 'product_cat',
+			'hide_empty' => false,
+		) );
+		if ( is_wp_error( $category_count ) ) {
+			$category_count = 0;
+		}
+
+		// Get tag count
+		$tag_count = wp_count_terms( array(
+			'taxonomy'   => 'product_tag',
+			'hide_empty' => false,
+		) );
+		if ( is_wp_error( $tag_count ) ) {
+			$tag_count = 0;
+		}
+
+		// Get order statistics (last 30 days)
+		$thirty_days_ago = gmdate( 'Y-m-d', strtotime( '-30 days' ) );
+		$order_counts    = array(
+			'total'      => 0,
+			'processing' => 0,
+			'completed'  => 0,
+		);
+
+		if ( function_exists( 'wc_get_orders' ) ) {
+			$recent_orders = wc_get_orders( array(
+				'date_created' => '>' . $thirty_days_ago,
+				'limit'        => -1,
+				'return'       => 'ids',
+			) );
+			$order_counts['total'] = count( $recent_orders );
+
+			$processing_orders = wc_get_orders( array(
+				'status'       => 'processing',
+				'date_created' => '>' . $thirty_days_ago,
+				'limit'        => -1,
+				'return'       => 'ids',
+			) );
+			$order_counts['processing'] = count( $processing_orders );
+
+			$completed_orders = wc_get_orders( array(
+				'status'       => 'completed',
+				'date_created' => '>' . $thirty_days_ago,
+				'limit'        => -1,
+				'return'       => 'ids',
+			) );
+			$order_counts['completed'] = count( $completed_orders );
+		}
+
+		// Get top categories by product count
+		$top_categories = get_terms( array(
+			'taxonomy'   => 'product_cat',
+			'orderby'    => 'count',
+			'order'      => 'DESC',
+			'number'     => 5,
+			'hide_empty' => false,
+		) );
+
+		$categories = array();
+		if ( ! is_wp_error( $top_categories ) ) {
+			foreach ( $top_categories as $cat ) {
+				$categories[] = array(
+					'id'            => $cat->term_id,
+					'name'          => $cat->name,
+					'product_count' => $cat->count,
+				);
+			}
+		}
+
+		// Get products with missing descriptions
+		$products_missing_desc = new WP_Query( array(
+			'post_type'      => 'product',
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'meta_query'     => array(
+				'relation' => 'OR',
+				array(
+					'key'     => '_product_description',
+					'compare' => 'NOT EXISTS',
+				),
+			),
+		) );
+
+		// Count products with empty description via direct query for accuracy
+		global $wpdb;
+		$empty_desc_count = (int) $wpdb->get_var(
+			"SELECT COUNT(*) FROM {$wpdb->posts} 
+			WHERE post_type = 'product' 
+			AND post_status = 'publish' 
+			AND (post_content = '' OR post_content IS NULL)"
+		);
+
+		// Get products without images
+		$products_no_image = (int) $wpdb->get_var(
+			"SELECT COUNT(*) FROM {$wpdb->posts} p
+			LEFT JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = '_thumbnail_id'
+			WHERE p.post_type = 'product' 
+			AND p.post_status = 'publish'
+			AND (pm.meta_value IS NULL OR pm.meta_value = '')"
+		);
+
+		// Get store context for additional info
+		$store_context = get_option( 'wooai_store_context', array() );
+
+		wp_send_json_success( array(
+			'products'        => array(
+				'total'         => $total_products,
+				'draft'         => $draft_products,
+				'missing_desc'  => $empty_desc_count,
+				'missing_image' => $products_no_image,
+			),
+			'categories'      => array(
+				'total' => (int) $category_count,
+				'top'   => $categories,
+			),
+			'tags'            => array(
+				'total' => (int) $tag_count,
+			),
+			'orders'          => $order_counts,
+			'store_context'   => array(
+				'name'        => isset( $store_context['store_name'] ) ? $store_context['store_name'] : get_bloginfo( 'name' ),
+				'description' => isset( $store_context['store_description'] ) ? $store_context['store_description'] : '',
+				'niche'       => isset( $store_context['business_niche'] ) ? $store_context['business_niche'] : '',
+				'audience'    => isset( $store_context['target_audience'] ) ? $store_context['target_audience'] : '',
+				'tone'        => isset( $store_context['brand_tone'] ) ? $store_context['brand_tone'] : '',
+			),
+			'currency'        => get_woocommerce_currency(),
+			'currency_symbol' => get_woocommerce_currency_symbol(),
+		) );
 	}
 }
