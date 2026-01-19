@@ -1421,13 +1421,26 @@
 	}
 
 	/**
+	 * Create error results for failed tool requests
+	 */
+	function createToolErrorResults(requests, errorMessage) {
+		return requests.map(function(req) {
+			return {
+				request_id: req.request_id,
+				tool: req.tool,
+				success: false,
+				error: errorMessage
+			};
+		});
+	}
+
+	/**
 	 * Handle tool data requests from AI
 	 * Fetches data via WordPress AJAX and sends results back to API
 	 */
 	function handleToolDataRequests(requests) {
 		if (!requests || requests.length === 0) return;
 
-		// Call WordPress AJAX to execute the tools
 		$.ajax({
 			url: wooaiChat.ajaxUrl,
 			method: 'POST',
@@ -1438,37 +1451,16 @@
 			},
 			success: function(response) {
 				hideToolProcessingMessage();
-
 				if (response.success && response.data && response.data.tool_results) {
-					// Send tool results back to API to continue conversation
 					sendToolResults(response.data.tool_results);
 				} else {
-					// Handle error - send error results back
-					const errorResults = requests.map(function(req) {
-						return {
-							request_id: req.request_id,
-							tool: req.tool,
-							success: false,
-							error: response.data || 'Failed to fetch tool data'
-						};
-					});
-					sendToolResults(errorResults);
+					sendToolResults(createToolErrorResults(requests, response.data || 'Failed to fetch tool data'));
 				}
 			},
 			error: function(xhr) {
 				hideToolProcessingMessage();
 				console.error('Tool data fetch error:', xhr);
-
-				// Send error results back to API
-				const errorResults = requests.map(function(req) {
-					return {
-						request_id: req.request_id,
-						tool: req.tool,
-						success: false,
-						error: 'Network error fetching tool data'
-					};
-				});
-				sendToolResults(errorResults);
+				sendToolResults(createToolErrorResults(requests, 'Network error fetching tool data'));
 			}
 		});
 	}
