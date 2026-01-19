@@ -36,13 +36,16 @@ $show_onboarding = empty( $has_visited ) && 'missing' === $context_status;
 ?>
 
 <div class="wrap wooai-admin-wrap wooai-chat-wrap">
+	<!-- WordPress Admin Notices Area - h1 triggers WP notice placement -->
+	<h1 class="wooai-notices-anchor"></h1>
+	
 	<!-- Page Header -->
 	<header class="wooai-chat-page-header">
 		<div class="wooai-chat-page-header__left">
-			<h1>
+			<span class="wooai-chat-page-title">
 				<span class="dashicons dashicons-format-chat"></span>
 				<?php esc_html_e( 'AI Agent', 'woo-ai-sales-manager' ); ?>
-			</h1>
+			</span>
 		</div>
 		<div class="wooai-chat-page-header__right">
 			<!-- Store Context Button -->
@@ -86,178 +89,8 @@ $show_onboarding = empty( $has_visited ) && 'missing' === $context_status;
 	</div>
 	<?php endif; ?>
 
-	<!-- Store Context Slide-out Panel -->
-	<div class="wooai-context-panel" id="wooai-context-panel">
-		<div class="wooai-context-panel__backdrop" id="wooai-context-backdrop"></div>
-		<div class="wooai-context-panel__content">
-			<div class="wooai-context-panel__header">
-				<h2>
-					<span class="dashicons dashicons-store"></span>
-					<?php esc_html_e( 'Store Context', 'woo-ai-sales-manager' ); ?>
-				</h2>
-				<button type="button" class="wooai-context-panel__close" id="wooai-close-context">
-					<span class="dashicons dashicons-no-alt"></span>
-				</button>
-			</div>
-			<div class="wooai-context-panel__body">
-				<p class="wooai-context-panel__intro">
-					<?php esc_html_e( 'Your store information helps AI write better content that matches your brand.', 'woo-ai-sales-manager' ); ?>
-				</p>
-
-				<form id="wooai-context-form" class="wooai-context-form">
-					<!-- Store Name -->
-					<div class="wooai-context-field">
-						<label for="wooai-store-name"><?php esc_html_e( 'Store Name', 'woo-ai-sales-manager' ); ?></label>
-						<input type="text" id="wooai-store-name" name="store_name" 
-							value="<?php echo esc_attr( isset( $store_context['store_name'] ) ? $store_context['store_name'] : get_bloginfo( 'name' ) ); ?>"
-							placeholder="<?php esc_attr_e( 'My Awesome Store', 'woo-ai-sales-manager' ); ?>">
-					</div>
-
-					<!-- Store Description -->
-					<div class="wooai-context-field">
-						<label for="wooai-store-description"><?php esc_html_e( 'Store Description', 'woo-ai-sales-manager' ); ?></label>
-						<textarea id="wooai-store-description" name="store_description" rows="2"
-							placeholder="<?php esc_attr_e( 'Brief description of what you sell...', 'woo-ai-sales-manager' ); ?>"><?php echo esc_textarea( isset( $store_context['store_description'] ) ? $store_context['store_description'] : get_bloginfo( 'description' ) ); ?></textarea>
-					</div>
-
-					<!-- Business Niche -->
-					<div class="wooai-context-field">
-						<label for="wooai-business-niche"><?php esc_html_e( 'Business Niche', 'woo-ai-sales-manager' ); ?></label>
-						<select id="wooai-business-niche" name="business_niche">
-							<option value=""><?php esc_html_e( 'Select a niche...', 'woo-ai-sales-manager' ); ?></option>
-							<?php
-							$niches = array(
-								'fashion'       => __( 'Fashion & Apparel', 'woo-ai-sales-manager' ),
-								'electronics'   => __( 'Electronics & Tech', 'woo-ai-sales-manager' ),
-								'home_garden'   => __( 'Home & Garden', 'woo-ai-sales-manager' ),
-								'health_beauty' => __( 'Health & Beauty', 'woo-ai-sales-manager' ),
-								'sports'        => __( 'Sports & Outdoors', 'woo-ai-sales-manager' ),
-								'toys_games'    => __( 'Toys & Games', 'woo-ai-sales-manager' ),
-								'food_beverage' => __( 'Food & Beverage', 'woo-ai-sales-manager' ),
-								'jewelry'       => __( 'Jewelry & Accessories', 'woo-ai-sales-manager' ),
-								'automotive'    => __( 'Automotive', 'woo-ai-sales-manager' ),
-								'books_media'   => __( 'Books & Media', 'woo-ai-sales-manager' ),
-								'pets'          => __( 'Pet Supplies', 'woo-ai-sales-manager' ),
-								'art_crafts'    => __( 'Art & Crafts', 'woo-ai-sales-manager' ),
-								'office'        => __( 'Office & Business', 'woo-ai-sales-manager' ),
-								'baby_kids'     => __( 'Baby & Kids', 'woo-ai-sales-manager' ),
-								'other'         => __( 'Other', 'woo-ai-sales-manager' ),
-							);
-							$current_niche = isset( $store_context['business_niche'] ) ? $store_context['business_niche'] : '';
-							foreach ( $niches as $value => $label ) :
-							?>
-								<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $current_niche, $value ); ?>><?php echo esc_html( $label ); ?></option>
-							<?php endforeach; ?>
-						</select>
-					</div>
-
-					<!-- Target Audience -->
-					<div class="wooai-context-field">
-						<label for="wooai-target-audience"><?php esc_html_e( 'Target Audience', 'woo-ai-sales-manager' ); ?></label>
-						<input type="text" id="wooai-target-audience" name="target_audience"
-							value="<?php echo esc_attr( isset( $store_context['target_audience'] ) ? $store_context['target_audience'] : '' ); ?>"
-							placeholder="<?php esc_attr_e( 'e.g., Young professionals 25-40', 'woo-ai-sales-manager' ); ?>">
-					</div>
-
-					<!-- Brand Tone -->
-					<div class="wooai-context-field">
-						<label><?php esc_html_e( 'Brand Tone', 'woo-ai-sales-manager' ); ?></label>
-						<div class="wooai-tone-options">
-							<?php
-							$tones = array(
-								'professional' => array( 'icon' => 'businessman', 'label' => __( 'Professional', 'woo-ai-sales-manager' ) ),
-								'friendly'     => array( 'icon' => 'smiley', 'label' => __( 'Friendly', 'woo-ai-sales-manager' ) ),
-								'luxury'       => array( 'icon' => 'star-filled', 'label' => __( 'Luxury', 'woo-ai-sales-manager' ) ),
-								'casual'       => array( 'icon' => 'format-status', 'label' => __( 'Casual', 'woo-ai-sales-manager' ) ),
-								'technical'    => array( 'icon' => 'desktop', 'label' => __( 'Technical', 'woo-ai-sales-manager' ) ),
-								'playful'      => array( 'icon' => 'heart', 'label' => __( 'Playful', 'woo-ai-sales-manager' ) ),
-							);
-							$current_tone = isset( $store_context['brand_tone'] ) ? $store_context['brand_tone'] : '';
-							foreach ( $tones as $value => $tone ) :
-							?>
-								<label class="wooai-tone-option">
-									<input type="radio" name="brand_tone" value="<?php echo esc_attr( $value ); ?>" <?php checked( $current_tone, $value ); ?>>
-									<span class="wooai-tone-option__content">
-										<span class="dashicons dashicons-<?php echo esc_attr( $tone['icon'] ); ?>"></span>
-										<span><?php echo esc_html( $tone['label'] ); ?></span>
-									</span>
-								</label>
-							<?php endforeach; ?>
-						</div>
-					</div>
-
-					<!-- Language -->
-					<div class="wooai-context-field">
-						<label for="wooai-language"><?php esc_html_e( 'Content Language', 'woo-ai-sales-manager' ); ?></label>
-						<select id="wooai-language" name="language">
-							<?php
-							$languages = array(
-								'English'    => __( 'English', 'woo-ai-sales-manager' ),
-								'Spanish'    => __( 'Spanish', 'woo-ai-sales-manager' ),
-								'French'     => __( 'French', 'woo-ai-sales-manager' ),
-								'German'     => __( 'German', 'woo-ai-sales-manager' ),
-								'Italian'    => __( 'Italian', 'woo-ai-sales-manager' ),
-								'Portuguese' => __( 'Portuguese', 'woo-ai-sales-manager' ),
-								'Dutch'      => __( 'Dutch', 'woo-ai-sales-manager' ),
-								'Japanese'   => __( 'Japanese', 'woo-ai-sales-manager' ),
-								'Chinese'    => __( 'Chinese', 'woo-ai-sales-manager' ),
-								'Korean'     => __( 'Korean', 'woo-ai-sales-manager' ),
-								'Thai'       => __( 'Thai', 'woo-ai-sales-manager' ),
-							);
-							$current_lang = isset( $store_context['language'] ) ? $store_context['language'] : 'English';
-							foreach ( $languages as $value => $label ) :
-							?>
-								<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $current_lang, $value ); ?>><?php echo esc_html( $label ); ?></option>
-							<?php endforeach; ?>
-						</select>
-					</div>
-
-					<!-- Custom Instructions -->
-					<div class="wooai-context-field">
-						<label for="wooai-custom-instructions"><?php esc_html_e( 'Custom Instructions', 'woo-ai-sales-manager' ); ?> <span class="wooai-optional"><?php esc_html_e( '(optional)', 'woo-ai-sales-manager' ); ?></span></label>
-						<textarea id="wooai-custom-instructions" name="custom_instructions" rows="3"
-							placeholder="<?php esc_attr_e( 'e.g., Always mention free shipping, use metric units, avoid certain words...', 'woo-ai-sales-manager' ); ?>"><?php echo esc_textarea( isset( $store_context['custom_instructions'] ) ? $store_context['custom_instructions'] : '' ); ?></textarea>
-					</div>
-
-					<!-- Sync Status -->
-					<div class="wooai-context-sync">
-						<div class="wooai-context-sync__status">
-							<span class="dashicons dashicons-update"></span>
-							<span id="wooai-sync-status">
-								<?php
-								$last_sync = isset( $store_context['last_sync'] ) ? $store_context['last_sync'] : '';
-								if ( $last_sync ) {
-									printf(
-										/* translators: %1$s: number of categories, %2$s: number of products, %3$s: date */
-										esc_html__( 'Synced: %1$s categories, %2$s products on %3$s', 'woo-ai-sales-manager' ),
-										isset( $store_context['category_count'] ) ? esc_html( $store_context['category_count'] ) : '0',
-										isset( $store_context['product_count'] ) ? esc_html( $store_context['product_count'] ) : '0',
-										esc_html( date_i18n( get_option( 'date_format' ), strtotime( $last_sync ) ) )
-									);
-								} else {
-									esc_html_e( 'Not synced yet', 'woo-ai-sales-manager' );
-								}
-								?>
-							</span>
-						</div>
-						<button type="button" class="wooai-btn wooai-btn--outline wooai-btn--sm" id="wooai-sync-context">
-							<span class="dashicons dashicons-update"></span>
-							<?php esc_html_e( 'Sync Now', 'woo-ai-sales-manager' ); ?>
-						</button>
-					</div>
-				</form>
-			</div>
-			<div class="wooai-context-panel__footer">
-				<button type="button" class="wooai-btn wooai-btn--outline" id="wooai-cancel-context">
-					<?php esc_html_e( 'Cancel', 'woo-ai-sales-manager' ); ?>
-				</button>
-				<button type="button" class="wooai-btn wooai-btn--primary" id="wooai-save-context">
-					<span class="dashicons dashicons-saved"></span>
-					<?php esc_html_e( 'Save Context', 'woo-ai-sales-manager' ); ?>
-				</button>
-			</div>
-		</div>
-	</div>
+	<!-- Store Context Slide-out Panel (Shared Partial) -->
+	<?php include WOOAI_PLUGIN_DIR . 'templates/partials/store-context-panel.php'; ?>
 
 	<!-- Main Chat Container -->
 	<div class="wooai-chat-container">
@@ -274,6 +107,10 @@ $show_onboarding = empty( $has_visited ) && 'missing' === $context_status;
 						<button type="button" class="wooai-entity-tab <?php echo 'category' === $entity_type ? 'wooai-entity-tab--active' : ''; ?>" data-type="category">
 							<span class="dashicons dashicons-category"></span>
 							<?php esc_html_e( 'Categories', 'woo-ai-sales-manager' ); ?>
+						</button>
+						<button type="button" class="wooai-entity-tab <?php echo 'agent' === $entity_type ? 'wooai-entity-tab--active' : ''; ?>" data-type="agent">
+							<span class="dashicons dashicons-superhero-alt"></span>
+							<?php esc_html_e( 'Agent', 'woo-ai-sales-manager' ); ?>
 						</button>
 					</div>
 					<div class="wooai-entity-selector">
@@ -320,6 +157,18 @@ $show_onboarding = empty( $has_visited ) && 'missing' === $context_status;
 							<div class="wooai-welcome-card__content">
 								<h4><?php esc_html_e( 'Categories', 'woo-ai-sales-manager' ); ?></h4>
 								<p><?php esc_html_e( 'Generate compelling category descriptions and SEO content', 'woo-ai-sales-manager' ); ?></p>
+							</div>
+							<span class="wooai-welcome-card__arrow">
+								<span class="dashicons dashicons-arrow-right-alt2"></span>
+							</span>
+						</button>
+						<button type="button" class="wooai-welcome-card wooai-welcome-card--agent" data-entity="agent">
+							<div class="wooai-welcome-card__icon wooai-welcome-card__icon--agent">
+								<span class="dashicons dashicons-superhero-alt"></span>
+							</div>
+							<div class="wooai-welcome-card__content">
+								<h4><?php esc_html_e( 'Marketing Agent', 'woo-ai-sales-manager' ); ?></h4>
+								<p><?php esc_html_e( 'Create campaigns, social content, emails, and marketing images', 'woo-ai-sales-manager' ); ?></p>
 							</div>
 							<span class="wooai-welcome-card__arrow">
 								<span class="dashicons dashicons-arrow-right-alt2"></span>
@@ -393,9 +242,47 @@ $show_onboarding = empty( $has_visited ) && 'missing' === $context_status;
 				</div>
 			</div>
 
+			<!-- Quick Actions - Agent (Marketing) -->
+			<div class="wooai-quick-actions wooai-quick-actions--agent" id="wooai-quick-actions-agent" style="display:none">
+				<span class="wooai-quick-actions__label"><?php esc_html_e( 'Marketing Actions:', 'woo-ai-sales-manager' ); ?></span>
+				<div class="wooai-quick-actions__buttons">
+					<button type="button" class="wooai-btn wooai-btn--outline wooai-btn--sm wooai-btn--agent" data-action="create_campaign" disabled>
+						<span class="dashicons dashicons-megaphone"></span>
+						<?php esc_html_e( 'Campaign', 'woo-ai-sales-manager' ); ?>
+					</button>
+					<button type="button" class="wooai-btn wooai-btn--outline wooai-btn--sm wooai-btn--agent" data-action="social_content" disabled>
+						<span class="dashicons dashicons-share"></span>
+						<?php esc_html_e( 'Social', 'woo-ai-sales-manager' ); ?>
+					</button>
+					<button type="button" class="wooai-btn wooai-btn--outline wooai-btn--sm wooai-btn--agent" data-action="email_campaign" disabled>
+						<span class="dashicons dashicons-email"></span>
+						<?php esc_html_e( 'Email', 'woo-ai-sales-manager' ); ?>
+					</button>
+					<button type="button" class="wooai-btn wooai-btn--outline wooai-btn--sm wooai-btn--agent" data-action="generate_image" disabled>
+						<span class="dashicons dashicons-format-image"></span>
+						<?php esc_html_e( 'Image', 'woo-ai-sales-manager' ); ?>
+					</button>
+					<button type="button" class="wooai-btn wooai-btn--outline wooai-btn--sm wooai-btn--agent" data-action="store_analysis" disabled>
+						<span class="dashicons dashicons-chart-bar"></span>
+						<?php esc_html_e( 'Analyze', 'woo-ai-sales-manager' ); ?>
+					</button>
+					<button type="button" class="wooai-btn wooai-btn--outline wooai-btn--sm wooai-btn--agent" data-action="bulk_optimize" disabled>
+						<span class="dashicons dashicons-admin-generic"></span>
+						<?php esc_html_e( 'Bulk Optimize', 'woo-ai-sales-manager' ); ?>
+					</button>
+				</div>
+			</div>
+
 			<!-- Message Input -->
 			<div class="wooai-chat-input">
+				<!-- Attachment Previews -->
+				<div class="wooai-attachment-previews" id="wooai-attachment-previews" style="display: none;"></div>
+				
 				<div class="wooai-chat-input__wrapper">
+					<button type="button" id="wooai-attach-button" class="wooai-btn wooai-btn--icon" title="<?php esc_attr_e( 'Attach files (images, PDF)', 'woo-ai-sales-manager' ); ?>">
+						<span class="dashicons dashicons-paperclip"></span>
+					</button>
+					<input type="file" id="wooai-file-input" multiple accept="image/png,image/jpeg,image/webp,image/heic,image/heif,application/pdf" style="display: none;">
 					<textarea
 						id="wooai-message-input"
 						placeholder="<?php esc_attr_e( 'Type your message...', 'woo-ai-sales-manager' ); ?>"
@@ -408,6 +295,7 @@ $show_onboarding = empty( $has_visited ) && 'missing' === $context_status;
 					</button>
 				</div>
 				<div class="wooai-chat-input__hint">
+					<span class="wooai-attachment-hint"><?php esc_html_e( 'You can attach images or PDFs (max 5 files)', 'woo-ai-sales-manager' ); ?></span>
 					<span class="wooai-tokens-used" id="wooai-tokens-used"></span>
 				</div>
 			</div>
@@ -766,6 +654,62 @@ $show_onboarding = empty( $has_visited ) && 'missing' === $context_status;
 						<span class="dashicons dashicons-visibility"></span>
 						<?php esc_html_e( 'View', 'woo-ai-sales-manager' ); ?>
 					</a>
+				</div>
+			</div>
+
+			<!-- Agent Info (hidden by default) -->
+			<div class="wooai-agent-info" id="wooai-agent-info" style="display: none;">
+				<!-- Agent Header -->
+				<div class="wooai-agent-info__header">
+					<div class="wooai-agent-info__icon">
+						<span class="dashicons dashicons-superhero-alt"></span>
+					</div>
+					<div class="wooai-agent-info__title">
+						<span><?php esc_html_e( 'Marketing Agent', 'woo-ai-sales-manager' ); ?></span>
+						<span class="wooai-agent-info__subtitle"><?php esc_html_e( 'Store-wide Marketing Operations', 'woo-ai-sales-manager' ); ?></span>
+					</div>
+				</div>
+
+				<!-- Agent Capabilities -->
+				<div class="wooai-agent-info__section">
+					<div class="wooai-agent-info__section-title">
+						<span class="dashicons dashicons-lightbulb"></span>
+						<?php esc_html_e( 'Capabilities', 'woo-ai-sales-manager' ); ?>
+					</div>
+					<ul class="wooai-agent-info__capabilities">
+						<li>
+							<span class="dashicons dashicons-megaphone"></span>
+							<?php esc_html_e( 'Create marketing campaigns', 'woo-ai-sales-manager' ); ?>
+						</li>
+						<li>
+							<span class="dashicons dashicons-share"></span>
+							<?php esc_html_e( 'Generate social media content', 'woo-ai-sales-manager' ); ?>
+						</li>
+						<li>
+							<span class="dashicons dashicons-email"></span>
+							<?php esc_html_e( 'Draft email campaigns', 'woo-ai-sales-manager' ); ?>
+						</li>
+						<li>
+							<span class="dashicons dashicons-format-image"></span>
+							<?php esc_html_e( 'Generate marketing images', 'woo-ai-sales-manager' ); ?>
+						</li>
+						<li>
+							<span class="dashicons dashicons-chart-bar"></span>
+							<?php esc_html_e( 'Analyze store performance', 'woo-ai-sales-manager' ); ?>
+						</li>
+						<li>
+							<span class="dashicons dashicons-admin-generic"></span>
+							<?php esc_html_e( 'Suggest bulk optimizations', 'woo-ai-sales-manager' ); ?>
+						</li>
+					</ul>
+				</div>
+
+				<!-- Agent Tips -->
+				<div class="wooai-agent-info__tips">
+					<div class="wooai-agent-info__tip">
+						<span class="dashicons dashicons-info-outline"></span>
+						<span><?php esc_html_e( 'Tip: Use the quick actions above or type naturally to describe what you need.', 'woo-ai-sales-manager' ); ?></span>
+					</div>
 				</div>
 			</div>
 		</div>

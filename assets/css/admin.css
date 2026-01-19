@@ -3300,6 +3300,15 @@
   color: var(--wooai-text-secondary);
 }
 
+/* Header Right Section - Contains Store Context Button & Balance Indicator */
+.wooai-page-header__right {
+  display: flex;
+  align-items: center;
+  gap: var(--wooai-space-3);
+  flex-shrink: 0;
+}
+
+/* Legacy balance styles (deprecated - use .wooai-balance-indicator from shared-components.css) */
 .wooai-page-header__balance {
   display: flex;
   align-items: center;
@@ -3768,6 +3777,12 @@
     flex-direction: column;
     align-items: flex-start;
     gap: var(--wooai-space-4);
+  }
+
+  .wooai-page-header__right {
+    align-self: flex-start;
+    width: 100%;
+    justify-content: flex-start;
   }
 
   .wooai-page-header__balance {

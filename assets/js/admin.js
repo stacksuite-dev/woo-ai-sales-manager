@@ -15,6 +15,7 @@
             this.bindAIActions();
             this.bindModalEvents();
             this.bindApiKeyEvents();
+            this.bindStoreContextEvents();
             this.handlePageToasts();
         },
 
@@ -806,6 +807,169 @@
                     $(this).remove();
                 });
             }, 3000);
+        },
+
+        /**
+         * Bind store context panel events
+         */
+        bindStoreContextEvents: function() {
+            var self = this;
+            var $panel = $('#wooai-context-panel');
+
+            // Skip if panel doesn't exist on this page
+            if (!$panel.length) {
+                return;
+            }
+
+            // Open/close panel
+            $('#wooai-open-context').on('click', function() { self.openContextPanel(); });
+            $('#wooai-close-context, #wooai-cancel-context, #wooai-context-backdrop').on('click', function() { self.closeContextPanel(); });
+
+            // Save and sync
+            $('#wooai-save-context').on('click', function() { self.saveStoreContext(); });
+            $('#wooai-sync-context').on('click', function() { self.syncStoreContext(); });
+
+            // Close on Escape key
+            $(document).on('keydown', function(e) {
+                if (e.key === 'Escape' && $panel.hasClass('wooai-context-panel--open')) {
+                    self.closeContextPanel();
+                }
+            });
+        },
+
+        /**
+         * Open store context panel
+         */
+        openContextPanel: function() {
+            $('#wooai-context-panel').addClass('wooai-context-panel--open');
+            $('body').addClass('wooai-context-panel-active');
+        },
+
+        /**
+         * Close store context panel
+         */
+        closeContextPanel: function() {
+            $('#wooai-context-panel').removeClass('wooai-context-panel--open');
+            $('body').removeClass('wooai-context-panel-active');
+        },
+
+        /**
+         * Save store context
+         */
+        saveStoreContext: function() {
+            var self = this;
+            var formData = {
+                store_name: $('#wooai-store-name').val(),
+                store_description: $('#wooai-store-description').val(),
+                business_niche: $('#wooai-business-niche').val(),
+                target_audience: $('#wooai-target-audience').val(),
+                brand_tone: $('input[name="brand_tone"]:checked').val() || '',
+                language: $('#wooai-language').val(),
+                custom_instructions: $('#wooai-custom-instructions').val()
+            };
+
+            var $saveBtn = $('#wooai-save-context');
+            $saveBtn.addClass('wooai-btn--loading').prop('disabled', true);
+
+            $.ajax({
+                url: wooaiAdmin.ajaxUrl,
+                method: 'POST',
+                data: {
+                    action: 'wooai_save_store_context',
+                    nonce: wooaiAdmin.chatNonce,
+                    context: formData
+                },
+                success: function(response) {
+                    if (response.success) {
+                        self.updateContextStatus(formData);
+                        self.closeContextPanel();
+                        self.showRichToast({
+                            type: 'success',
+                            icon: 'dashicons-saved',
+                            title: 'Saved',
+                            message: 'Store context saved successfully',
+                            duration: 3000
+                        });
+                    } else {
+                        self.showErrorToast(response.data || 'Failed to save store context');
+                    }
+                },
+                error: function() {
+                    self.showErrorToast('Failed to save store context');
+                },
+                complete: function() {
+                    $saveBtn.removeClass('wooai-btn--loading').prop('disabled', false);
+                }
+            });
+        },
+
+        /**
+         * Sync store context (re-fetch category/product counts)
+         */
+        syncStoreContext: function() {
+            var self = this;
+            var $syncBtn = $('#wooai-sync-context');
+            $syncBtn.addClass('wooai-btn--loading').prop('disabled', true);
+
+            $.ajax({
+                url: wooaiAdmin.ajaxUrl,
+                method: 'POST',
+                data: {
+                    action: 'wooai_sync_store_context',
+                    nonce: wooaiAdmin.chatNonce
+                },
+                success: function(response) {
+                    if (response.success) {
+                        var message = response.data.message || 'Store context synced';
+                        $('#wooai-sync-status').text(message);
+                        self.showRichToast({
+                            type: 'success',
+                            icon: 'dashicons-update',
+                            title: 'Synced',
+                            message: message,
+                            duration: 3000
+                        });
+                    } else {
+                        self.showErrorToast(response.data || 'Failed to sync store context', 'Sync Failed');
+                    }
+                },
+                error: function() {
+                    self.showErrorToast('Failed to sync store context');
+                },
+                complete: function() {
+                    $syncBtn.removeClass('wooai-btn--loading').prop('disabled', false);
+                }
+            });
+        },
+
+        /**
+         * Show error toast (helper to reduce duplication)
+         */
+        showErrorToast: function(message, title) {
+            this.showRichToast({
+                type: 'error',
+                icon: 'dashicons-warning',
+                title: title || 'Error',
+                message: message,
+                duration: 4000
+            });
+        },
+
+        /**
+         * Update context status indicator
+         */
+        updateContextStatus: function(context) {
+            var hasRequired = context.store_name || context.business_niche;
+            var hasOptional = context.target_audience || context.brand_tone;
+            var status = hasRequired ? (hasOptional ? 'configured' : 'partial') : 'missing';
+
+            $('.wooai-context-status')
+                .removeClass('wooai-context-status--configured wooai-context-status--partial wooai-context-status--missing')
+                .addClass('wooai-context-status--' + status);
+
+            if (context.store_name) {
+                $('.wooai-store-name').text(context.store_name);
+            }
         },
 
         /**

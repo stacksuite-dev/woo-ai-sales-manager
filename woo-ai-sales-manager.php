@@ -152,6 +152,9 @@ final class WooAI_Sales_Manager {
 		}
 
 		// Use file modification time for versioning in dev mode.
+		$shared_css_version = defined( 'WP_DEBUG' ) && WP_DEBUG
+			? filemtime( WOOAI_PLUGIN_DIR . 'assets/css/shared-components.css' )
+			: WOOAI_VERSION;
 		$css_version = defined( 'WP_DEBUG' ) && WP_DEBUG
 			? filemtime( WOOAI_PLUGIN_DIR . 'assets/css/admin.css' )
 			: WOOAI_VERSION;
@@ -159,10 +162,18 @@ final class WooAI_Sales_Manager {
 			? filemtime( WOOAI_PLUGIN_DIR . 'assets/js/admin.js' )
 			: WOOAI_VERSION;
 
+		// Shared components CSS (store context button, balance indicator, etc.)
+		wp_enqueue_style(
+			'wooai-shared',
+			WOOAI_PLUGIN_URL . 'assets/css/shared-components.css',
+			array(),
+			$shared_css_version
+		);
+
 		wp_enqueue_style(
 			'wooai-admin',
 			WOOAI_PLUGIN_URL . 'assets/css/admin.css',
-			array(),
+			array( 'wooai-shared' ),
 			$css_version
 		);
 
@@ -178,9 +189,10 @@ final class WooAI_Sales_Manager {
 			'wooai-admin',
 			'wooaiAdmin',
 			array(
-				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-				'nonce'   => wp_create_nonce( 'wooai_nonce' ),
-				'strings' => array(
+				'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
+				'nonce'     => wp_create_nonce( 'wooai_nonce' ),
+				'chatNonce' => wp_create_nonce( 'wooai_chat_nonce' ),
+				'strings'   => array(
 					'error'        => __( 'An error occurred. Please try again.', 'woo-ai-sales-manager' ),
 					'generating'   => __( 'Generating...', 'woo-ai-sales-manager' ),
 					'applying'     => __( 'Applying...', 'woo-ai-sales-manager' ),

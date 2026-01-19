@@ -154,6 +154,18 @@ class WooAI_Admin_Settings {
 			}
 		}
 
+		// Get store context status
+		$store_context  = get_option( 'wooai_store_context', array() );
+		$context_status = 'missing';
+		$store_name     = get_bloginfo( 'name' );
+
+		if ( ! empty( $store_context ) ) {
+			$store_name   = isset( $store_context['store_name'] ) ? $store_context['store_name'] : $store_name;
+			$has_required = ! empty( $store_context['store_name'] ) || ! empty( $store_context['business_niche'] );
+			$has_optional = ! empty( $store_context['target_audience'] ) || ! empty( $store_context['brand_tone'] );
+			$context_status = $has_required ? ( $has_optional ? 'configured' : 'partial' ) : 'missing';
+		}
+
 		?>
 		<div class="wrap wooai-admin-wrap">
 			<?php if ( $is_connected ) : ?>
@@ -166,12 +178,22 @@ class WooAI_Admin_Settings {
 						<h1 class="wooai-page-header__title"><?php esc_html_e( 'WooAI Sales Manager', 'woo-ai-sales-manager' ); ?></h1>
 						<p class="wooai-page-header__subtitle"><?php esc_html_e( 'AI-powered tools for your WooCommerce products', 'woo-ai-sales-manager' ); ?></p>
 					</div>
-					<div class="wooai-page-header__balance <?php echo esc_attr( $balance_class ); ?>">
-						<span class="dashicons dashicons-database"></span>
-						<span class="wooai-page-header__balance-count" id="wooai-balance-count"><?php echo esc_html( number_format( $balance ) ); ?></span>
-						<span><?php esc_html_e( 'tokens', 'woo-ai-sales-manager' ); ?></span>
+					<div class="wooai-page-header__right">
+						<button type="button" class="wooai-store-context-btn" id="wooai-open-context" title="<?php esc_attr_e( 'Store Context Settings', 'woo-ai-sales-manager' ); ?>">
+							<span class="dashicons dashicons-store"></span>
+							<span class="wooai-store-name"><?php echo esc_html( $store_name ); ?></span>
+							<span class="wooai-context-status wooai-context-status--<?php echo esc_attr( $context_status ); ?>"></span>
+						</button>
+						<span class="wooai-balance-indicator">
+							<span class="dashicons dashicons-database"></span>
+							<span class="wooai-balance-indicator__count" id="wooai-balance-count"><?php echo esc_html( number_format( $balance ) ); ?></span>
+							<?php esc_html_e( 'tokens', 'woo-ai-sales-manager' ); ?>
+						</span>
 					</div>
 				</header>
+
+				<!-- Store Context Slide-out Panel (Shared Partial) -->
+				<?php include WOOAI_PLUGIN_DIR . 'templates/partials/store-context-panel.php'; ?>
 
 				<!-- Modern Navigation Tabs -->
 				<nav class="wooai-nav">
