@@ -296,6 +296,9 @@
 		
 		// Quick actions - Agent
 		elements.quickActionsAgent.on('click', '[data-action]', handleAgentQuickAction);
+		
+		// Agent capabilities (right panel)
+		elements.agentInfo.on('click', '.wooai-capability-btn', handleAgentQuickAction);
 
 		// New chat
 		elements.newChatButton.on('click', handleNewChat);

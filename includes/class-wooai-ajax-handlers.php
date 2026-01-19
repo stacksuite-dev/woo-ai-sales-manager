@@ -1052,7 +1052,10 @@ class WooAI_Ajax_Handlers {
 	public function handle_fetch_tool_data() {
 		$this->verify_chat_admin_request();
 
-		$requests = isset( $_POST['requests'] ) ? $_POST['requests'] : array();
+		$requests_raw = isset( $_POST['requests'] ) ? wp_unslash( $_POST['requests'] ) : '';
+
+		// Decode JSON string from JavaScript
+		$requests = json_decode( $requests_raw, true );
 
 		if ( empty( $requests ) || ! is_array( $requests ) ) {
 			wp_send_json_error( array( 'message' => __( 'No tool requests provided.', 'woo-ai-sales-manager' ) ) );

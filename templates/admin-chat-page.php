@@ -676,32 +676,32 @@ $show_onboarding = empty( $has_visited ) && 'missing' === $context_status;
 						<span class="dashicons dashicons-lightbulb"></span>
 						<?php esc_html_e( 'Capabilities', 'woo-ai-sales-manager' ); ?>
 					</div>
-					<ul class="wooai-agent-info__capabilities">
-						<li>
+					<div class="wooai-agent-info__capabilities">
+						<button type="button" class="wooai-capability-btn" data-action="create_campaign">
 							<span class="dashicons dashicons-megaphone"></span>
 							<?php esc_html_e( 'Create marketing campaigns', 'woo-ai-sales-manager' ); ?>
-						</li>
-						<li>
+						</button>
+						<button type="button" class="wooai-capability-btn" data-action="social_content">
 							<span class="dashicons dashicons-share"></span>
 							<?php esc_html_e( 'Generate social media content', 'woo-ai-sales-manager' ); ?>
-						</li>
-						<li>
+						</button>
+						<button type="button" class="wooai-capability-btn" data-action="email_campaign">
 							<span class="dashicons dashicons-email"></span>
 							<?php esc_html_e( 'Draft email campaigns', 'woo-ai-sales-manager' ); ?>
-						</li>
-						<li>
+						</button>
+						<button type="button" class="wooai-capability-btn" data-action="generate_image">
 							<span class="dashicons dashicons-format-image"></span>
 							<?php esc_html_e( 'Generate marketing images', 'woo-ai-sales-manager' ); ?>
-						</li>
-						<li>
+						</button>
+						<button type="button" class="wooai-capability-btn" data-action="store_analysis">
 							<span class="dashicons dashicons-chart-bar"></span>
 							<?php esc_html_e( 'Analyze store performance', 'woo-ai-sales-manager' ); ?>
-						</li>
-						<li>
+						</button>
+						<button type="button" class="wooai-capability-btn" data-action="bulk_optimize">
 							<span class="dashicons dashicons-admin-generic"></span>
 							<?php esc_html_e( 'Suggest bulk optimizations', 'woo-ai-sales-manager' ); ?>
-						</li>
-					</ul>
+						</button>
+					</div>
 				</div>
 
 				<!-- Agent Tips -->

@@ -2612,7 +2612,6 @@
 
 /* Agent Capabilities */
 .wooai-agent-info__capabilities {
-	list-style: none;
 	margin: 0;
 	padding: 0;
 	display: flex;
@@ -2620,24 +2619,29 @@
 	gap: var(--wooai-space-2);
 }
 
-.wooai-agent-info__capabilities li {
+.wooai-capability-btn {
 	display: flex;
 	align-items: center;
 	gap: var(--wooai-space-2);
 	padding: var(--wooai-space-2) var(--wooai-space-3);
 	background: var(--wooai-bg-subtle);
+	border: 1px solid transparent;
 	border-radius: var(--wooai-radius-md);
 	font-size: var(--wooai-font-sm);
 	color: var(--wooai-text-secondary);
+	text-align: left;
+	cursor: pointer;
 	transition: all var(--wooai-transition-fast);
+	width: 100%;
 }
 
-.wooai-agent-info__capabilities li:hover {
+.wooai-capability-btn:hover {
 	background: #f5f3ff;
 	color: #6366f1;
+	border-color: #c7d2fe;
 }
 
-.wooai-agent-info__capabilities li .dashicons {
+.wooai-capability-btn .dashicons {
 	font-size: 16px;
 	width: 16px;
 	height: 16px;
@@ -2645,7 +2649,7 @@
 	opacity: 0.7;
 }
 
-.wooai-agent-info__capabilities li:hover .dashicons {
+.wooai-capability-btn:hover .dashicons {
 	opacity: 1;
 }
 
