@@ -1,0 +1,38 @@
+# Build artifacts
+/build/
+/dist/
+*.zip
+
+# Dependencies
+/node_modules/
+/vendor/
+
+# IDE and editors
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Testing
+/tests/coverage/
+.phpunit.result.cache
+
+# Composer
+composer.lock
+
+# Source maps (keep in dev, excluded from build)
+# *.map
