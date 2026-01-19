@@ -27,6 +27,13 @@ class WooAI_Admin_Settings {
 	private $current_tab = 'dashboard';
 
 	/**
+	 * Toast notification data to show on page load
+	 *
+	 * @var array|null
+	 */
+	private $page_toast = null;
+
+	/**
 	 * Get instance
 	 *
 	 * @return WooAI_Admin_Settings
@@ -44,6 +51,26 @@ class WooAI_Admin_Settings {
 	private function __construct() {
 		add_action( 'admin_menu', array( $this, 'add_menu_page' ) );
 		add_action( 'admin_init', array( $this, 'handle_actions' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_toast_script' ), 20 );
+	}
+
+	/**
+	 * Enqueue toast script data if needed
+	 *
+	 * @param string $hook Current admin page hook.
+	 */
+	public function enqueue_toast_script( $hook ) {
+		if ( 'toplevel_page_woo-ai-manager' !== $hook || null === $this->page_toast ) {
+			return;
+		}
+
+		// Add toast data as inline script after the main admin script.
+		$toast_data = wp_json_encode( $this->page_toast );
+		wp_add_inline_script(
+			'wooai-admin',
+			'if (typeof wooaiAdmin !== "undefined") { wooaiAdmin.toast = ' . $toast_data . '; }',
+			'before'
+		);
 	}
 
 	/**
@@ -65,30 +92,31 @@ class WooAI_Admin_Settings {
 	 * Handle form actions
 	 */
 	public function handle_actions() {
-		// Handle top-up success
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		// Handle top-up success.
 		if ( isset( $_GET['page'] ) && 'woo-ai-manager' === $_GET['page'] && isset( $_GET['topup'] ) && 'success' === $_GET['topup'] ) {
-			add_action( 'admin_footer', function() {
-				?>
-				<script>
-				(function($) {
-					$(document).ready(function() {
-						if (typeof WooAI !== 'undefined' && WooAI.showRichToast) {
-							WooAI.showRichToast({
-								type: 'success',
-								icon: 'dashicons-yes-alt',
-								title: '<?php echo esc_js( __( 'Top-Up Successful!', 'woo-ai-sales-manager' ) ); ?>',
-								message: '<?php echo esc_js( __( '10,000 tokens have been added to your account.', 'woo-ai-sales-manager' ) ); ?>',
-								duration: 5000
-							});
-						}
-					});
-				})(jQuery);
-				</script>
-				<?php
-			} );
+			$this->page_toast = array(
+				'type'     => 'success',
+				'icon'     => 'dashicons-yes-alt',
+				'title'    => __( 'Top-Up Successful!', 'woo-ai-sales-manager' ),
+				'message'  => __( '10,000 tokens have been added to your account.', 'woo-ai-sales-manager' ),
+				'duration' => 5000,
+			);
 		}
 
-		// Handle disconnect
+		// Handle disconnected notice - show toast on page load.
+		if ( isset( $_GET['page'] ) && 'woo-ai-manager' === $_GET['page'] && isset( $_GET['disconnected'] ) ) {
+			$this->page_toast = array(
+				'type'     => 'info',
+				'icon'     => 'dashicons-unlock',
+				'title'    => __( 'Disconnected', 'woo-ai-sales-manager' ),
+				'message'  => __( 'Your account has been disconnected from this site.', 'woo-ai-sales-manager' ),
+				'duration' => 4000,
+			);
+		}
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+		// Handle disconnect.
 		if ( isset( $_POST['wooai_disconnect'] ) && check_admin_referer( 'wooai_disconnect_nonce' ) ) {
 			delete_option( 'wooai_api_key' );
 			delete_option( 'wooai_user_email' );
@@ -96,29 +124,6 @@ class WooAI_Admin_Settings {
 
 			wp_safe_redirect( admin_url( 'admin.php?page=woo-ai-manager&disconnected=1' ) );
 			exit;
-		}
-
-		// Handle disconnected notice - show toast on page load
-		if ( isset( $_GET['page'] ) && 'woo-ai-manager' === $_GET['page'] && isset( $_GET['disconnected'] ) ) {
-			add_action( 'admin_footer', function() {
-				?>
-				<script>
-				(function($) {
-					$(document).ready(function() {
-						if (typeof WooAI !== 'undefined' && WooAI.showRichToast) {
-							WooAI.showRichToast({
-								type: 'info',
-								icon: 'dashicons-unlock',
-								title: '<?php echo esc_js( __( 'Disconnected', 'woo-ai-sales-manager' ) ); ?>',
-								message: '<?php echo esc_js( __( 'Your account has been disconnected from this site.', 'woo-ai-sales-manager' ) ); ?>',
-								duration: 4000
-							});
-						}
-					});
-				})(jQuery);
-				</script>
-				<?php
-			} );
 		}
 	}
 
@@ -141,9 +146,9 @@ class WooAI_Admin_Settings {
 			$account = $api->get_account();
 			if ( ! is_wp_error( $account ) && isset( $account['balance_tokens'] ) ) {
 				$balance = $account['balance_tokens'];
-				if ( $balance < 500 ) {
+				if ( 500 > $balance ) {
 					$balance_class = 'wooai-page-header__balance--critical';
-				} elseif ( $balance < 2000 ) {
+				} elseif ( 2000 > $balance ) {
 					$balance_class = 'wooai-page-header__balance--low';
 				}
 			}
@@ -361,7 +366,7 @@ class WooAI_Admin_Settings {
 						 style="width: <?php echo esc_attr( $balance_percentage ); ?>%;"></div>
 				</div>
 
-				<?php if ( $balance < 1000 ) : ?>
+				<?php if ( 1000 > $balance ) : ?>
 					<div class="wooai-alert wooai-alert--warning wooai-alert--compact wooai-mb-4">
 						<span class="dashicons dashicons-warning"></span>
 						<div class="wooai-alert__content">

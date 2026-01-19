@@ -1,16 +1,17 @@
 <?php
 /**
  * Plugin Name: WooAI Sales Manager
- * Plugin URI: https://example.com/woo-ai-sales-manager
+ * Plugin URI: https://github.com/stacksuite-dev/woo-ai-sales-manager
  * Description: AI-powered product catalog management for WooCommerce. Generate content, suggest tags/categories, and create/improve product images using Google Gemini.
  * Version: 1.1.0
- * Author: Your Company
- * Author URI: https://example.com
+ * Author: StackSuite
+ * Author URI: https://stacksuite.dev
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: woo-ai-sales-manager
  * Domain Path: /languages
  * Requires at least: 6.0
+ * Tested up to: 6.7
  * Requires PHP: 8.0
  * WC requires at least: 8.0
  * WC tested up to: 9.0

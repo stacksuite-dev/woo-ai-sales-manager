@@ -15,6 +15,29 @@
             this.bindAIActions();
             this.bindModalEvents();
             this.bindApiKeyEvents();
+            this.handlePageToasts();
+        },
+
+        /**
+         * Handle page-load toast notifications from localized data
+         */
+        handlePageToasts: function() {
+            var self = this;
+
+            // Check for toast data from localized script
+            if (typeof wooaiAdmin !== 'undefined' && wooaiAdmin.toast) {
+                var toast = wooaiAdmin.toast;
+                // Small delay to ensure DOM is ready
+                setTimeout(function() {
+                    self.showRichToast({
+                        type: toast.type || 'info',
+                        icon: toast.icon || 'dashicons-info',
+                        title: toast.title || '',
+                        message: toast.message || '',
+                        duration: toast.duration || 4000
+                    });
+                }, 100);
+            }
         },
 
         /**

@@ -37,6 +37,30 @@ class WooAI_Chat_Page {
 	private function __construct() {
 		add_action( 'admin_menu', array( $this, 'add_submenu_page' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+
+		// Invalidate product cache when products change.
+		add_action( 'save_post_product', array( $this, 'clear_products_cache' ) );
+		add_action( 'deleted_post', array( $this, 'clear_products_cache' ) );
+		add_action( 'trashed_post', array( $this, 'clear_products_cache' ) );
+
+		// Invalidate category cache when categories change.
+		add_action( 'created_product_cat', array( $this, 'clear_categories_cache' ) );
+		add_action( 'edited_product_cat', array( $this, 'clear_categories_cache' ) );
+		add_action( 'delete_product_cat', array( $this, 'clear_categories_cache' ) );
+	}
+
+	/**
+	 * Clear products selector cache
+	 */
+	public function clear_products_cache() {
+		delete_transient( 'wooai_products_selector' );
+	}
+
+	/**
+	 * Clear categories selector cache
+	 */
+	public function clear_categories_cache() {
+		delete_transient( 'wooai_categories_selector' );
 	}
 
 	/**
@@ -96,9 +120,18 @@ class WooAI_Chat_Page {
 			true
 		);
 
-		// Get products and categories for selectors.
-		$products   = $this->get_products_for_selector();
-		$categories = $this->get_categories_for_selector();
+		// Get products and categories for selectors (with caching).
+		$products = get_transient( 'wooai_products_selector' );
+		if ( false === $products ) {
+			$products = $this->get_products_for_selector();
+			set_transient( 'wooai_products_selector', $products, HOUR_IN_SECONDS );
+		}
+
+		$categories = get_transient( 'wooai_categories_selector' );
+		if ( false === $categories ) {
+			$categories = $this->get_categories_for_selector();
+			set_transient( 'wooai_categories_selector', $categories, HOUR_IN_SECONDS );
+		}
 
 		// Get store context.
 		$store_context = get_option( 'wooai_store_context', array() );

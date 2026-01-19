@@ -1,8 +1,8 @@
 === WooAI Sales Manager ===
-Contributors: yourcompany
+Contributors: stacksuite
 Tags: woocommerce, ai, product management, content generation, image generation, chatbot
 Requires at least: 6.0
-Tested up to: 6.5
+Tested up to: 6.7
 Requires PHP: 8.0
 Stable tag: 1.1.0
 WC requires at least: 8.0
@@ -85,6 +85,22 @@ The AI Agent is an interactive chat interface where you can have conversations w
 = Why do I need WooCommerce? =
 
 This plugin is specifically designed for WooCommerce stores. It integrates with WooCommerce products, categories, and taxonomies. The plugin will not activate without WooCommerce installed.
+
+== External Services ==
+
+This plugin connects to the WooAI SaaS platform (https://woo-ai-worker.simplebuild.site) for:
+
+* AI content generation and processing
+* Token balance and account management
+* Billing and checkout
+
+Data sent: Product titles, descriptions, and category information for AI processing.
+Data is NOT stored after processing is complete.
+
+* [Privacy Policy](https://stacksuite.dev/privacy)
+* [Terms of Service](https://stacksuite.dev/terms)
+
+By using the AI features, you agree to these terms.
 
 == Screenshots ==
 

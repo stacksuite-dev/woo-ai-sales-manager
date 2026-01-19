@@ -1,0 +1,554 @@
+# Copyright (C) 2024 StackSuite
+# This file is distributed under the same license as the WooAI Sales Manager plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: WooAI Sales Manager 1.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/stacksuite-dev/woo-ai-sales-manager/issues\n"
+"POT-Creation-Date: 2024-01-19T00:00:00+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: woo-ai-sales-manager.php:57
+msgid "WooAI Sales Manager"
+msgstr ""
+
+#: woo-ai-sales-manager.php:58
+msgid "requires WooCommerce to be installed and active."
+msgstr ""
+
+#: woo-ai-sales-manager.php:183
+msgid "An error occurred. Please try again."
+msgstr ""
+
+#: woo-ai-sales-manager.php:184
+msgid "Generating..."
+msgstr ""
+
+#: woo-ai-sales-manager.php:185
+msgid "Applying..."
+msgstr ""
+
+#: woo-ai-sales-manager.php:186
+msgid "Success!"
+msgstr ""
+
+#: woo-ai-sales-manager.php:187
+msgid "Low balance. Please top up."
+msgstr ""
+
+#: woo-ai-sales-manager.php:188
+msgid "Apply this suggestion?"
+msgstr ""
+
+#: woo-ai-sales-manager.php:233
+msgid "Settings"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:54
+msgid "WooAI Manager"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:101
+msgid "Top-Up Successful!"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:102
+msgid "10,000 tokens have been added to your account."
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:112
+msgid "Disconnected"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:113
+msgid "Your account has been disconnected from this site."
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:161
+msgid "AI-powered tools for your WooCommerce products"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:167
+msgid "tokens"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:176
+msgid "Dashboard"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:182
+msgid "Usage History"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:188
+msgid "Account"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:235
+msgid "Welcome to WooAI"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:237
+msgid "AI-powered tools for your WooCommerce products"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:245
+msgid "Email Address"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:250
+msgid "We'll use this for purchase receipts and notifications."
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:255
+msgid "Site Domain"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:262
+msgid "Your site domain is used as your unique account identifier."
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:268
+msgid "Get Started"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:272
+msgid "Enter the same email to reconnect an existing account."
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:284
+msgid "Simple Pricing"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:289
+msgid "for 10,000 tokens"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:293
+msgid "Content"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:294
+msgid "tokens/product"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:298
+msgid "Taxonomy"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:303
+msgid "Images"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:304
+msgid "tokens/image"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:308
+msgid "No subscription. Pay only for what you use."
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:338
+msgid "API Connection Error:"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:351
+msgid "Token Balance"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:356
+msgid "tokens available"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:368
+msgid "Low balance! Top up to continue using AI tools."
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:376
+msgid "Top Up $9 → 10,000 tokens"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:385
+msgid "AI Activity"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:392
+msgid "Tags"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:415
+msgid "Recent Activity"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:418
+msgid "View All"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:426
+msgid "Date"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:427
+msgid "Operation"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:428
+msgid "Tokens Used"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:449
+msgid "No usage yet"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:450
+msgid "Start by editing a product and using the AI tools!"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:463
+msgid "Getting Started"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:466
+msgid "Go to Products → Edit any product"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:467
+msgid "Find the \"AI Tools\" panel in the sidebar"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:468
+msgid "Click any AI action to generate content"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:469
+msgid "Review and apply the suggestions"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:527
+msgid "Total Tokens Used"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:558
+msgid "No usage history yet"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:559
+msgid "Start by editing a product and using the AI tools to generate content, tags, or images."
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:656
+msgid "Account Information"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:663
+msgid "Email"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:670
+msgid "Connected Site"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:689
+msgid "Manage Account"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:700
+msgid "Danger Zone"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:705
+msgid "Disconnect your account from this WordPress site. Your SaaS account and token balance will remain intact — you can reconnect anytime using the same email."
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:711
+msgid "Are you sure you want to disconnect? You can reconnect anytime."
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:713
+msgid "Disconnect Account"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:735
+msgid "%d min ago"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:737
+msgid "%d hours ago"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:751
+msgid "Image Generate"
+msgstr ""
+
+#: includes/class-wooai-admin-settings.php:752
+msgid "Image Improve"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:48
+msgid "AI Agent"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:126
+msgid "Send"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:127
+msgid "Type your message..."
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:128
+msgid "Thinking..."
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:129
+msgid "Apply"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:130
+msgid "Discard"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:131
+msgid "Applied"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:132
+msgid "Discarded"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:133
+msgid "An error occurred. Please try again."
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:134
+msgid "Insufficient balance. Please top up."
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:135
+msgid "Connection error. Please check your internet."
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:136
+msgid "New Chat"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:137
+msgid "Chat History"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:138
+msgid "Quick Actions"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:139
+msgid "tokens used"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:140
+msgid "Pending Changes"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:141
+msgid "Accept All"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:142
+msgid "Discard All"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:145
+msgid "Select a product..."
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:146
+msgid "No products found"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:147
+msgid "Product Info"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:148
+msgid "Edit Product"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:149
+msgid "View Product"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:150
+msgid "Improve Title"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:151
+msgid "Improve Description"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:152
+msgid "SEO Optimize"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:153
+msgid "Suggest Tags"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:154
+msgid "Suggest Categories"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:155
+msgid "Generate Content"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:158
+msgid "Select a category..."
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:159
+msgid "No categories found"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:160
+msgid "Category Info"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:161
+msgid "Edit Category"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:162
+msgid "View Category"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:163
+msgid "Improve Name"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:165
+msgid "Subcategories"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:166
+msgid "Parent Category"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:167
+msgid "Products"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:170
+msgid "Store Context"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:171
+msgid "Help AI understand your store better"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:172
+msgid "Save Context"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:173
+msgid "Store context saved successfully"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:174
+msgid "Failed to save store context"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:177
+msgid "Welcome to AI Agent"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:178
+msgid "Select what you want to work on"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:179
+msgid "Work on Products"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:180
+msgid "Work on Categories"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:452
+msgid "Connect Your Account"
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:453
+msgid "Connect your WooAI account to start using the AI Agent."
+msgstr ""
+
+#: includes/class-wooai-chat-page.php:455
+msgid "Go to Settings"
+msgstr ""
+
+#: includes/class-wooai-ajax-handlers.php
+msgid "Permission denied."
+msgstr ""
+
+#: includes/class-wooai-ajax-handlers.php
+msgid "Invalid security token."
+msgstr ""
+
+#: includes/class-wooai-ajax-handlers.php
+msgid "Email and password are required."
+msgstr ""
+
+#: includes/class-wooai-ajax-handlers.php
+msgid "Login successful!"
+msgstr ""
+
+#: includes/class-wooai-ajax-handlers.php
+msgid "Email is required."
+msgstr ""
+
+#: includes/class-wooai-ajax-handlers.php
+msgid "Domain is required."
+msgstr ""
+
+#: includes/class-wooai-ajax-handlers.php
+msgid "Connected successfully!"
+msgstr ""
+
+#: includes/class-wooai-ajax-handlers.php
+msgid "Account created successfully!"
+msgstr ""
+
+#: includes/class-wooai-ajax-handlers.php
+msgid "Product not found."
+msgstr ""
+
+#: includes/class-wooai-ajax-handlers.php
+msgid "Product updated successfully."
+msgstr ""
+
+#: includes/class-wooai-ajax-handlers.php
+msgid "Category not found."
+msgstr ""
+
+#: includes/class-wooai-ajax-handlers.php
+msgid "Category updated successfully."
+msgstr ""
+
+#: includes/class-wooai-ajax-handlers.php
+msgid "Invalid product."
+msgstr ""
+
+#: includes/class-wooai-ajax-handlers.php
+msgid "Invalid category."
+msgstr ""
+
+#: includes/class-wooai-ajax-handlers.php
+msgid "Invalid field."
+msgstr ""
+
+#: includes/class-wooai-product-metabox.php
+msgid "AI Tools"
+msgstr ""
