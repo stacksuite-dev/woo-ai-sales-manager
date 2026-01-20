@@ -146,43 +146,8 @@ class AISales_API_Client {
 	}
 
 	/**
-	 * Register new account
-	 *
-	 * @param string $email    User email.
-	 * @param string $password User password.
-	 * @return array|WP_Error
-	 */
-	public function register( $email, $password ) {
-		if ( $this->use_mock ) {
-			return $this->mock_register( $email );
-		}
-
-		return $this->request( '/auth/register', 'POST', array(
-			'email'    => $email,
-			'password' => $password,
-		) );
-	}
-
-	/**
-	 * Login to account
-	 *
-	 * @param string $email    User email.
-	 * @param string $password User password.
-	 * @return array|WP_Error
-	 */
-	public function login( $email, $password ) {
-		if ( $this->use_mock ) {
-			return $this->mock_login( $email );
-		}
-
-		return $this->request( '/auth/login', 'POST', array(
-			'email'    => $email,
-			'password' => $password,
-		) );
-	}
-
-	/**
 	 * Connect WordPress site (domain-based authentication)
+	 * New accounts receive 10,000 welcome bonus tokens
 	 *
 	 * @param string $email  User email.
 	 * @param string $domain Site domain.
@@ -346,6 +311,16 @@ class AISales_API_Client {
 		return $this->request( '/ai/category/subcategories', 'POST', $category_data );
 	}
 
+	/**
+	 * Generate email template using AI
+	 *
+	 * @param array $data Template generation data (template_type, store_context, etc.).
+	 * @return array|WP_Error
+	 */
+	public function generate_email_template( $data ) {
+		return $this->request( '/ai/email/generate', 'POST', $data );
+	}
+
 	// =========================================================================
 	// BILLING & AUTO TOP-UP METHODS
 	// =========================================================================
@@ -465,80 +440,119 @@ class AISales_API_Client {
 		return $this->request( '/billing/plans' );
 	}
 
+	/**
+	 * Request API key recovery token
+	 * This creates a recovery token that can be sent via email
+	 * Requires both email AND domain to match for security.
+	 *
+	 * @param string $email  User email.
+	 * @param string $domain Site domain.
+	 * @return array|WP_Error Returns token data or error
+	 */
+	public function create_recovery_token( $email, $domain ) {
+		if ( $this->use_mock ) {
+			return $this->mock_create_recovery_token( $email, $domain );
+		}
+
+		return $this->request_without_auth( '/auth/create-recovery-token', 'POST', array(
+			'email'  => $email,
+			'domain' => $domain,
+		) );
+	}
+
+	/**
+	 * Validate recovery token and get new API key
+	 *
+	 * @param string $token Recovery token.
+	 * @return array|WP_Error Returns new API key or error
+	 */
+	public function validate_recovery_token( $token ) {
+		if ( $this->use_mock ) {
+			return $this->mock_validate_recovery_token( $token );
+		}
+
+		return $this->request_without_auth( '/auth/validate-recovery-token', 'POST', array(
+			'token' => $token,
+		) );
+	}
+
+	/**
+	 * Make API request without authentication
+	 * Used for auth endpoints before we have an API key
+	 *
+	 * @param string $endpoint API endpoint.
+	 * @param string $method   HTTP method.
+	 * @param array  $body     Request body.
+	 * @return array|WP_Error
+	 */
+	private function request_without_auth( $endpoint, $method = 'GET', $body = array() ) {
+		$args = array(
+			'method'  => $method,
+			'headers' => array(
+				'Content-Type' => 'application/json',
+			),
+			'timeout' => 30,
+			'sslverify' => apply_filters( 'aisales_api_sslverify', true ),
+		);
+
+		if ( ! empty( $body ) && in_array( $method, array( 'POST', 'PUT', 'PATCH' ), true ) ) {
+			$args['body'] = wp_json_encode( $body );
+		}
+
+		$url      = $this->api_url . $endpoint;
+		$response = wp_remote_request( $url, $args );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$body_content = wp_remote_retrieve_body( $response );
+		$data         = json_decode( $body_content, true );
+		$status_code  = wp_remote_retrieve_response_code( $response );
+
+		if ( $status_code >= 400 ) {
+			$message = isset( $data['error']['message'] ) ? $data['error']['message'] : __( 'API request failed', 'ai-sales-manager-for-woocommerce' );
+			return new WP_Error(
+				'api_error',
+				$message,
+				array( 'status' => $status_code )
+			);
+		}
+
+		return isset( $data['data'] ) ? $data['data'] : $data;
+	}
+
 	// =========================================================================
 	// MOCK DATA METHODS (for development/testing)
 	// =========================================================================
 
 	/**
-	 * Mock register response
-	 *
-	 * @param string $email User email.
-	 * @return array
-	 */
-	private function mock_register( $email ) {
-		$api_key = 'wai_mock_' . wp_generate_password( 32, false );
-		update_option( 'aisales_api_key', $api_key );
-		update_option( 'aisales_user_email', $email );
-		update_option( 'aisales_balance', 1000 ); // Start with 1000 tokens for testing
-
-		return array(
-			'message'        => 'Account created successfully',
-			'user_id'        => 1,
-			'email'          => $email,
-			'api_key'        => $api_key,
-			'balance_tokens' => 1000,
-		);
-	}
-
-	/**
-	 * Mock login response
-	 *
-	 * @param string $email User email.
-	 * @return array
-	 */
-	private function mock_login( $email ) {
-		$api_key = get_option( 'aisales_api_key' );
-		if ( ! $api_key ) {
-			$api_key = 'wai_mock_' . wp_generate_password( 32, false );
-			update_option( 'aisales_api_key', $api_key );
-		}
-		update_option( 'aisales_user_email', $email );
-
-		$balance = get_option( 'aisales_balance', 7432 );
-
-		return array(
-			'message'        => 'Login successful',
-			'user_id'        => 1,
-			'email'          => $email,
-			'api_key'        => $api_key,
-			'balance_tokens' => $balance,
-		);
-	}
-
-	/**
 	 * Mock connect response (domain-based auth)
+	 * New accounts receive 10,000 welcome bonus tokens
 	 *
 	 * @param string $email  User email.
 	 * @param string $domain Site domain.
 	 * @return array
 	 */
 	private function mock_connect( $email, $domain ) {
-		$api_key = get_option( 'aisales_api_key' );
-		$is_new  = false;
+		$api_key       = get_option( 'aisales_api_key' );
+		$is_new        = false;
+		$welcome_bonus = null;
 
 		if ( ! $api_key ) {
-			$api_key = 'wai_mock_' . wp_generate_password( 32, false );
-			$is_new  = true;
-			update_option( 'aisales_balance', 1000 );
+			$api_key       = 'wai_mock_' . wp_generate_password( 32, false );
+			$is_new        = true;
+			$welcome_bonus = 10000;
+			update_option( 'aisales_balance', 10000 ); // Welcome bonus: 10,000 tokens
 		}
 
 		update_option( 'aisales_api_key', $api_key );
 		update_option( 'aisales_user_email', $email );
 		update_option( 'aisales_domain', $domain );
 
-		$balance = get_option( 'aisales_balance', 1000 );
+		$balance = get_option( 'aisales_balance', 10000 );
 
-		return array(
+		$response = array(
 			'message'        => $is_new ? 'Account created successfully' : 'Connected successfully',
 			'user_id'        => 1,
 			'email'          => $email,
@@ -547,6 +561,12 @@ class AISales_API_Client {
 			'balance_tokens' => $balance,
 			'is_new'         => $is_new,
 		);
+
+		if ( $welcome_bonus ) {
+			$response['welcome_bonus'] = $welcome_bonus;
+		}
+
+		return $response;
 	}
 
 	/**
@@ -1048,6 +1068,91 @@ class AISales_API_Client {
 				'output' => 75,
 				'total'  => 150,
 			),
+		);
+	}
+
+	/**
+	 * Mock create recovery token response
+	 *
+	 * @param string $email  User email.
+	 * @param string $domain Site domain.
+	 * @return array
+	 */
+	private function mock_create_recovery_token( $email, $domain ) {
+		// Normalize domain (strip www. prefix)
+		$normalized_domain = preg_replace( '/^www\./i', '', strtolower( trim( $domain ) ) );
+		
+		// Check if we have a stored domain that matches
+		$stored_domain = get_option( 'aisales_domain', '' );
+		$stored_email  = get_option( 'aisales_user_email', '' );
+		
+		// Normalize stored domain too
+		$stored_normalized = preg_replace( '/^www\./i', '', strtolower( trim( $stored_domain ) ) );
+		
+		// Verify domain matches
+		if ( $stored_normalized !== $normalized_domain ) {
+			return array(
+				'success'     => true,
+				'has_account' => false,
+				'message'     => 'If an account exists with this email and domain, a recovery token has been created',
+			);
+		}
+		
+		// Verify email matches
+		if ( strtolower( trim( $stored_email ) ) !== strtolower( trim( $email ) ) ) {
+			return array(
+				'success'     => true,
+				'has_account' => false,
+				'message'     => 'If an account exists with this email and domain, a recovery token has been created',
+			);
+		}
+
+		// Generate a mock token
+		$token = 'mock_recovery_' . wp_generate_password( 32, false );
+
+		// Store the token temporarily for validation
+		set_transient( 'aisales_mock_recovery_token', array(
+			'token'  => $token,
+			'email'  => $email,
+			'domain' => $normalized_domain,
+		), HOUR_IN_SECONDS );
+
+		return array(
+			'success'     => true,
+			'has_account' => true,
+			'token'       => $token,
+			'email'       => $email,
+			'expires_at'  => gmdate( 'Y-m-d H:i:s', time() + HOUR_IN_SECONDS ),
+		);
+	}
+
+	/**
+	 * Mock validate recovery token response
+	 *
+	 * @param string $token Recovery token.
+	 * @return array|WP_Error
+	 */
+	private function mock_validate_recovery_token( $token ) {
+		// Get the stored mock token
+		$stored = get_transient( 'aisales_mock_recovery_token' );
+
+		if ( ! $stored || $stored['token'] !== $token ) {
+			return new WP_Error(
+				'invalid_token',
+				__( 'Invalid or expired recovery token.', 'ai-sales-manager-for-woocommerce' )
+			);
+		}
+
+		// Generate a new mock API key
+		$new_api_key = 'wai_mock_' . wp_generate_password( 32, false );
+
+		// Clean up the used token
+		delete_transient( 'aisales_mock_recovery_token' );
+
+		return array(
+			'api_key' => $new_api_key,
+			'email'   => $stored['email'],
+			'message' => __( 'API key recovered successfully.', 'ai-sales-manager-for-woocommerce' ),
 		);
 	}
 }

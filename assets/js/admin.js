@@ -99,54 +99,7 @@
         bindAuthEvents: function() {
             var self = this;
 
-            // Tab switching (legacy support)
-            $('.aisales-auth-tab-btn').on('click', function() {
-                var tab = $(this).data('tab');
-
-                // Update button states (support both old and new classes)
-                $('.aisales-auth-tab-btn').removeClass('button-primary aisales-auth__tab--active');
-                $(this).addClass('button-primary aisales-auth__tab--active');
-
-                // Show/hide forms
-                $('.aisales-auth-form').hide();
-                $('#aisales-' + tab + '-form').show();
-
-                // Clear message
-                $('#aisales-auth-message').hide();
-            });
-
-            // Legacy Login form
-            $('#aisales-login-btn').on('click', function() {
-                var email = $('#aisales-login-email').val();
-                var password = $('#aisales-login-password').val();
-
-                if (!email || !password) {
-                    self.showAuthMessage('error', aisalesAdmin.strings.error);
-                    return;
-                }
-
-                self.authRequest('aisales_login', { email: email, password: password }, $(this));
-            });
-
-            // Legacy Register form
-            $('#aisales-register-btn').on('click', function() {
-                var email = $('#aisales-register-email').val();
-                var password = $('#aisales-register-password').val();
-
-                if (!email || !password) {
-                    self.showAuthMessage('error', aisalesAdmin.strings.error);
-                    return;
-                }
-
-                if (password.length < 8) {
-                    self.showAuthMessage('error', 'Password must be at least 8 characters.');
-                    return;
-                }
-
-                self.authRequest('aisales_register', { email: email, password: password }, $(this));
-            });
-
-            // New Connect form (domain-based auth)
+            // Connect form (domain-based auth)
             $('#aisales-connect-btn').on('click', function() {
                 var email = $('#aisales-connect-email').val();
                 var domain = $('#aisales-connect-domain').val();
@@ -179,13 +132,25 @@
                         // Show success toast for connect action
                         if (action === 'aisales_connect') {
                             var isNew = response.data.is_new;
+                            var welcomeBonus = response.data.welcome_bonus || 0;
+                            var title, message;
+
+                            if (isNew && welcomeBonus > 0) {
+                                title = 'Welcome!';
+                                message = 'You received ' + welcomeBonus.toLocaleString() + ' free tokens to get started. Redirecting...';
+                            } else if (isNew) {
+                                title = 'Account Created!';
+                                message = 'Your AISales account is ready. Redirecting to dashboard...';
+                            } else {
+                                title = 'Connected!';
+                                message = 'Welcome back! Redirecting to dashboard...';
+                            }
+
                             self.showRichToast({
                                 type: 'success',
                                 icon: 'dashicons-yes-alt',
-                                title: isNew ? 'Account Created!' : 'Connected!',
-                                message: isNew
-                                    ? 'Your AISales account is ready. Redirecting to dashboard...'
-                                    : 'Welcome back! Redirecting to dashboard...',
+                                title: title,
+                                message: message,
                                 duration: 2500
                             });
                         } else {
