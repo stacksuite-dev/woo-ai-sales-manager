@@ -1,0 +1,650 @@
+/**
+ * AI Sales Manager - Frontend Shortcodes Styles
+ *
+ * Styling for all shortcode widgets displayed on the frontend.
+ */
+
+/* ==========================================================================
+   BASE WIDGET STYLES
+   ========================================================================== */
+
+.aisales-widget {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 14px;
+	line-height: 1.4;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+.aisales-widget svg {
+	flex-shrink: 0;
+}
+
+/* ==========================================================================
+   TOTAL SOLD WIDGET
+   ========================================================================== */
+
+.aisales-total-sold {
+	--aisales-icon-color: #2e7d32;
+	color: #2e7d32;
+	background: #e8f5e9;
+	padding: 4px 10px;
+	border-radius: 4px;
+	font-weight: 500;
+}
+
+.aisales-total-sold__icon {
+	display: inline-flex;
+	align-items: center;
+}
+
+.aisales-total-sold__icon svg {
+	color: var(--aisales-icon-color, #2e7d32);
+}
+
+.aisales-total-sold__text {
+	/* Inherits from parent */
+}
+
+/* ==========================================================================
+   STOCK URGENCY WIDGET
+   ========================================================================== */
+
+.aisales-stock-urgency {
+	padding: 6px 12px;
+	border-radius: 4px;
+	font-weight: 600;
+}
+
+.aisales-stock-urgency__icon {
+	display: inline-flex;
+	align-items: center;
+}
+
+.aisales-stock-urgency__text {
+	/* Inherits from parent */
+}
+
+/* Urgency Levels */
+
+/* Low urgency (6-10 items) - Orange/Amber */
+.aisales-stock-urgency--low {
+	color: #e65100;
+	background: #fff3e0;
+}
+
+.aisales-stock-urgency--low .aisales-stock-urgency__icon svg {
+	color: #e65100;
+}
+
+/* Warning urgency (4-5 items) - Deep Orange */
+.aisales-stock-urgency--warning {
+	color: #d84315;
+	background: #fbe9e7;
+}
+
+.aisales-stock-urgency--warning .aisales-stock-urgency__icon svg {
+	color: #d84315;
+}
+
+/* Critical urgency (1-3 items) - Red */
+.aisales-stock-urgency--critical {
+	color: #c62828;
+	background: #ffebee;
+}
+
+.aisales-stock-urgency--critical .aisales-stock-urgency__icon svg {
+	color: #c62828;
+}
+
+/* Pulse animation - controlled by config */
+.aisales-stock-urgency--pulse {
+	animation: aisales-pulse 2s ease-in-out infinite;
+}
+
+@keyframes aisales-pulse {
+	0%, 100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.7;
+	}
+}
+
+/* ==========================================================================
+   REVIEW SUMMARY WIDGET
+   ========================================================================== */
+
+.aisales-review-summary {
+	--aisales-star-color: #f59e0b;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	color: #1f2937;
+	font-weight: 500;
+}
+
+.aisales-review-summary__stars {
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+}
+
+.aisales-star {
+	width: 16px;
+	height: 16px;
+	flex-shrink: 0;
+}
+
+.aisales-star--full {
+	color: var(--aisales-star-color, #f59e0b);
+}
+
+.aisales-star--half {
+	color: var(--aisales-star-color, #f59e0b);
+}
+
+.aisales-star--empty {
+	color: #d1d5db;
+}
+
+.aisales-review-summary__rating {
+	font-weight: 600;
+	color: #1f2937;
+}
+
+.aisales-review-summary__count {
+	color: #6b7280;
+	font-weight: 400;
+}
+
+/* Rating Breakdown */
+.aisales-review-summary__breakdown {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	margin-top: 12px;
+	padding-top: 12px;
+	border-top: 1px solid #e5e7eb;
+	width: 100%;
+}
+
+.aisales-breakdown__row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 12px;
+}
+
+.aisales-breakdown__label {
+	width: 50px;
+	color: #6b7280;
+	flex-shrink: 0;
+}
+
+.aisales-breakdown__bar {
+	flex: 1;
+	height: 8px;
+	background: #e5e7eb;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.aisales-breakdown__fill {
+	height: 100%;
+	background: var(--aisales-star-color, #f59e0b);
+	border-radius: 4px;
+	transition: width 0.3s ease;
+}
+
+.aisales-breakdown__count {
+	width: 30px;
+	text-align: right;
+	color: #6b7280;
+	flex-shrink: 0;
+}
+
+/* Review summary with breakdown needs block display */
+.aisales-review-summary:has(.aisales-review-summary__breakdown) {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   COUNTDOWN WIDGET
+   ========================================================================== */
+
+.aisales-countdown {
+	--aisales-countdown-accent: #dc2626;
+	color: #c62828;
+	background: #ffebee;
+	padding: 8px 14px;
+	border-radius: 4px;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+}
+
+/* Inline style (default) */
+.aisales-countdown--inline {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.aisales-countdown__icon {
+	display: inline-flex;
+	align-items: center;
+	color: var(--aisales-countdown-accent, #dc2626);
+}
+
+.aisales-countdown__text {
+	/* Inherits from parent */
+}
+
+.aisales-countdown__timer {
+	font-weight: 700;
+	color: var(--aisales-countdown-accent, #dc2626);
+	letter-spacing: 0.5px;
+}
+
+/* Box style - individual time units */
+.aisales-countdown--boxes {
+	background: transparent;
+	padding: 0;
+}
+
+.aisales-countdown__boxes {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+
+.aisales-countdown__unit {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background: #ffebee;
+	border-radius: 6px;
+	padding: 8px 12px;
+	min-width: 50px;
+}
+
+.aisales-countdown__value {
+	font-size: 1.5rem;
+	font-weight: 700;
+	line-height: 1;
+	color: var(--aisales-countdown-accent, #dc2626);
+}
+
+.aisales-countdown__label {
+	font-size: 10px;
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: #9ca3af;
+	margin-top: 4px;
+}
+
+/* Separator between box units */
+.aisales-countdown__boxes .aisales-countdown__unit:not(:last-child)::after {
+	content: ':';
+	position: absolute;
+	right: -8px;
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: #d1d5db;
+}
+
+.aisales-countdown__unit {
+	position: relative;
+}
+
+/* Ended state */
+.aisales-countdown--ended {
+	opacity: 0.6;
+}
+
+.aisales-countdown--ended .aisales-countdown__timer,
+.aisales-countdown--ended .aisales-countdown__value {
+	color: #9ca3af;
+}
+
+/* ==========================================================================
+   PRICE DROP WIDGET
+   ========================================================================== */
+
+.aisales-price-drop {
+	color: #c62828;
+	background: #ffebee;
+	padding: 4px 10px;
+	border-radius: 4px;
+	font-weight: 600;
+}
+
+/* Badge style (default) - icon + text */
+.aisales-price-drop--badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.aisales-price-drop__icon {
+	display: inline-flex;
+	align-items: center;
+}
+
+.aisales-price-drop__icon svg {
+	color: currentColor;
+}
+
+.aisales-price-drop__text {
+	/* Inherits from parent */
+}
+
+/* Ribbon style - compact percentage badge */
+.aisales-price-drop--ribbon {
+	display: inline-block;
+	padding: 2px 8px;
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.5px;
+	text-transform: uppercase;
+}
+
+.aisales-price-drop__ribbon {
+	/* Inherits from parent */
+}
+
+/* Inline style - text only, minimal styling */
+.aisales-price-drop--inline {
+	background: none;
+	padding: 0;
+	color: #c62828;
+	font-weight: 600;
+}
+
+.aisales-price-drop__percent {
+	font-weight: 700;
+}
+
+.aisales-price-drop__amount {
+	color: #6b7280;
+	font-weight: 500;
+}
+
+/* ==========================================================================
+   BUNDLE SAVINGS WIDGET (placeholder)
+   ========================================================================== */
+
+.aisales-bundle-savings {
+	color: #6a1b9a;
+	background: #f3e5f5;
+	padding: 6px 12px;
+	border-radius: 4px;
+	font-weight: 500;
+}
+
+/* ==========================================================================
+   CART URGENCY WIDGET (placeholder)
+   ========================================================================== */
+
+.aisales-cart-urgency {
+	color: #e65100;
+	background: #fff3e0;
+	padding: 8px 14px;
+	border-radius: 4px;
+	font-weight: 500;
+}
+
+/* ==========================================================================
+   PRODUCT GRID WIDGETS (bestsellers, trending, new arrivals, etc.)
+   ========================================================================== */
+
+.aisales-product-grid {
+	display: block;
+	width: 100%;
+}
+
+.aisales-product-grid__title {
+	font-size: 1.5rem;
+	font-weight: 600;
+	margin: 0 0 16px 0;
+	color: #1f2937;
+}
+
+/* Grid Layout */
+.aisales-product-grid__items {
+	display: grid;
+	gap: 20px;
+}
+
+.aisales-product-grid--grid.aisales-product-grid--cols-2 {
+	grid-template-columns: repeat(2, 1fr);
+}
+
+.aisales-product-grid--grid.aisales-product-grid--cols-3 {
+	grid-template-columns: repeat(3, 1fr);
+}
+
+.aisales-product-grid--grid.aisales-product-grid--cols-4 {
+	grid-template-columns: repeat(4, 1fr);
+}
+
+.aisales-product-grid--grid.aisales-product-grid--cols-5 {
+	grid-template-columns: repeat(5, 1fr);
+}
+
+.aisales-product-grid--grid.aisales-product-grid--cols-6 {
+	grid-template-columns: repeat(6, 1fr);
+}
+
+/* List Layout */
+.aisales-product-grid--list {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.aisales-product-grid--list .aisales-product-grid__item {
+	display: flex;
+	gap: 16px;
+	align-items: center;
+}
+
+.aisales-product-grid--list .aisales-product-grid__image-wrap {
+	width: 80px;
+	flex-shrink: 0;
+}
+
+.aisales-product-grid--list .aisales-product-grid__info {
+	flex: 1;
+}
+
+/* Product Item */
+.aisales-product-grid__item {
+	position: relative;
+}
+
+.aisales-product-grid__link {
+	display: block;
+	text-decoration: none;
+	color: inherit;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.aisales-product-grid__link:hover {
+	transform: translateY(-2px);
+}
+
+/* Image Container */
+.aisales-product-grid__image-wrap {
+	position: relative;
+	overflow: hidden;
+	border-radius: 8px;
+	background: #f9fafb;
+	aspect-ratio: 1;
+}
+
+.aisales-product-grid__image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform 0.3s ease;
+}
+
+.aisales-product-grid__link:hover .aisales-product-grid__image {
+	transform: scale(1.05);
+}
+
+/* Badges */
+.aisales-product-grid__badge {
+	position: absolute;
+	top: 8px;
+	left: 8px;
+	padding: 4px 8px;
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: #fff;
+	background: #2563eb;
+	border-radius: 4px;
+	z-index: 1;
+}
+
+.aisales-product-grid__sale-badge {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	padding: 4px 8px;
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: #fff;
+	background: #dc2626;
+	border-radius: 4px;
+	z-index: 1;
+}
+
+/* Product Info */
+.aisales-product-grid__info {
+	padding: 12px 0;
+}
+
+.aisales-product-grid__product-title {
+	font-size: 14px;
+	font-weight: 500;
+	margin: 0 0 6px 0;
+	color: #1f2937;
+	line-height: 1.4;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.aisales-product-grid__link:hover .aisales-product-grid__product-title {
+	color: #2563eb;
+}
+
+/* Rating in grid */
+.aisales-product-grid__rating {
+	margin-bottom: 6px;
+}
+
+.aisales-product-grid__rating .aisales-stars {
+	display: inline-flex;
+	align-items: center;
+	gap: 1px;
+}
+
+.aisales-product-grid__rating .aisales-star {
+	width: 14px;
+	height: 14px;
+}
+
+.aisales-product-grid__rating .aisales-star--full {
+	color: #f59e0b;
+}
+
+.aisales-product-grid__rating .aisales-star--half {
+	color: #f59e0b;
+}
+
+.aisales-product-grid__rating .aisales-star--empty {
+	color: #d1d5db;
+}
+
+/* Price */
+.aisales-product-grid__price {
+	font-size: 14px;
+	font-weight: 600;
+	color: #1f2937;
+}
+
+.aisales-product-grid__price del {
+	color: #9ca3af;
+	font-weight: 400;
+	margin-right: 6px;
+}
+
+.aisales-product-grid__price ins {
+	text-decoration: none;
+	color: #dc2626;
+}
+
+/* ==========================================================================
+   RESPONSIVE ADJUSTMENTS
+   ========================================================================== */
+
+@media (max-width: 600px) {
+	.aisales-widget {
+		font-size: 13px;
+	}
+	
+	.aisales-stock-urgency,
+	.aisales-countdown,
+	.aisales-cart-urgency {
+		padding: 5px 10px;
+	}
+
+	/* Product grid responsive */
+	.aisales-product-grid--grid.aisales-product-grid--cols-4,
+	.aisales-product-grid--grid.aisales-product-grid--cols-5,
+	.aisales-product-grid--grid.aisales-product-grid--cols-6 {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.aisales-product-grid--grid.aisales-product-grid--cols-3 {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.aisales-product-grid__title {
+		font-size: 1.25rem;
+	}
+
+	.aisales-product-grid__items {
+		gap: 12px;
+	}
+
+	.aisales-product-grid__product-title {
+		font-size: 13px;
+	}
+
+	.aisales-product-grid__price {
+		font-size: 13px;
+	}
+}
+
+@media (max-width: 900px) and (min-width: 601px) {
+	.aisales-product-grid--grid.aisales-product-grid--cols-5,
+	.aisales-product-grid--grid.aisales-product-grid--cols-6 {
+		grid-template-columns: repeat(4, 1fr);
+	}
+
+	.aisales-product-grid--grid.aisales-product-grid--cols-4 {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}

@@ -223,7 +223,7 @@ class AISales_Shortcodes {
 				'exclude_products'   => '',
 				'exclude_categories' => '',
 			),
-			'stock_urgency' => array(
+			'stock_urgency'  => array(
 				'margin_top'         => 10,
 				'margin_bottom'      => 10,
 				'show_icon'          => true,
@@ -237,6 +237,112 @@ class AISales_Shortcodes {
 				'format_critical'    => 'Almost gone! Only {count} left!',
 				'exclude_backorder'  => true,
 				'exclude_products'   => '',
+			),
+			'review_summary' => array(
+				'margin_top'       => 10,
+				'margin_bottom'    => 10,
+				'show_count'       => true,
+				'show_breakdown'   => false,
+				'min_reviews'      => 1,
+				'star_color'       => '#f59e0b',
+				'text_color'       => '',
+				'custom_class'     => '',
+				'exclude_products' => '',
+			),
+			'price_drop'     => array(
+				'margin_top'       => 10,
+				'margin_bottom'    => 10,
+				'show_percentage'  => true,
+				'show_amount'      => false,
+				'style'            => 'badge',
+				'format'           => 'Save {percent}!',
+				'min_discount'     => 5,
+				'text_color'       => '',
+				'bg_color'         => '',
+				'custom_class'     => '',
+				'exclude_products' => '',
+			),
+			'new_arrivals'   => array(
+				'margin_top'         => 20,
+				'margin_bottom'      => 20,
+				'limit'              => 4,
+				'columns'            => 4,
+				'days'               => 30,
+				'category'           => '',
+				'layout'             => 'grid',
+				'show_title'         => true,
+				'show_price'         => true,
+				'show_rating'        => true,
+				'show_badge'         => true,
+				'badge_text'         => 'New',
+				'title_text'         => 'New Arrivals',
+				'show_section_title' => true,
+				'custom_class'       => '',
+			),
+			'bestsellers'    => array(
+				'margin_top'         => 20,
+				'margin_bottom'      => 20,
+				'limit'              => 4,
+				'columns'            => 4,
+				'category'           => '',
+				'layout'             => 'grid',
+				'show_title'         => true,
+				'show_price'         => true,
+				'show_rating'        => true,
+				'show_badge'         => true,
+				'badge_text'         => 'Best Seller',
+				'title_text'         => 'Best Sellers',
+				'show_section_title' => true,
+				'custom_class'       => '',
+			),
+			'trending'       => array(
+				'margin_top'         => 20,
+				'margin_bottom'      => 20,
+				'limit'              => 4,
+				'columns'            => 4,
+				'period'             => '7days',
+				'category'           => '',
+				'layout'             => 'grid',
+				'show_title'         => true,
+				'show_price'         => true,
+				'show_rating'        => true,
+				'show_badge'         => true,
+				'badge_text'         => 'Trending',
+				'title_text'         => 'Trending Now',
+				'show_section_title' => true,
+				'custom_class'       => '',
+			),
+			'countdown'      => array(
+				'margin_top'       => 10,
+				'margin_bottom'    => 10,
+				'style'            => 'inline',
+				'format'           => 'Sale ends in {timer}',
+				'end_action'       => 'hide',
+				'show_days'        => true,
+				'show_hours'       => true,
+				'show_minutes'     => true,
+				'show_seconds'     => true,
+				'text_color'       => '',
+				'bg_color'         => '',
+				'accent_color'     => '#dc2626',
+				'custom_class'     => '',
+				'exclude_products' => '',
+			),
+			'recently_viewed' => array(
+				'margin_top'         => 20,
+				'margin_bottom'      => 20,
+				'limit'              => 4,
+				'columns'            => 4,
+				'layout'             => 'grid',
+				'exclude_current'    => true,
+				'show_title'         => true,
+				'show_price'         => true,
+				'show_rating'        => true,
+				'show_badge'         => true,
+				'badge_text'         => 'Viewed',
+				'title_text'         => 'Recently Viewed',
+				'show_section_title' => true,
+				'custom_class'       => '',
 			),
 		);
 
@@ -538,12 +644,187 @@ class AISales_Shortcodes {
 	/**
 	 * Render [aisales_review_summary] shortcode
 	 *
+	 * Displays star rating and review count for a product.
+	 *
 	 * @param array $atts Shortcode attributes.
 	 * @return string HTML output.
 	 */
 	public function render_review_summary( $atts ) {
-		// TODO: Implement review summary.
-		return '';
+		// Get saved widget configuration.
+		$config = $this->get_widget_config( 'review_summary' );
+
+		// Shortcode attributes with config defaults.
+		$atts = shortcode_atts(
+			array(
+				'product_id'     => '',
+				'show_count'     => isset( $config['show_count'] ) ? ( $config['show_count'] ? 'true' : 'false' ) : 'true',
+				'show_breakdown' => isset( $config['show_breakdown'] ) ? ( $config['show_breakdown'] ? 'true' : 'false' ) : 'false',
+			),
+			$atts,
+			'aisales_review_summary'
+		);
+
+		$product_id = $this->get_product_id( $atts );
+		if ( ! $product_id ) {
+			return '';
+		}
+
+		// Check exclusions.
+		$exclude_products = isset( $config['exclude_products'] ) ? $config['exclude_products'] : '';
+		if ( ! empty( $exclude_products ) ) {
+			$excluded_ids = array_map( 'absint', array_filter( explode( ',', $exclude_products ) ) );
+			if ( in_array( $product_id, $excluded_ids, true ) ) {
+				return '';
+			}
+		}
+
+		$product = $this->get_product( $product_id );
+		if ( ! $product ) {
+			return '';
+		}
+
+		// Get review data.
+		$average_rating = (float) $product->get_average_rating();
+		$review_count   = (int) $product->get_review_count();
+
+		// Check minimum reviews threshold.
+		$min_reviews = isset( $config['min_reviews'] ) ? absint( $config['min_reviews'] ) : 1;
+		if ( $review_count < $min_reviews ) {
+			return '';
+		}
+
+		$show_count     = filter_var( $atts['show_count'], FILTER_VALIDATE_BOOLEAN );
+		$show_breakdown = filter_var( $atts['show_breakdown'], FILTER_VALIDATE_BOOLEAN );
+
+		// Build star rating HTML.
+		$full_stars  = floor( $average_rating );
+		$half_star   = ( $average_rating - $full_stars ) >= 0.5;
+		$empty_stars = 5 - $full_stars - ( $half_star ? 1 : 0 );
+
+		$stars_html = '<span class="aisales-review-summary__stars">';
+		
+		// Full stars.
+		for ( $i = 0; $i < $full_stars; $i++ ) {
+			$stars_html .= '<svg class="aisales-star aisales-star--full" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>';
+		}
+		
+		// Half star.
+		if ( $half_star ) {
+			$stars_html .= '<svg class="aisales-star aisales-star--half" viewBox="0 0 24 24" width="16" height="16"><defs><linearGradient id="half-grad"><stop offset="50%" stop-color="currentColor"/><stop offset="50%" stop-color="#d1d5db"/></linearGradient></defs><path fill="url(#half-grad)" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>';
+		}
+		
+		// Empty stars.
+		for ( $i = 0; $i < $empty_stars; $i++ ) {
+			$stars_html .= '<svg class="aisales-star aisales-star--empty" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>';
+		}
+		
+		$stars_html .= '</span>';
+
+		// Build content.
+		$content = $stars_html;
+
+		// Rating number.
+		$content .= '<span class="aisales-review-summary__rating">' . number_format( $average_rating, 1 ) . '</span>';
+
+		// Review count.
+		if ( $show_count ) {
+			$count_text = sprintf(
+				/* translators: %s: number of reviews */
+				_n( '(%s review)', '(%s reviews)', $review_count, 'ai-sales-manager-for-woocommerce' ),
+				$this->format_number( $review_count )
+			);
+			$content .= '<span class="aisales-review-summary__count">' . esc_html( $count_text ) . '</span>';
+		}
+
+		// Rating breakdown (optional).
+		if ( $show_breakdown ) {
+			$breakdown_html = $this->get_rating_breakdown_html( $product_id );
+			if ( $breakdown_html ) {
+				$content .= $breakdown_html;
+			}
+		}
+
+		// Build classes.
+		$classes      = array();
+		$custom_class = isset( $config['custom_class'] ) ? $config['custom_class'] : '';
+		if ( ! empty( $custom_class ) ) {
+			$classes[] = sanitize_html_class( $custom_class );
+		}
+
+		// Build styles.
+		$style = $this->build_margin_style( $config );
+
+		// Apply custom colors.
+		if ( ! empty( $config['star_color'] ) ) {
+			$style .= '--aisales-star-color:' . esc_attr( $config['star_color'] ) . ';';
+		}
+		if ( ! empty( $config['text_color'] ) ) {
+			$style .= 'color:' . esc_attr( $config['text_color'] ) . ';';
+		}
+
+		return $this->wrap_output( 'review_summary', $content, $classes, $style );
+	}
+
+	/**
+	 * Get rating breakdown HTML for a product
+	 *
+	 * @param int $product_id Product ID.
+	 * @return string HTML output or empty string.
+	 */
+	private function get_rating_breakdown_html( $product_id ) {
+		global $wpdb;
+
+		// Query to get rating distribution.
+		$ratings = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT meta_value as rating, COUNT(*) as count
+				FROM {$wpdb->comments} c
+				INNER JOIN {$wpdb->commentmeta} cm ON c.comment_ID = cm.comment_id
+				WHERE c.comment_post_ID = %d
+				AND c.comment_approved = '1'
+				AND c.comment_type = 'review'
+				AND cm.meta_key = 'rating'
+				GROUP BY meta_value
+				ORDER BY meta_value DESC",
+				$product_id
+			)
+		);
+
+		if ( empty( $ratings ) ) {
+			return '';
+		}
+
+		// Build distribution array.
+		$distribution = array( 5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0 );
+		$total        = 0;
+
+		foreach ( $ratings as $row ) {
+			$star              = absint( $row->rating );
+			$count             = absint( $row->count );
+			$distribution[ $star ] = $count;
+			$total            += $count;
+		}
+
+		if ( 0 === $total ) {
+			return '';
+		}
+
+		$html = '<div class="aisales-review-summary__breakdown">';
+		
+		for ( $star = 5; $star >= 1; $star-- ) {
+			$count      = $distribution[ $star ];
+			$percentage = ( $total > 0 ) ? round( ( $count / $total ) * 100 ) : 0;
+			
+			$html .= '<div class="aisales-breakdown__row">';
+			$html .= '<span class="aisales-breakdown__label">' . $star . ' star</span>';
+			$html .= '<div class="aisales-breakdown__bar"><div class="aisales-breakdown__fill" style="width:' . $percentage . '%"></div></div>';
+			$html .= '<span class="aisales-breakdown__count">' . $count . '</span>';
+			$html .= '</div>';
+		}
+		
+		$html .= '</div>';
+
+		return $html;
 	}
 
 	/**
@@ -553,19 +834,281 @@ class AISales_Shortcodes {
 	 * @return string HTML output.
 	 */
 	public function render_countdown( $atts ) {
-		// TODO: Implement countdown timer.
-		return '';
+		// Get saved widget configuration.
+		$config = $this->get_widget_config( 'countdown' );
+
+		// Shortcode attributes with config defaults.
+		$atts = shortcode_atts(
+			array(
+				'product_id' => '',
+				'end_date'   => '', // ISO 8601 format or relative like '+2 days'.
+				'style'      => isset( $config['style'] ) ? $config['style'] : 'inline',
+			),
+			$atts,
+			'aisales_countdown'
+		);
+
+		$product_id = $this->get_product_id( $atts );
+		$end_date   = '';
+
+		// Try to get end date from product sale schedule if on a product page.
+		if ( $product_id && empty( $atts['end_date'] ) ) {
+			$product = $this->get_product( $product_id );
+			if ( $product && $product->is_on_sale() ) {
+				$sale_end = $product->get_date_on_sale_to();
+				if ( $sale_end ) {
+					$end_date = $sale_end->date( 'c' ); // ISO 8601 format.
+				}
+			}
+		}
+
+		// Use explicit end_date attribute if provided.
+		if ( ! empty( $atts['end_date'] ) ) {
+			$parsed = strtotime( $atts['end_date'] );
+			if ( $parsed ) {
+				$end_date = date( 'c', $parsed );
+			}
+		}
+
+		// If no end date found, don't render.
+		if ( empty( $end_date ) ) {
+			return '';
+		}
+
+		// Check if countdown has already ended.
+		$end_timestamp = strtotime( $end_date );
+		if ( $end_timestamp <= time() ) {
+			$end_action = isset( $config['end_action'] ) ? $config['end_action'] : 'hide';
+			if ( 'hide' === $end_action ) {
+				return '';
+			}
+			// Otherwise show "Sale ended" message.
+		}
+
+		// Check exclusions.
+		if ( $product_id ) {
+			$exclude_products = isset( $config['exclude_products'] ) ? $config['exclude_products'] : '';
+			if ( ! empty( $exclude_products ) ) {
+				$excluded_ids = array_map( 'absint', array_filter( explode( ',', $exclude_products ) ) );
+				if ( in_array( $product_id, $excluded_ids, true ) ) {
+					return '';
+				}
+			}
+		}
+
+		$style       = sanitize_key( $atts['style'] );
+		$show_days   = isset( $config['show_days'] ) ? $config['show_days'] : true;
+		$show_hours  = isset( $config['show_hours'] ) ? $config['show_hours'] : true;
+		$show_mins   = isset( $config['show_minutes'] ) ? $config['show_minutes'] : true;
+		$show_secs   = isset( $config['show_seconds'] ) ? $config['show_seconds'] : true;
+		$format      = isset( $config['format'] ) ? $config['format'] : 'Sale ends in {timer}';
+
+		// Build timer HTML based on style.
+		$content = '';
+
+		if ( 'boxes' === $style ) {
+			// Box style with individual units.
+			$content .= '<div class="aisales-countdown__boxes" data-end="' . esc_attr( $end_date ) . '">';
+			
+			if ( $show_days ) {
+				$content .= '<div class="aisales-countdown__unit">';
+				$content .= '<span class="aisales-countdown__value" data-unit="days">00</span>';
+				$content .= '<span class="aisales-countdown__label">' . esc_html__( 'Days', 'ai-sales-manager-for-woocommerce' ) . '</span>';
+				$content .= '</div>';
+			}
+			if ( $show_hours ) {
+				$content .= '<div class="aisales-countdown__unit">';
+				$content .= '<span class="aisales-countdown__value" data-unit="hours">00</span>';
+				$content .= '<span class="aisales-countdown__label">' . esc_html__( 'Hours', 'ai-sales-manager-for-woocommerce' ) . '</span>';
+				$content .= '</div>';
+			}
+			if ( $show_mins ) {
+				$content .= '<div class="aisales-countdown__unit">';
+				$content .= '<span class="aisales-countdown__value" data-unit="minutes">00</span>';
+				$content .= '<span class="aisales-countdown__label">' . esc_html__( 'Min', 'ai-sales-manager-for-woocommerce' ) . '</span>';
+				$content .= '</div>';
+			}
+			if ( $show_secs ) {
+				$content .= '<div class="aisales-countdown__unit">';
+				$content .= '<span class="aisales-countdown__value" data-unit="seconds">00</span>';
+				$content .= '<span class="aisales-countdown__label">' . esc_html__( 'Sec', 'ai-sales-manager-for-woocommerce' ) . '</span>';
+				$content .= '</div>';
+			}
+			
+			$content .= '</div>';
+		} else {
+			// Inline style with formatted text.
+			$content .= '<span class="aisales-countdown__icon">';
+			$content .= '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/><path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>';
+			$content .= '</span>';
+
+			// Timer placeholder that JS will update.
+			$timer_html = '<span class="aisales-countdown__timer" data-end="' . esc_attr( $end_date ) . '" ';
+			$timer_html .= 'data-show-days="' . ( $show_days ? '1' : '0' ) . '" ';
+			$timer_html .= 'data-show-hours="' . ( $show_hours ? '1' : '0' ) . '" ';
+			$timer_html .= 'data-show-minutes="' . ( $show_mins ? '1' : '0' ) . '" ';
+			$timer_html .= 'data-show-seconds="' . ( $show_secs ? '1' : '0' ) . '">';
+			$timer_html .= '00:00:00'; // Placeholder, JS will update.
+			$timer_html .= '</span>';
+
+			// Replace {timer} in format string.
+			$text = str_replace( '{timer}', $timer_html, $format );
+			$content .= '<span class="aisales-countdown__text">' . wp_kses_post( $text ) . '</span>';
+		}
+
+		// Build classes.
+		$classes   = array( 'aisales-countdown--' . $style );
+		$custom_class = isset( $config['custom_class'] ) ? $config['custom_class'] : '';
+		if ( ! empty( $custom_class ) ) {
+			$classes[] = sanitize_html_class( $custom_class );
+		}
+
+		// Build styles.
+		$inline_style = $this->build_margin_style( $config );
+
+		// Apply custom colors.
+		if ( ! empty( $config['text_color'] ) ) {
+			$inline_style .= 'color:' . esc_attr( $config['text_color'] ) . ';';
+		}
+		if ( ! empty( $config['bg_color'] ) ) {
+			$inline_style .= 'background-color:' . esc_attr( $config['bg_color'] ) . ';';
+		}
+		if ( ! empty( $config['accent_color'] ) ) {
+			$inline_style .= '--aisales-countdown-accent:' . esc_attr( $config['accent_color'] ) . ';';
+		}
+
+		return $this->wrap_output( 'countdown', $content, $classes, $inline_style );
 	}
 
 	/**
 	 * Render [aisales_price_drop] shortcode
 	 *
+	 * Displays a sale badge with percentage/amount saved for products on sale.
+	 *
 	 * @param array $atts Shortcode attributes.
 	 * @return string HTML output.
 	 */
 	public function render_price_drop( $atts ) {
-		// TODO: Implement price drop badge.
-		return '';
+		// Get saved widget configuration.
+		$config = $this->get_widget_config( 'price_drop' );
+
+		// Shortcode attributes with config defaults.
+		$atts = shortcode_atts(
+			array(
+				'product_id'      => '',
+				'show_percentage' => isset( $config['show_percentage'] ) ? ( $config['show_percentage'] ? 'true' : 'false' ) : 'true',
+				'show_amount'     => isset( $config['show_amount'] ) ? ( $config['show_amount'] ? 'true' : 'false' ) : 'false',
+				'style'           => isset( $config['style'] ) ? $config['style'] : 'badge',
+			),
+			$atts,
+			'aisales_price_drop'
+		);
+
+		$product_id = $this->get_product_id( $atts );
+		if ( ! $product_id ) {
+			return '';
+		}
+
+		// Check exclusions.
+		$exclude_products = isset( $config['exclude_products'] ) ? $config['exclude_products'] : '';
+		if ( ! empty( $exclude_products ) ) {
+			$excluded_ids = array_map( 'absint', array_filter( explode( ',', $exclude_products ) ) );
+			if ( in_array( $product_id, $excluded_ids, true ) ) {
+				return '';
+			}
+		}
+
+		$product = $this->get_product( $product_id );
+		if ( ! $product ) {
+			return '';
+		}
+
+		// Only show for products on sale.
+		if ( ! $product->is_on_sale() ) {
+			return '';
+		}
+
+		// Get prices.
+		$regular_price = (float) $product->get_regular_price();
+		$sale_price    = (float) $product->get_sale_price();
+
+		// Handle variable products - get min prices.
+		if ( $product->is_type( 'variable' ) ) {
+			$regular_price = (float) $product->get_variation_regular_price( 'min' );
+			$sale_price    = (float) $product->get_variation_sale_price( 'min' );
+		}
+
+		// Validate prices.
+		if ( $regular_price <= 0 || $sale_price <= 0 || $sale_price >= $regular_price ) {
+			return '';
+		}
+
+		// Calculate savings.
+		$savings_amount  = $regular_price - $sale_price;
+		$savings_percent = round( ( $savings_amount / $regular_price ) * 100 );
+
+		// Check minimum discount threshold.
+		$min_discount = isset( $config['min_discount'] ) ? absint( $config['min_discount'] ) : 5;
+		if ( $savings_percent < $min_discount ) {
+			return '';
+		}
+
+		$show_percentage = filter_var( $atts['show_percentage'], FILTER_VALIDATE_BOOLEAN );
+		$show_amount     = filter_var( $atts['show_amount'], FILTER_VALIDATE_BOOLEAN );
+		$style           = sanitize_key( $atts['style'] );
+
+		// Build display text.
+		$format = isset( $config['format'] ) ? $config['format'] : 'Save {percent}!';
+		$text   = str_replace(
+			array( '{percent}', '{amount}' ),
+			array( $savings_percent . '%', wc_price( $savings_amount ) ),
+			$format
+		);
+
+		// Build content based on style.
+		$content = '';
+
+		if ( 'ribbon' === $style ) {
+			// Ribbon style - percentage only, compact.
+			$content = '<span class="aisales-price-drop__ribbon">-' . $savings_percent . '%</span>';
+		} elseif ( 'inline' === $style ) {
+			// Inline style - text with both values.
+			$parts = array();
+			if ( $show_percentage ) {
+				$parts[] = '<span class="aisales-price-drop__percent">-' . $savings_percent . '%</span>';
+			}
+			if ( $show_amount ) {
+				/* translators: %s: savings amount */
+				$parts[] = '<span class="aisales-price-drop__amount">' . sprintf( esc_html__( 'Save %s', 'ai-sales-manager-for-woocommerce' ), wp_strip_all_tags( wc_price( $savings_amount ) ) ) . '</span>';
+			}
+			$content = implode( ' ', $parts );
+		} else {
+			// Badge style (default) - uses format string.
+			$content = '<span class="aisales-price-drop__icon">';
+			$content .= '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg>';
+			$content .= '</span>';
+			$content .= '<span class="aisales-price-drop__text">' . wp_kses_post( $text ) . '</span>';
+		}
+
+		// Build classes.
+		$classes   = array( 'aisales-price-drop--' . $style );
+		$custom_class = isset( $config['custom_class'] ) ? $config['custom_class'] : '';
+		if ( ! empty( $custom_class ) ) {
+			$classes[] = sanitize_html_class( $custom_class );
+		}
+
+		// Build styles.
+		$inline_style = $this->build_margin_style( $config );
+
+		// Apply custom colors.
+		if ( ! empty( $config['text_color'] ) ) {
+			$inline_style .= 'color:' . esc_attr( $config['text_color'] ) . ';';
+		}
+		if ( ! empty( $config['bg_color'] ) ) {
+			$inline_style .= 'background-color:' . esc_attr( $config['bg_color'] ) . ';';
+		}
+
+		return $this->wrap_output( 'price_drop', $content, $classes, $inline_style );
 	}
 
 	/**
@@ -593,12 +1136,57 @@ class AISales_Shortcodes {
 	/**
 	 * Render [aisales_bestsellers] shortcode
 	 *
+	 * Displays top-selling products in a grid layout.
+	 *
 	 * @param array $atts Shortcode attributes.
 	 * @return string HTML output.
 	 */
 	public function render_bestsellers( $atts ) {
-		// TODO: Implement bestsellers grid.
-		return '';
+		// Get saved widget configuration.
+		$config = $this->get_widget_config( 'bestsellers' );
+
+		// Shortcode attributes with config defaults.
+		$atts = shortcode_atts(
+			array(
+				'limit'    => isset( $config['limit'] ) ? $config['limit'] : 4,
+				'columns'  => isset( $config['columns'] ) ? $config['columns'] : 4,
+				'category' => isset( $config['category'] ) ? $config['category'] : '',
+				'layout'   => isset( $config['layout'] ) ? $config['layout'] : 'grid',
+			),
+			$atts,
+			'aisales_bestsellers'
+		);
+
+		// Query args for best sellers.
+		$query_args = array(
+			'post_type'      => 'product',
+			'post_status'    => 'publish',
+			'posts_per_page' => absint( $atts['limit'] ),
+			'meta_key'       => 'total_sales',
+			'orderby'        => 'meta_value_num',
+			'order'          => 'DESC',
+		);
+
+		// Filter by category if specified.
+		if ( ! empty( $atts['category'] ) ) {
+			$query_args['tax_query'] = array(
+				array(
+					'taxonomy' => 'product_cat',
+					'field'    => 'slug',
+					'terms'    => sanitize_text_field( $atts['category'] ),
+				),
+			);
+		}
+
+		// Only show visible products.
+		$query_args['tax_query'][] = array(
+			'taxonomy' => 'product_visibility',
+			'field'    => 'name',
+			'terms'    => array( 'exclude-from-catalog' ),
+			'operator' => 'NOT IN',
+		);
+
+		return $this->render_product_grid( 'bestsellers', $query_args, $atts, $config );
 	}
 
 	/**
@@ -608,8 +1196,98 @@ class AISales_Shortcodes {
 	 * @return string HTML output.
 	 */
 	public function render_trending( $atts ) {
-		// TODO: Implement trending products.
-		return '';
+		// Get saved widget configuration.
+		$config = $this->get_widget_config( 'trending' );
+
+		// Shortcode attributes with config defaults.
+		$atts = shortcode_atts(
+			array(
+				'limit'    => isset( $config['limit'] ) ? $config['limit'] : 4,
+				'columns'  => isset( $config['columns'] ) ? $config['columns'] : 4,
+				'period'   => isset( $config['period'] ) ? $config['period'] : '7days',
+				'category' => isset( $config['category'] ) ? $config['category'] : '',
+				'layout'   => isset( $config['layout'] ) ? $config['layout'] : 'grid',
+			),
+			$atts,
+			'aisales_trending'
+		);
+
+		// Calculate date range based on period.
+		$period = sanitize_key( $atts['period'] );
+		switch ( $period ) {
+			case '24hours':
+				$date_after = '-1 day';
+				break;
+			case '30days':
+				$date_after = '-30 days';
+				break;
+			case '7days':
+			default:
+				$date_after = '-7 days';
+				break;
+		}
+
+		$date_threshold = date( 'Y-m-d H:i:s', strtotime( $date_after ) );
+
+		// Query for products with recent orders.
+		// We'll get products that have been ordered recently, sorted by order count.
+		global $wpdb;
+
+		// Get product IDs from recent orders, ordered by frequency.
+		$recent_product_ids = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT DISTINCT order_item_meta.meta_value as product_id
+				FROM {$wpdb->prefix}woocommerce_order_items as order_items
+				INNER JOIN {$wpdb->prefix}woocommerce_order_itemmeta as order_item_meta 
+					ON order_items.order_item_id = order_item_meta.order_item_id
+				INNER JOIN {$wpdb->posts} as posts 
+					ON order_items.order_id = posts.ID
+				WHERE posts.post_type = 'shop_order'
+				AND posts.post_status IN ('wc-completed', 'wc-processing')
+				AND posts.post_date >= %s
+				AND order_item_meta.meta_key = '_product_id'
+				GROUP BY order_item_meta.meta_value
+				ORDER BY COUNT(*) DESC
+				LIMIT %d",
+				$date_threshold,
+				absint( $atts['limit'] ) * 2 // Get extra to account for filtering.
+			)
+		);
+
+		if ( empty( $recent_product_ids ) ) {
+			// Fallback to bestsellers if no recent orders.
+			return $this->render_bestsellers( $atts );
+		}
+
+		// Query args for trending products.
+		$query_args = array(
+			'post_type'      => 'product',
+			'post_status'    => 'publish',
+			'posts_per_page' => absint( $atts['limit'] ),
+			'post__in'       => array_map( 'absint', $recent_product_ids ),
+			'orderby'        => 'post__in',
+		);
+
+		// Filter by category if specified.
+		if ( ! empty( $atts['category'] ) ) {
+			$query_args['tax_query'] = array(
+				array(
+					'taxonomy' => 'product_cat',
+					'field'    => 'slug',
+					'terms'    => sanitize_text_field( $atts['category'] ),
+				),
+			);
+		}
+
+		// Only show visible products.
+		$query_args['tax_query'][] = array(
+			'taxonomy' => 'product_visibility',
+			'field'    => 'name',
+			'terms'    => array( 'exclude-from-catalog' ),
+			'operator' => 'NOT IN',
+		);
+
+		return $this->render_product_grid( 'trending', $query_args, $atts, $config );
 	}
 
 	/**
@@ -619,8 +1297,70 @@ class AISales_Shortcodes {
 	 * @return string HTML output.
 	 */
 	public function render_recently_viewed( $atts ) {
-		// TODO: Implement recently viewed.
-		return '';
+		// Get saved widget configuration.
+		$config = $this->get_widget_config( 'recently_viewed' );
+
+		// Shortcode attributes with config defaults.
+		$atts = shortcode_atts(
+			array(
+				'limit'           => isset( $config['limit'] ) ? $config['limit'] : 4,
+				'columns'         => isset( $config['columns'] ) ? $config['columns'] : 4,
+				'exclude_current' => isset( $config['exclude_current'] ) ? ( $config['exclude_current'] ? 'true' : 'false' ) : 'true',
+				'layout'          => isset( $config['layout'] ) ? $config['layout'] : 'grid',
+			),
+			$atts,
+			'aisales_recently_viewed'
+		);
+
+		// Get recently viewed products from WooCommerce cookie.
+		$viewed_products = array();
+		if ( ! empty( $_COOKIE['woocommerce_recently_viewed'] ) ) {
+			$viewed_products = explode( '|', wp_unslash( $_COOKIE['woocommerce_recently_viewed'] ) );
+		}
+
+		$viewed_products = array_map( 'absint', array_filter( $viewed_products ) );
+
+		if ( empty( $viewed_products ) ) {
+			return '';
+		}
+
+		// Reverse to show most recent first.
+		$viewed_products = array_reverse( $viewed_products );
+
+		// Optionally exclude current product.
+		$exclude_current = filter_var( $atts['exclude_current'], FILTER_VALIDATE_BOOLEAN );
+		if ( $exclude_current ) {
+			$current_id = $this->get_product_id( $atts );
+			if ( $current_id ) {
+				$viewed_products = array_diff( $viewed_products, array( $current_id ) );
+			}
+		}
+
+		$viewed_products = array_values( array_unique( $viewed_products ) );
+		$viewed_products = array_slice( $viewed_products, 0, absint( $atts['limit'] ) );
+
+		if ( empty( $viewed_products ) ) {
+			return '';
+		}
+
+		// Query args for recently viewed products.
+		$query_args = array(
+			'post_type'      => 'product',
+			'post_status'    => 'publish',
+			'posts_per_page' => absint( $atts['limit'] ),
+			'post__in'       => $viewed_products,
+			'orderby'        => 'post__in',
+		);
+
+		// Only show visible products.
+		$query_args['tax_query'][] = array(
+			'taxonomy' => 'product_visibility',
+			'field'    => 'name',
+			'terms'    => array( 'exclude-from-catalog' ),
+			'operator' => 'NOT IN',
+		);
+
+		return $this->render_product_grid( 'recently_viewed', $query_args, $atts, $config );
 	}
 
 	/**
@@ -637,11 +1377,246 @@ class AISales_Shortcodes {
 	/**
 	 * Render [aisales_new_arrivals] shortcode
 	 *
+	 * Displays recently added products in a grid layout.
+	 *
 	 * @param array $atts Shortcode attributes.
 	 * @return string HTML output.
 	 */
 	public function render_new_arrivals( $atts ) {
-		// TODO: Implement new arrivals.
-		return '';
+		// Get saved widget configuration.
+		$config = $this->get_widget_config( 'new_arrivals' );
+
+		// Shortcode attributes with config defaults.
+		$atts = shortcode_atts(
+			array(
+				'limit'    => isset( $config['limit'] ) ? $config['limit'] : 4,
+				'columns'  => isset( $config['columns'] ) ? $config['columns'] : 4,
+				'days'     => isset( $config['days'] ) ? $config['days'] : 30,
+				'category' => isset( $config['category'] ) ? $config['category'] : '',
+				'layout'   => isset( $config['layout'] ) ? $config['layout'] : 'grid',
+			),
+			$atts,
+			'aisales_new_arrivals'
+		);
+
+		// Calculate date threshold.
+		$days           = absint( $atts['days'] );
+		$date_threshold = date( 'Y-m-d H:i:s', strtotime( "-{$days} days" ) );
+
+		// Query args for new arrivals.
+		$query_args = array(
+			'post_type'      => 'product',
+			'post_status'    => 'publish',
+			'posts_per_page' => absint( $atts['limit'] ),
+			'orderby'        => 'date',
+			'order'          => 'DESC',
+			'date_query'     => array(
+				array(
+					'after' => $date_threshold,
+				),
+			),
+		);
+
+		// Filter by category if specified.
+		if ( ! empty( $atts['category'] ) ) {
+			$query_args['tax_query'] = array(
+				array(
+					'taxonomy' => 'product_cat',
+					'field'    => 'slug',
+					'terms'    => sanitize_text_field( $atts['category'] ),
+				),
+			);
+		}
+
+		// Only show visible products.
+		$query_args['tax_query'][] = array(
+			'taxonomy' => 'product_visibility',
+			'field'    => 'name',
+			'terms'    => array( 'exclude-from-catalog' ),
+			'operator' => 'NOT IN',
+		);
+
+		return $this->render_product_grid( 'new_arrivals', $query_args, $atts, $config );
+	}
+
+	/* =========================================================================
+	   PRODUCT GRID HELPER
+	   ========================================================================= */
+
+	/**
+	 * Render a product grid/list
+	 *
+	 * Shared helper for discovery widgets (bestsellers, new_arrivals, trending, etc.)
+	 *
+	 * @param string $widget_key Widget key (e.g., 'bestsellers', 'new_arrivals').
+	 * @param array  $query_args WP_Query arguments.
+	 * @param array  $atts       Shortcode attributes.
+	 * @param array  $config     Widget configuration.
+	 * @return string HTML output.
+	 */
+	private function render_product_grid( $widget_key, $query_args, $atts, $config ) {
+		if ( ! function_exists( 'wc_get_product' ) ) {
+			return '';
+		}
+
+		$products = new WP_Query( $query_args );
+
+		if ( ! $products->have_posts() ) {
+			wp_reset_postdata();
+			return '';
+		}
+
+		$this->enqueue_assets();
+
+		// Get display options from config.
+		$show_title         = isset( $config['show_title'] ) ? $config['show_title'] : true;
+		$show_price         = isset( $config['show_price'] ) ? $config['show_price'] : true;
+		$show_rating        = isset( $config['show_rating'] ) ? $config['show_rating'] : true;
+		$show_badge         = isset( $config['show_badge'] ) ? $config['show_badge'] : true;
+		$badge_text         = isset( $config['badge_text'] ) ? $config['badge_text'] : '';
+		$title_text         = isset( $config['title_text'] ) ? $config['title_text'] : '';
+		$show_section_title = isset( $config['show_section_title'] ) ? $config['show_section_title'] : true;
+		$columns            = isset( $atts['columns'] ) ? absint( $atts['columns'] ) : 4;
+		$layout             = isset( $atts['layout'] ) ? sanitize_key( $atts['layout'] ) : 'grid';
+
+		// Build output.
+		$output = '';
+
+		// Section title.
+		if ( $show_section_title && ! empty( $title_text ) ) {
+			$output .= '<h3 class="aisales-product-grid__title">' . esc_html( $title_text ) . '</h3>';
+		}
+
+		// Grid wrapper.
+		$grid_class = 'aisales-product-grid__items';
+		$grid_class .= ' aisales-product-grid--' . $layout;
+		$grid_class .= ' aisales-product-grid--cols-' . $columns;
+
+		$output .= '<div class="' . esc_attr( $grid_class ) . '">';
+
+		while ( $products->have_posts() ) {
+			$products->the_post();
+			$product = wc_get_product( get_the_ID() );
+
+			if ( ! $product ) {
+				continue;
+			}
+
+			$output .= '<div class="aisales-product-grid__item">';
+
+			// Product link wrapper.
+			$output .= '<a href="' . esc_url( $product->get_permalink() ) . '" class="aisales-product-grid__link">';
+
+			// Image container with badge.
+			$output .= '<div class="aisales-product-grid__image-wrap">';
+
+			// Product image.
+			$image_id = $product->get_image_id();
+			if ( $image_id ) {
+				$output .= wp_get_attachment_image( $image_id, 'woocommerce_thumbnail', false, array( 'class' => 'aisales-product-grid__image' ) );
+			} else {
+				$output .= wc_placeholder_img( 'woocommerce_thumbnail', array( 'class' => 'aisales-product-grid__image' ) );
+			}
+
+			// Badge.
+			if ( $show_badge && ! empty( $badge_text ) ) {
+				$output .= '<span class="aisales-product-grid__badge">' . esc_html( $badge_text ) . '</span>';
+			}
+
+			// Sale badge (if on sale).
+			if ( $product->is_on_sale() ) {
+				$output .= '<span class="aisales-product-grid__sale-badge">' . esc_html__( 'Sale', 'ai-sales-manager-for-woocommerce' ) . '</span>';
+			}
+
+			$output .= '</div>'; // End image-wrap.
+
+			// Product info.
+			$output .= '<div class="aisales-product-grid__info">';
+
+			// Title.
+			if ( $show_title ) {
+				$output .= '<h4 class="aisales-product-grid__product-title">' . esc_html( $product->get_name() ) . '</h4>';
+			}
+
+			// Rating.
+			if ( $show_rating && $product->get_average_rating() > 0 ) {
+				$rating = $product->get_average_rating();
+				$output .= '<div class="aisales-product-grid__rating">';
+				$output .= $this->render_star_rating( $rating );
+				$output .= '</div>';
+			}
+
+			// Price.
+			if ( $show_price ) {
+				$output .= '<div class="aisales-product-grid__price">' . $product->get_price_html() . '</div>';
+			}
+
+			$output .= '</div>'; // End info.
+			$output .= '</a>'; // End link.
+			$output .= '</div>'; // End item.
+		}
+
+		$output .= '</div>'; // End items.
+
+		wp_reset_postdata();
+
+		// Build wrapper classes.
+		$classes      = array();
+		$custom_class = isset( $config['custom_class'] ) ? $config['custom_class'] : '';
+		if ( ! empty( $custom_class ) ) {
+			$classes[] = sanitize_html_class( $custom_class );
+		}
+
+		// Build styles.
+		$style = $this->build_margin_style( $config );
+
+		// Use wrap_output but with block display.
+		$base_class = 'aisales-widget aisales-product-grid aisales-' . str_replace( '_', '-', $widget_key );
+		if ( ! empty( $classes ) ) {
+			$base_class .= ' ' . implode( ' ', $classes );
+		}
+
+		$style_attr = ! empty( $style ) ? sprintf( ' style="%s"', esc_attr( $style ) ) : '';
+
+		return sprintf(
+			'<div class="%s"%s>%s</div>',
+			esc_attr( $base_class ),
+			$style_attr,
+			$output
+		);
+	}
+
+	/**
+	 * Render star rating HTML (compact version for grids)
+	 *
+	 * @param float $rating Rating value (0-5).
+	 * @return string HTML output.
+	 */
+	private function render_star_rating( $rating ) {
+		$rating     = (float) $rating;
+		$full_stars = floor( $rating );
+		$half_star  = ( $rating - $full_stars ) >= 0.5;
+
+		$html = '<span class="aisales-stars">';
+
+		// Full stars.
+		for ( $i = 0; $i < $full_stars; $i++ ) {
+			$html .= '<svg class="aisales-star aisales-star--full" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>';
+		}
+
+		// Half star.
+		if ( $half_star ) {
+			$html .= '<svg class="aisales-star aisales-star--half" viewBox="0 0 24 24" width="14" height="14"><defs><linearGradient id="half-grad-grid"><stop offset="50%" stop-color="currentColor"/><stop offset="50%" stop-color="#d1d5db"/></linearGradient></defs><path fill="url(#half-grad-grid)" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>';
+		}
+
+		// Empty stars to fill to 5.
+		$empty_stars = 5 - $full_stars - ( $half_star ? 1 : 0 );
+		for ( $i = 0; $i < $empty_stars; $i++ ) {
+			$html .= '<svg class="aisales-star aisales-star--empty" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>';
+		}
+
+		$html .= '</span>';
+
+		return $html;
 	}
 }
