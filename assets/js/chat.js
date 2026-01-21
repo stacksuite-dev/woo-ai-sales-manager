@@ -7,8 +7,11 @@
 (function($) {
 	'use strict';
 
+	// Expose app globally for modules
+	const app = window.AISalesChat = window.AISalesChat || {};
+
 	// Chat state
-	const state = {
+	const state = app.state = {
 		sessionId: null,
 		entityType: 'product', // 'product' | 'category' | 'agent'
 		selectedProduct: null,
@@ -26,11 +29,15 @@
 		maxAttachments: 5,
 		maxFileSize: 7 * 1024 * 1024, // 7MB
 		maxImageSize: 1024 * 1024, // 1MB - resize images larger than this
-		allowedMimeTypes: ['image/png', 'image/jpeg', 'image/webp', 'image/heic', 'image/heif', 'application/pdf']
+		allowedMimeTypes: ['image/png', 'image/jpeg', 'image/webp', 'image/heic', 'image/heif', 'application/pdf'],
+		// Wizard state
+		wizardStep: 1,
+		wizardTask: null, // 'product' | 'category' | 'agent'
+		wizardComplete: false
 	};
 
 	// DOM Elements
-	const elements = {
+	const elements = app.elements = {
 		// Entity switcher
 		entityTabs: null,
 		entitySelect: null,
@@ -72,11 +79,59 @@
 		onboardingOverlay: null,
 		
 		// Welcome cards
-		welcomeCards: null
+		welcomeCards: null,
+		
+		// Wizard elements
+		wizard: null,
+		wizardSteps: null,
+		wizardPanels: null,
+		wizardCards: null,
+		wizardSearch: null,
+		wizardItems: null,
+		wizardTitle: null,
+		wizardSubtitle: null,
+		wizardBack: null,
+		wizardSetupContext: null,
+		breadcrumb: null,
+		breadcrumbType: null,
+		breadcrumbName: null,
+		breadcrumbChange: null
 	};
 
-	// Templates
-	const templates = {};
+	// Templates - expose to app for module access
+	const templates = app.templates = {};
+
+	// Utility function wrappers - use module if loaded, otherwise fall back to local
+	const escapeHtml = app.utils ? app.utils.escapeHtml : function(str) {
+		if (!str) return '';
+		return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+	};
+	const truncate = app.utils ? app.utils.truncate : function(str, len) {
+		if (!str) return '';
+		return str.length > len ? str.substring(0, len) + '...' : str;
+	};
+	const formatPrice = app.utils ? app.utils.formatPrice : null;
+	const formatStock = app.utils ? app.utils.formatStock : null;
+	const formatStatus = app.utils ? app.utils.formatStatus : null;
+	const formatCurrency = app.utils ? app.utils.formatCurrency : null;
+	const numberFormat = app.utils ? app.utils.numberFormat : function(num) {
+		return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+	};
+	const debounce = app.utils ? app.utils.debounce : function(func, wait) {
+		var timeout;
+		return function() {
+			var context = this, args = arguments;
+			clearTimeout(timeout);
+			timeout = setTimeout(function() { func.apply(context, args); }, wait);
+		};
+	};
+	const animateBalance = app.utils ? app.utils.animateBalance : null;
+	const syncBalanceToWordPress = app.utils ? app.utils.syncBalanceToWordPress : null;
+	const highlightSearchMatch = app.utils ? app.utils.highlightSearchMatch : null;
+
+	// Attachment function wrappers - use module if loaded
+	const clearAttachments = app.attachments ? app.attachments.clear : null;
+	const updateAttachmentPreviews = app.attachments ? app.attachments.updatePreviews : null;
 
 	/**
 	 * Initialize the chat interface
@@ -102,31 +157,88 @@
 		}
 
 		// Populate entity selector based on type
-		populateEntitySelector();
+		if (app.entities && typeof app.entities.populateSelector === 'function') {
+			app.entities.populateSelector();
+		} else {
+			populateEntitySelector();
+		}
 
 		// Bind events
 		bindEvents();
 
+		// Initialize attachments module (if loaded)
+		if (app.attachments && typeof app.attachments.init === 'function') {
+			app.attachments.init();
+		}
+
+		// Initialize context panel module (if loaded)
+		if (app.context && typeof app.context.init === 'function') {
+			app.context.init();
+		}
+
+		// Initialize entities module (if loaded)
+		if (app.entities && typeof app.entities.init === 'function') {
+			app.entities.init();
+		}
+
+		// Initialize messaging module (if loaded)
+		if (app.messaging && typeof app.messaging.init === 'function') {
+			app.messaging.init();
+		}
+
+		// Initialize suggestions module (if loaded)
+		if (app.suggestions && typeof app.suggestions.init === 'function') {
+			app.suggestions.init();
+		}
+
+		// Initialize images module (if loaded)
+		if (app.images && typeof app.images.init === 'function') {
+			app.images.init();
+		}
+
 		// Check for preselected product
 		if (typeof window.aisalesPreselectedProduct !== 'undefined') {
 			state.entityType = 'product';
-			updateEntityTabs();
-			selectProduct(window.aisalesPreselectedProduct);
+			if (app.entities) {
+				app.entities.updateTabs();
+				app.entities.selectProduct(window.aisalesPreselectedProduct);
+			} else {
+				updateEntityTabs();
+				selectProduct(window.aisalesPreselectedProduct);
+			}
 		}
 
 		// Check for preselected category
 		if (typeof window.aisalesPreselectedCategory !== 'undefined') {
 			state.entityType = 'category';
-			updateEntityTabs();
-			selectCategory(window.aisalesPreselectedCategory);
+			if (app.entities) {
+				app.entities.updateTabs();
+				app.entities.selectCategory(window.aisalesPreselectedCategory);
+			} else {
+				updateEntityTabs();
+				selectCategory(window.aisalesPreselectedCategory);
+			}
 		}
 
 		// Auto-resize textarea
 		autoResizeTextarea();
 
 		// Update UI based on initial entity type
-		updateEntityTabs();
-		updateQuickActionsVisibility();
+		if (app.entities) {
+			app.entities.updateTabs();
+			app.entities.updateQuickActionsVisibility();
+		} else {
+			updateEntityTabs();
+			updateQuickActionsVisibility();
+		}
+		
+		// Initialize wizard module (if loaded)
+		if (app.wizard && typeof app.wizard.init === 'function') {
+			app.wizard.init();
+		} else {
+			// Fallback to local initWizard if module not loaded
+			initWizard();
+		}
 	}
 
 	/**
@@ -175,6 +287,22 @@
 		
 		// Welcome cards
 		elements.welcomeCards = $('.aisales-welcome-cards');
+		
+		// Wizard elements
+		elements.wizard = $('#aisales-wizard');
+		elements.wizardSteps = $('.aisales-wizard__step');
+		elements.wizardPanels = $('.aisales-wizard__panel');
+		elements.wizardCards = $('.aisales-wizard__card');
+		elements.wizardSearch = $('#aisales-wizard-search');
+		elements.wizardItems = $('#aisales-wizard-items');
+		elements.wizardTitle = $('#aisales-wizard-title');
+		elements.wizardSubtitle = $('#aisales-wizard-subtitle');
+		elements.wizardBack = $('.aisales-wizard__back');
+		elements.wizardSetupContext = $('.aisales-wizard-setup-context');
+		elements.breadcrumb = $('#aisales-chat-breadcrumb');
+		elements.breadcrumbType = $('#aisales-breadcrumb-type');
+		elements.breadcrumbName = $('#aisales-breadcrumb-name');
+		elements.breadcrumbChange = $('#aisales-breadcrumb-change');
 		
 		// Attachment elements
 		elements.attachButton = $('#aisales-attach-button');
@@ -273,11 +401,12 @@
 	 * Bind event handlers
 	 */
 	function bindEvents() {
-		// Entity type tabs
-		elements.entityTabs.on('click', '.aisales-entity-tab', handleEntityTabClick);
-
-		// Entity selection
-		elements.entitySelect.on('change', handleEntityChange);
+		// Entity type tabs and selection - only bind if entities module not loaded
+		if (!app.entities) {
+			elements.entityTabs.on('click', '.aisales-entity-tab', handleEntityTabClick);
+			elements.entitySelect.on('change', handleEntityChange);
+			elements.entityPanel.on('click', '.aisales-expand-toggle', handleExpandToggle);
+		}
 
 		// Send message
 		elements.sendButton.on('click', handleSendMessage);
@@ -289,7 +418,7 @@
 		});
 
 		// Quick actions - Product
-		elements.quickActionsProduct.on('click', '[data-action]', handleQuickAction);
+		elements.quickActionsProduct.on('click', '[data-action]', handleProductQuickAction);
 		
 		// Quick actions - Category
 		elements.quickActionsCategory.on('click', '[data-action]', handleCategoryQuickAction);
@@ -303,58 +432,75 @@
 		// New chat
 		elements.newChatButton.on('click', handleNewChat);
 
-		// Accept/Discard all - Products
-		$('#aisales-accept-all').on('click', handleAcceptAll);
-		$('#aisales-discard-all').on('click', handleDiscardAll);
-		
-		// Accept/Discard all - Categories
-		$('#aisales-category-accept-all').on('click', handleAcceptAll);
-		$('#aisales-category-discard-all').on('click', handleDiscardAll);
+		// Suggestion-related events - only bind if suggestions module not loaded
+		if (!app.suggestions) {
+			// Accept/Discard all - Products
+			$('#aisales-accept-all').on('click', handleAcceptAll);
+			$('#aisales-discard-all').on('click', handleDiscardAll);
+			
+			// Accept/Discard all - Categories
+			$('#aisales-category-accept-all').on('click', handleAcceptAll);
+			$('#aisales-category-discard-all').on('click', handleDiscardAll);
 
-		// Suggestion actions (delegated)
-		elements.messagesContainer.on('click', '.aisales-suggestion [data-action]', handleSuggestionAction);
+			// Suggestion actions (delegated)
+			elements.messagesContainer.on('click', '.aisales-suggestion [data-action]', handleSuggestionAction);
 
-		// Product panel suggestion actions
-		elements.productInfo.on('click', '.aisales-pending-change__actions [data-action]', handlePendingChangeAction);
-		
-		// Category panel suggestion actions
-		elements.categoryInfo.on('click', '.aisales-pending-change__actions [data-action]', handlePendingChangeAction);
+			// Catalog suggestion actions
+			elements.messagesContainer.on('click', '.aisales-catalog-suggestion [data-action]', handleCatalogSuggestionAction);
 
-		// Expand toggle for description
-		elements.entityPanel.on('click', '.aisales-expand-toggle', handleExpandToggle);
+			// Product panel suggestion actions
+			elements.productInfo.on('click', '.aisales-pending-change__actions [data-action]', handlePendingChangeAction);
+			
+			// Category panel suggestion actions
+			elements.categoryInfo.on('click', '.aisales-pending-change__actions [data-action]', handlePendingChangeAction);
+		}
 
-		// Store context panel
-		elements.storeContextBtn.on('click', openContextPanel);
-		$('#aisales-close-context, #aisales-cancel-context').on('click', closeContextPanel);
-		elements.contextBackdrop.on('click', closeContextPanel);
-		$('#aisales-save-context').on('click', saveStoreContext);
-		$('#aisales-sync-context').on('click', syncStoreContext);
+		// Inline options (conversational quick actions in AI messages)
+		elements.messagesContainer.on('click', '.aisales-inline-option', handleInlineOptionClick);
 
-		// Onboarding
-		$('#aisales-onboarding-setup').on('click', function() {
-			closeOnboarding();
-			openContextPanel();
-		});
-		$('#aisales-onboarding-skip').on('click', closeOnboarding);
+		// Generated image actions - only bind if images module not loaded
+		if (!app.images) {
+			elements.messagesContainer.on('click', '.aisales-generated-image [data-action]', handleGeneratedImageAction);
+			elements.messagesContainer.on('click', '.aisales-generated-image__expand', handleImageExpand);
+			elements.messagesContainer.on('click', '.aisales-generated-image__img', handleImageExpand);
+		}
+
+		// Store context panel - only bind if context module not loaded
+		if (!app.context) {
+			elements.storeContextBtn.on('click', openContextPanel);
+			$('#aisales-close-context, #aisales-cancel-context').on('click', closeContextPanel);
+			elements.contextBackdrop.on('click', closeContextPanel);
+			$('#aisales-save-context').on('click', saveStoreContext);
+			$('#aisales-sync-context').on('click', syncStoreContext);
+
+			// Onboarding
+			$('#aisales-onboarding-setup').on('click', function() {
+				closeOnboarding();
+				openContextPanel();
+			});
+			$('#aisales-onboarding-skip').on('click', closeOnboarding);
+			
+			// Welcome context hint
+			$('#aisales-welcome-setup-context').on('click', openContextPanel);
+		}
 
 		// Welcome cards
 		elements.welcomeCards.on('click', '.aisales-welcome-card', handleWelcomeCardClick);
 		
-		// Welcome context hint
-		$('#aisales-welcome-setup-context').on('click', openContextPanel);
-		
-		// Attachment handling
-		elements.attachButton.on('click', function() {
-			elements.fileInput.click();
-		});
-		elements.fileInput.on('change', handleFileSelect);
-		elements.attachmentPreviews.on('click', '.aisales-attachment-remove', handleRemoveAttachment);
-		
-		// Drag and drop
-		setupDragAndDrop();
-		
-		// Paste handling for images
-		elements.messageInput.on('paste', handlePaste);
+		// Attachment handling - only bind if module not loaded
+		if (!app.attachments) {
+			elements.attachButton.on('click', function() {
+				elements.fileInput.click();
+			});
+			elements.fileInput.on('change', handleFileSelect);
+			elements.attachmentPreviews.on('click', '.aisales-attachment-remove', handleRemoveAttachment);
+			
+			// Drag and drop
+			setupDragAndDrop();
+			
+			// Paste handling for images
+			elements.messageInput.on('paste', handlePaste);
+		}
 	}
 
 	/**
@@ -373,7 +519,9 @@
 	function handleRemoveAttachment(e) {
 		const index = $(e.currentTarget).closest('.aisales-attachment-preview').data('index');
 		state.pendingAttachments.splice(index, 1);
-		updateAttachmentPreviews();
+		if (app.attachments) {
+			app.attachments.updatePreviews();
+		}
 	}
 
 	/**
@@ -426,7 +574,7 @@
 		// Check max attachments
 		const remainingSlots = state.maxAttachments - state.pendingAttachments.length;
 		if (remainingSlots <= 0) {
-			showNotice('Maximum ' + state.maxAttachments + ' files allowed per message', 'error');
+			app.ui.showNotice('Maximum ' + state.maxAttachments + ' files allowed per message', 'error');
 			return;
 		}
 
@@ -435,13 +583,13 @@
 		filesToProcess.forEach(function(file) {
 			// Validate file type
 			if (!state.allowedMimeTypes.includes(file.type)) {
-				showNotice('File type not supported: ' + file.name, 'error');
+				app.ui.showNotice('File type not supported: ' + file.name, 'error');
 				return;
 			}
 
 			// Validate file size
 			if (file.size > state.maxFileSize) {
-				showNotice('File too large: ' + file.name + ' (max ' + Math.round(state.maxFileSize / 1024 / 1024) + 'MB)', 'error');
+				app.ui.showNotice('File too large: ' + file.name + ' (max ' + Math.round(state.maxFileSize / 1024 / 1024) + 'MB)', 'error');
 				return;
 			}
 
@@ -473,10 +621,12 @@
 				data: base64Data,
 				preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : null
 			});
-			updateAttachmentPreviews();
+			if (app.attachments) {
+				app.attachments.updatePreviews();
+			}
 		}).catch(function(err) {
 			console.error('Failed to read file:', err);
-			showNotice('Failed to read file: ' + file.name, 'error');
+			app.ui.showNotice('Failed to read file: ' + file.name, 'error');
 		});
 	}
 
@@ -544,64 +694,7 @@
 		});
 	}
 
-	/**
-	 * Update attachment previews UI
-	 */
-	function updateAttachmentPreviews() {
-		const $container = elements.attachmentPreviews;
-		$container.empty();
-
-		if (state.pendingAttachments.length === 0) {
-			$container.hide();
-			elements.attachButton.find('.aisales-attachment-count').remove();
-			return;
-		}
-
-		state.pendingAttachments.forEach(function(attachment, index) {
-			const isImage = attachment.mime_type.startsWith('image/');
-			const isPdf = attachment.mime_type === 'application/pdf';
-
-			let previewHtml = '<div class="aisales-attachment-preview" data-index="' + index + '">';
-			
-			if (isImage && attachment.preview) {
-				previewHtml += '<img src="' + attachment.preview + '" alt="' + escapeHtml(attachment.filename) + '">';
-			} else if (isPdf) {
-				previewHtml += '<div class="aisales-attachment-preview__icon"><span class="dashicons dashicons-pdf"></span></div>';
-			} else {
-				previewHtml += '<div class="aisales-attachment-preview__icon"><span class="dashicons dashicons-media-default"></span></div>';
-			}
-
-			previewHtml += '<div class="aisales-attachment-preview__name">' + escapeHtml(truncate(attachment.filename, 15)) + '</div>';
-			previewHtml += '<button type="button" class="aisales-attachment-remove" title="Remove"><span class="dashicons dashicons-no-alt"></span></button>';
-			previewHtml += '</div>';
-
-			$container.append(previewHtml);
-		});
-
-		$container.show();
-
-		// Update attachment count on button
-		let $count = elements.attachButton.find('.aisales-attachment-count');
-		if ($count.length === 0) {
-			$count = $('<span class="aisales-attachment-count"></span>');
-			elements.attachButton.append($count);
-		}
-		$count.text(state.pendingAttachments.length);
-	}
-
-	/**
-	 * Clear all pending attachments
-	 */
-	function clearAttachments() {
-		// Revoke object URLs to prevent memory leaks
-		state.pendingAttachments.forEach(function(attachment) {
-			if (attachment.preview) {
-				URL.revokeObjectURL(attachment.preview);
-			}
-		});
-		state.pendingAttachments = [];
-		updateAttachmentPreviews();
-	}
+	// updateAttachmentPreviews and clearAttachments moved to attachments.js module
 
 	/**
 	 * Handle entity tab click (switch between Products/Categories/Agent)
@@ -722,7 +815,7 @@
 		state.selectedProduct = product;
 		state.selectedCategory = null;
 		state.isAgentMode = false;
-		updateProductPanel(product);
+		app.panels.updateProductPanel(product);
 		enableInputs();
 
 		// Hide welcome, show product info
@@ -743,7 +836,7 @@
 		state.selectedCategory = category;
 		state.selectedProduct = null;
 		state.isAgentMode = false;
-		updateCategoryPanel(category);
+		app.panels.updateCategoryPanel(category);
 		enableInputs();
 
 		// Hide welcome, show category info
@@ -770,7 +863,7 @@
 		state.isAgentMode = true;
 		
 		// Clear messages display
-		clearMessages();
+		app.ui.clearMessages();
 		
 		// Enable inputs for agent mode
 		enableInputs();
@@ -842,7 +935,7 @@
 		elements.pendingSummary.hide();
 
 		disableInputs();
-		showWelcomeMessage();
+		app.ui.showWelcomeMessage();
 	}
 
 	/**
@@ -859,7 +952,7 @@
 		elements.categoryPendingSummary.hide();
 
 		disableInputs();
-		showWelcomeMessage();
+		app.ui.showWelcomeMessage();
 	}
 
 	/**
@@ -875,134 +968,10 @@
 		elements.entityEmpty.show();
 
 		disableInputs();
-		showWelcomeMessage();
+		app.ui.showWelcomeMessage();
 	}
 
-	/**
-	 * Update product info panel
-	 */
-	function updateProductPanel(product) {
-		elements.entityEmpty.hide();
-		elements.productInfo.show();
-
-		// Image
-		const $image = $('#aisales-product-image');
-		if (product.image_url) {
-			$image.attr('src', product.image_url).show();
-		} else {
-			$image.hide();
-		}
-
-		// Title
-		$('#aisales-product-title').text(product.title || '');
-
-		// Description
-		const desc = product.description || '';
-		$('#aisales-product-description').html(desc.substring(0, 200) + (desc.length > 200 ? '...' : ''));
-
-		// Short description
-		$('#aisales-product-short-description').text(product.short_description || '');
-
-		// Categories
-		const categories = product.categories || [];
-		if (categories.length > 0) {
-			$('#aisales-product-categories').html(
-				categories.map(cat => '<span class="aisales-tag">' + escapeHtml(cat) + '</span>').join('')
-			);
-		} else {
-			$('#aisales-product-categories').html('<span class="aisales-no-value">' + (aisalesChat.i18n.none || 'None') + '</span>');
-		}
-
-		// Tags
-		const tags = product.tags || [];
-		if (tags.length > 0) {
-			$('#aisales-product-tags').html(
-				tags.map(tag => '<span class="aisales-tag">' + escapeHtml(tag) + '</span>').join('')
-			);
-		} else {
-			$('#aisales-product-tags').html('<span class="aisales-no-value">' + (aisalesChat.i18n.none || 'None') + '</span>');
-		}
-
-		// Price
-		const priceHtml = formatPrice(product.regular_price, product.sale_price, product.price);
-		$('#aisales-product-price').html(priceHtml);
-
-		// Stock
-		const stockHtml = formatStock(product.stock_status, product.stock_quantity);
-		$('#aisales-product-stock').html(stockHtml);
-
-		// Status
-		$('#aisales-product-status').html(formatStatus(product.status));
-
-		// Edit/View links
-		$('#aisales-edit-product').attr('href', product.edit_url || '#');
-		$('#aisales-view-product').attr('href', product.view_url || '#');
-
-		// Set selected in dropdown
-		elements.entitySelect.val(product.id);
-	}
-
-	/**
-	 * Update category info panel
-	 */
-	function updateCategoryPanel(category) {
-		elements.entityEmpty.hide();
-		elements.categoryInfo.show();
-
-		// Name
-		$('#aisales-category-name').text(category.name || '');
-		$('#aisales-category-name-value').text(category.name || '');
-
-		// Parent
-		if (category.parent_name) {
-			$('#aisales-category-parent').text('in ' + category.parent_name).show();
-		} else {
-			$('#aisales-category-parent').hide();
-		}
-
-		// Stats
-		$('#aisales-category-product-count').text(category.product_count || 0);
-		$('#aisales-category-subcat-count').text(category.subcategory_count || 0);
-
-		// Description
-		const desc = category.description || '';
-		if (desc) {
-			$('#aisales-category-description').html(desc.substring(0, 200) + (desc.length > 200 ? '...' : ''));
-		} else {
-			$('#aisales-category-description').html('<span class="aisales-no-value">' + (aisalesChat.i18n.noDescription || 'No description') + '</span>');
-		}
-
-		// SEO Title
-		if (category.seo_title) {
-			$('#aisales-category-seo-title').text(category.seo_title);
-		} else {
-			$('#aisales-category-seo-title').html('<span class="aisales-no-value">' + (aisalesChat.i18n.notSet || 'Not set') + '</span>');
-		}
-
-		// Meta Description
-		if (category.meta_description) {
-			$('#aisales-category-meta-description').text(category.meta_description);
-		} else {
-			$('#aisales-category-meta-description').html('<span class="aisales-no-value">' + (aisalesChat.i18n.notSet || 'Not set') + '</span>');
-		}
-
-		// Subcategories
-		const subcats = category.subcategories || [];
-		if (subcats.length > 0) {
-			$('#aisales-category-subcategories').html(
-				subcats.map(sub => '<span class="aisales-subcat-tag"><span class="dashicons dashicons-category"></span>' + escapeHtml(sub.name) + '</span>').join('')
-			);
-		} else {
-			$('#aisales-category-subcategories').html('<span class="aisales-no-value">' + (aisalesChat.i18n.none || 'None') + '</span>');
-		}
-
-		// Edit/View links
-		$('#aisales-edit-category').attr('href', category.edit_url || '#');
-		$('#aisales-view-category').attr('href', category.view_url || '#');
-
-		// Set selected in dropdown
-		elements.entitySelect.val(category.id);
-	}
+	// updateProductPanel and updateCategoryPanel moved to panels.js module
 
 	/**
 	 * Create a new chat session
@@ -1011,7 +980,7 @@
 		if (state.isLoading) return;
 
 		setLoading(true);
-		clearMessages();
+		app.ui.clearMessages();
 
 		const sessionData = {
 			entity_type: entityType || state.entityType
@@ -1111,7 +1080,7 @@
 				}
 			},
 			error: function(xhr) {
-				handleError(xhr);
+				app.ui.handleError(xhr);
 				setLoading(false);
 			}
 		});
@@ -1138,12 +1107,12 @@
 					state.pendingSuggestions[suggestion.id] = suggestion;
 				});
 
-				renderMessages();
-				updatePendingSummary();
+				app.ui.renderMessages();
+				app.updatePendingSummary();
 				setLoading(false);
 			},
 			error: function(xhr) {
-				handleError(xhr);
+				app.ui.handleError(xhr);
 				setLoading(false);
 			}
 		});
@@ -1168,14 +1137,19 @@
 		setLoading(true);
 		elements.messageInput.val('');
 
-		// Capture attachments before clearing
-		const attachments = state.pendingAttachments.map(function(a) {
-			return {
-				filename: a.filename,
-				mime_type: a.mime_type,
-				data: a.data
-			};
-		});
+		// Capture attachments before clearing - use module if available
+		var attachmentsData;
+		if (app.attachments && typeof app.attachments.getForSending === 'function') {
+			attachmentsData = app.attachments.getForSending();
+		} else {
+			attachmentsData = state.pendingAttachments.map(function(a) {
+				return {
+					filename: a.filename,
+					mime_type: a.mime_type,
+					data: a.data
+				};
+			});
+		}
 
 		// Add user message to UI immediately (with attachment indicators)
 		const messageData = {
@@ -1183,15 +1157,19 @@
 			role: 'user',
 			content: content,
 			created_at: new Date().toISOString(),
-			attachments: attachments.length > 0 ? attachments : undefined
+			attachments: attachmentsData.length > 0 ? attachmentsData : undefined
 		};
-		addMessage(messageData);
+		app.ui.addMessage(messageData);
 
-		// Clear attachments after capturing
-		clearAttachments();
+		// Clear attachments after capturing - use module if available
+		if (app.attachments && typeof app.attachments.clear === 'function') {
+			app.attachments.clear();
+		} else if (typeof clearAttachments === 'function') {
+			clearAttachments();
+		}
 
 		// Show thinking indicator
-		showThinking();
+		app.ui.showThinking();
 
 		// Build request data
 		const requestData = {
@@ -1202,8 +1180,8 @@
 			requestData.quick_action = quickAction;
 		}
 
-		if (attachments.length > 0) {
-			requestData.attachments = attachments;
+		if (attachmentsData.length > 0) {
+			requestData.attachments = attachmentsData;
 		}
 
 		// Try SSE first, fall back to regular request
@@ -1246,7 +1224,7 @@
 			} else {
 				// Regular JSON response
 				return response.json().then(function(data) {
-					hideThinking();
+					app.ui.hideThinking();
 					// Handle both wrapped {success, data} and direct response formats
 					const responseData = data.data || data;
 					if (responseData.assistant_message || responseData.suggestions) {
@@ -1258,7 +1236,7 @@
 		})
 		.catch(function(error) {
 			console.error('Chat error:', error);
-			hideThinking();
+			app.ui.hideThinking();
 			
 			// Handle specific error codes
 			let errorMessage = aisalesChat.i18n.connectionError;
@@ -1275,7 +1253,7 @@
 				}
 			}
 			
-			addErrorMessage(errorMessage);
+			app.ui.addErrorMessage(errorMessage);
 			setLoading(false);
 		});
 	}
@@ -1325,27 +1303,37 @@
 					};
 					break;
 
-				case 'content_delta':
-					if (data.delta) {
-						// On first content, hide thinking and add the message bubble
-						if (!messageContent && assistantMessage) {
-							hideThinking();
-							addMessage(assistantMessage, true);
+			case 'content_delta':
+				if (data.delta) {
+					// On first content, hide thinking/processing indicators and add the message bubble
+					if (!messageContent) {
+						app.ui.hideThinking();
+						hideToolProcessingMessage();
+						// Create assistant message if not already created by message_start
+						if (!assistantMessage) {
+							assistantMessage = {
+								id: 'msg-' + Date.now(),
+								role: 'assistant',
+								content: '',
+								created_at: new Date().toISOString()
+							};
 						}
-						messageContent += data.delta;
-						updateStreamingMessage(messageContent);
+						app.ui.addMessage(assistantMessage, true);
 					}
-					break;
+					messageContent += data.delta;
+					app.ui.updateStreamingMessage(messageContent);
+				}
+				break;
 
 				case 'suggestion':
 					if (data.suggestion) {
-						handleSuggestionReceived(data.suggestion);
+						app.handleSuggestionReceived(data.suggestion);
 					}
 					break;
 
 				case 'usage':
 					if (data.tokens) {
-						updateTokensUsed(data.tokens);
+						app.ui.updateTokensUsed(data.tokens);
 						// Don't update balance here - wait for balance_update event with accurate value
 					}
 					break;
@@ -1386,13 +1374,40 @@
 					}
 					break;
 
-				case 'done':
+				case 'image_generating':
+					// AI is generating an image
+					app.showImageGeneratingIndicator(data.prompt || 'Creating your image...');
+					break;
+
+			case 'image_generated':
+				// Image generation complete
+				app.hideImageGeneratingIndicator();
+				if (data.url) {
+					app.appendGeneratedImage(data);
+				}
+				break;
+
+			case 'catalog_suggestion':
+				// Catalog reorganization suggestion from AI
+				if (data.suggestion) {
+					app.renderCatalogSuggestion(data.suggestion);
+				}
+				break;
+
+			case 'research_confirmation':
+				// Market research requires user confirmation
+				if (data) {
+					app.showResearchConfirmation(data);
+				}
+				break;
+
+			case 'done':
 					setLoading(false);
 					break;
 
 				case 'error':
-					hideThinking();
-					addErrorMessage(data.message || aisalesChat.i18n.errorOccurred);
+					app.ui.hideThinking();
+					app.ui.addErrorMessage(data.message || aisalesChat.i18n.errorOccurred);
 					setLoading(false);
 					break;
 			}
@@ -1433,7 +1448,7 @@
 		);
 
 		elements.messagesContainer.append($toolMessage);
-		scrollToBottom();
+		app.ui.scrollToBottom();
 	}
 
 	/**
@@ -1442,6 +1457,27 @@
 	function hideToolProcessingMessage() {
 		elements.messagesContainer.find('.aisales-message--tool-processing').remove();
 	}
+
+	// Image & catalog suggestion functions moved to images.js and suggestions.js modules
+
+	/**
+	 * Handle inline option click (conversational quick actions)
+	 */
+	function handleInlineOptionClick(e) {
+		var $btn = $(e.currentTarget);
+		var value = $btn.data('option-value');
+
+		if (!value) return;
+
+		// Disable all options in this group and mark selected
+		$btn.closest('.aisales-inline-options').find('.aisales-inline-option').prop('disabled', true);
+		$btn.addClass('aisales-inline-option--selected');
+
+		// Send as user message
+		sendMessage(value);
+	}
+
+	// Image action functions moved to images.js module
 
 	/**
 	 * Create error results for failed tool requests
@@ -1499,7 +1535,7 @@
 		}
 
 		// Show thinking indicator while AI processes the results
-		showThinking();
+		app.ui.showThinking();
 
 		const requestData = {
 			role: 'tool',
@@ -1539,7 +1575,7 @@
 				return handleSSEResponse(response);
 			} else {
 				return response.json().then(function(data) {
-					hideThinking();
+					app.ui.hideThinking();
 					const responseData = data.data || data;
 					if (responseData.assistant_message || responseData.suggestions) {
 						handleMessageResponse(responseData);
@@ -1551,7 +1587,7 @@
 		.catch(function(error) {
 			console.error('[AISales Debug] Tool results send error:', error);
 			console.error('[AISales Debug] Error data:', JSON.stringify(error.data, null, 2));
-			hideThinking();
+			app.ui.hideThinking();
 
 			// Handle specific error codes
 			let errorMessage = aisalesChat.i18n.connectionError || 'Connection error';
@@ -1566,7 +1602,7 @@
 				}
 			}
 			
-			addErrorMessage(errorMessage);
+			app.ui.addErrorMessage(errorMessage);
 			setLoading(false);
 		});
 	}
@@ -1576,37 +1612,35 @@
 	 */
 	function handleMessageResponse(data) {
 		if (data.assistant_message) {
-			addMessage(data.assistant_message);
+			app.ui.addMessage(data.assistant_message);
 		}
 
 		if (data.suggestions && data.suggestions.length > 0) {
 			data.suggestions.forEach(function(suggestion) {
-				handleSuggestionReceived(suggestion);
+				app.handleSuggestionReceived(suggestion);
 			});
 		}
 
 		if (data.tokens_used) {
-			updateTokensUsed(data.tokens_used);
-			updateBalance(-data.tokens_used.total);
+			app.ui.updateTokensUsed(data.tokens_used);
+			app.ui.updateBalance(-data.tokens_used.total);
 		}
 	}
 
-	/**
-	 * Handle received suggestion
-	 */
-	function handleSuggestionReceived(suggestion) {
-		state.pendingSuggestions[suggestion.id] = suggestion;
-		renderSuggestionInMessage(suggestion);
-		showPendingChange(suggestion);
-		updatePendingSummary();
-	}
+	// handleSuggestionReceived moved to suggestions.js module
 
 	/**
-	 * Handle quick action button click
+	 * Handle product quick action button click
 	 */
-	function handleQuickAction(e) {
+	function handleProductQuickAction(e) {
 		const action = $(e.currentTarget).data('action');
 		if (!action || !state.selectedProduct) return;
+
+		// Show modal for image generation actions
+		if (action === 'generate_product_image' || action === 'enhance_product_image') {
+			app.showImageGenerationModal('product');
+			return;
+		}
 
 		const actionMessages = {
 			'improve_title': 'Please improve the product title',
@@ -1628,6 +1662,12 @@
 		const action = $(e.currentTarget).data('action');
 		if (!action || !state.selectedCategory) return;
 
+		// Show modal for image generation action
+		if (action === 'generate_category_image') {
+			app.showImageGenerationModal('category');
+			return;
+		}
+
 		const actionMessages = {
 			'improve_name': 'Please suggest a better name for this category',
 			'improve_cat_description': 'Please generate a compelling description for this category',
@@ -1646,13 +1686,20 @@
 		const action = $(e.currentTarget).data('action');
 		if (!action || !state.isAgentMode) return;
 
+		// Show modal for image generation action
+		if (action === 'generate_image') {
+			app.showImageGenerationModal('agent');
+			return;
+		}
+
 		const actionMessages = {
 			'create_campaign': 'Help me create a marketing campaign for my store',
 			'social_content': 'Generate social media content for my store products',
 			'email_campaign': 'Create an email marketing campaign',
-			'generate_image': 'Help me create a marketing image',
 			'store_analysis': 'Analyze my store and suggest improvements',
-			'bulk_optimize': 'Suggest bulk optimization strategies for my products'
+			'bulk_optimize': 'Suggest bulk optimization strategies for my products',
+			'catalog_organize': 'Analyze my catalog structure and suggest improvements',
+			'catalog_research': 'Help me with market research for my store'
 		};
 
 		const message = actionMessages[action] || 'Help with marketing';
@@ -1663,195 +1710,39 @@
 	 * Handle new chat button
 	 */
 	function handleNewChat() {
-		if (state.isAgentMode) {
-			state.pendingSuggestions = {};
-			updatePendingSummary();
-			clearPendingChanges();
-			createSession(null, 'agent');
-		} else if (state.entityType === 'category' && state.selectedCategory) {
-			state.pendingSuggestions = {};
-			updatePendingSummary();
-			clearPendingChanges();
-			createSession(state.selectedCategory, 'category');
-		} else if (state.selectedProduct) {
-			state.pendingSuggestions = {};
-			updatePendingSummary();
-			clearPendingChanges();
-			createSession(state.selectedProduct, 'product');
-		}
+		// Clear pending state
+		state.pendingSuggestions = {};
+		app.updatePendingSummary();
+		app.suggestions.clearPendingChanges();
+		
+		// Clear current session
+		state.sessionId = null;
+		state.messages = [];
+		state.selectedProduct = null;
+		state.selectedCategory = null;
+		state.isAgentMode = false;
+		
+		// Clear chat messages UI
+		elements.messagesContainer.find('.aisales-message').remove();
+		elements.chatWelcome.show();
+		
+		// Hide entity panels
+		elements.productInfo.hide();
+		elements.categoryInfo.hide();
+		elements.agentInfo.hide();
+		elements.entityEmpty.show();
+		
+		// Disable quick actions
+		$('.aisales-quick-actions button[data-action]').prop('disabled', true);
+		
+		// Reset and show wizard for new selection
+		resetWizard();
+		showWizard();
 	}
 
-	/**
-	 * Handle suggestion action (apply/edit/discard)
-	 */
-	function handleSuggestionAction(e) {
-		e.preventDefault();
-		const action = $(e.currentTarget).data('action');
-		const $suggestion = $(e.currentTarget).closest('.aisales-suggestion');
-		const suggestionId = $suggestion.data('suggestion-id');
-
-		if (action === 'apply') {
-			applySuggestion(suggestionId, $suggestion);
-		} else if (action === 'discard') {
-			discardSuggestion(suggestionId, $suggestion);
-		} else if (action === 'edit') {
-			editSuggestion(suggestionId, $suggestion);
-		}
-	}
-
-	/**
-	 * Handle pending change action in product panel
-	 */
-	function handlePendingChangeAction(e) {
-		e.preventDefault();
-		const action = $(e.currentTarget).data('action');
-		const $field = $(e.currentTarget).closest('.aisales-product-info__field, .aisales-category-info__field');
-		const fieldType = $field.data('field');
-
-		// Find matching suggestion
-		const suggestion = Object.values(state.pendingSuggestions).find(function(s) {
-			return s.suggestion_type === fieldType && s.status === 'pending';
-		});
-
-		if (suggestion) {
-			if (action === 'accept') {
-				applySuggestion(suggestion.id);
-			} else if (action === 'undo') {
-				discardSuggestion(suggestion.id);
-			}
-		}
-	}
-
-	/**
-	 * Apply a suggestion
-	 */
-	function applySuggestion(suggestionId, $element) {
-		const suggestion = state.pendingSuggestions[suggestionId];
-		if (!suggestion) return;
-
-		$.ajax({
-			url: aisalesChat.apiBaseUrl + '/ai/chat/sessions/' + state.sessionId + '/suggestions/' + suggestionId,
-			method: 'PATCH',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-API-Key': aisalesChat.apiKey
-			},
-			data: JSON.stringify({ action: 'apply' }),
-			success: function(response) {
-				// Handle both { success: true, data: {...} } and { suggestion: {...} } formats
-				const appliedSuggestion = response.suggestion || (response.data && response.data.suggestion);
-				if (appliedSuggestion || response.success) {
-					suggestion.status = 'applied';
-
-					// Update entity data based on type
-					if (state.entityType === 'category') {
-						updateCategoryField(suggestion.suggestion_type, suggestion.suggested_value);
-						saveCategoryField(suggestion.suggestion_type, suggestion.suggested_value);
-					} else {
-						updateProductField(suggestion.suggestion_type, suggestion.suggested_value);
-						saveProductField(suggestion.suggestion_type, suggestion.suggested_value);
-					}
-
-					// Update UI
-					if ($element) {
-						$element.addClass('aisales-suggestion--applied');
-						$element.find('.aisales-suggestion__actions').html(
-							'<span class="aisales-suggestion__status aisales-suggestion__status--applied">' +
-							'<span class="dashicons dashicons-yes-alt"></span> ' +
-							aisalesChat.i18n.applied +
-							'</span>'
-						);
-					}
-
-					// Update entity panel
-					hidePendingChange(suggestion.suggestion_type);
-					delete state.pendingSuggestions[suggestionId];
-					updatePendingSummary();
-				}
-			},
-			error: handleError
-		});
-	}
-
-	/**
-	 * Discard a suggestion
-	 */
-	function discardSuggestion(suggestionId, $element) {
-		const suggestion = state.pendingSuggestions[suggestionId];
-		if (!suggestion) return;
-
-		$.ajax({
-			url: aisalesChat.apiBaseUrl + '/ai/chat/sessions/' + state.sessionId + '/suggestions/' + suggestionId,
-			method: 'PATCH',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-API-Key': aisalesChat.apiKey
-			},
-			data: JSON.stringify({ action: 'discard' }),
-			success: function(response) {
-				// Handle both { success: true, data: {...} } and { suggestion: {...} } formats
-				const discardedSuggestion = response.suggestion || (response.data && response.data.suggestion);
-				if (discardedSuggestion || response.success) {
-					suggestion.status = 'discarded';
-
-					// Update UI
-					if ($element) {
-						$element.addClass('aisales-suggestion--discarded');
-						$element.find('.aisales-suggestion__actions').html(
-							'<span class="aisales-suggestion__status aisales-suggestion__status--discarded">' +
-							'<span class="dashicons dashicons-dismiss"></span> ' +
-							aisalesChat.i18n.discarded +
-							'</span>'
-						);
-					}
-
-					// Update product panel
-					hidePendingChange(suggestion.suggestion_type);
-					delete state.pendingSuggestions[suggestionId];
-					updatePendingSummary();
-				}
-			},
-			error: handleError
-		});
-	}
-
-	/**
-	 * Edit a suggestion (show in text input)
-	 */
-	function editSuggestion(suggestionId, $element) {
-		const suggestion = state.pendingSuggestions[suggestionId];
-		if (!suggestion) return;
-
-		// Pre-fill the input with suggested value
-		elements.messageInput.val('Please modify: ' + suggestion.suggested_value);
-		elements.messageInput.focus();
-	}
-
-	/**
-	 * Handle accept all pending suggestions
-	 */
-	function handleAcceptAll() {
-		const pending = Object.keys(state.pendingSuggestions);
-		if (pending.length === 0) return;
-
-		pending.forEach(function(suggestionId) {
-			const $element = $('[data-suggestion-id="' + suggestionId + '"]');
-			applySuggestion(suggestionId, $element);
-		});
-	}
-
-	/**
-	 * Handle discard all pending suggestions
-	 */
-	function handleDiscardAll() {
-		const pending = Object.keys(state.pendingSuggestions);
-		if (pending.length === 0) return;
-
-		pending.forEach(function(suggestionId) {
-			const $element = $('[data-suggestion-id="' + suggestionId + '"]');
-			discardSuggestion(suggestionId, $element);
-		});
-	}
+	// Suggestion action functions moved to suggestions.js module:
+	// handleSuggestionAction, handlePendingChangeAction, applySuggestion,
+	// discardSuggestion, editSuggestion, handleAcceptAll, handleDiscardAll
 
 	/**
 	 * Handle expand toggle for description
@@ -1936,13 +1827,13 @@
 					closeContextPanel();
 					
 					// Show success notice
-					showNotice('Store context saved successfully', 'success');
+					app.ui.showNotice('Store context saved successfully', 'success');
 				} else {
-					showNotice(response.data || 'Failed to save store context', 'error');
+					app.ui.showNotice(response.data || 'Failed to save store context', 'error');
 				}
 			},
 			error: function() {
-				showNotice('Failed to save store context', 'error');
+				app.ui.showNotice('Failed to save store context', 'error');
 			},
 			complete: function() {
 				$saveBtn.removeClass('aisales-btn--loading').prop('disabled', false);
@@ -1968,11 +1859,11 @@
 				if (response.success) {
 					$('#aisales-sync-status').text(response.data.message || 'Synced successfully');
 				} else {
-					showNotice(response.data || 'Sync failed', 'error');
+					app.ui.showNotice(response.data || 'Sync failed', 'error');
 				}
 			},
 			error: function() {
-				showNotice('Sync failed', 'error');
+				app.ui.showNotice('Sync failed', 'error');
 			},
 			complete: function() {
 				$syncBtn.removeClass('aisales-btn--loading').prop('disabled', false);
@@ -2021,449 +1912,18 @@
 		});
 	}
 
-	/**
-	 * Show a notice
-	 */
-	function showNotice(message, type) {
-		const $notice = $('<div class="notice notice-' + type + ' is-dismissible"><p>' + escapeHtml(message) + '</p></div>');
-		$('.aisales-chat-page-header').after($notice);
-		
-		// Auto-dismiss after 5 seconds
-		setTimeout(function() {
-			$notice.fadeOut(300, function() {
-				$(this).remove();
-			});
-		}, 5000);
-	}
+	// UI functions moved to ui.js module:
+	// showNotice, addMessage, renderMessage, updateStreamingMessage, renderMessages,
+	// clearMessages, showWelcomeMessage, showThinking, hideThinking, addErrorMessage,
+	// updateTokensUsed, updateBalance
 
-	/**
-	 * Add a message to the chat
-	 */
-	function addMessage(message, isStreaming) {
-		const $message = renderMessage(message, isStreaming);
-		elements.messagesContainer.append($message);
-		scrollToBottom();
-	}
+	// renderSuggestionInMessage and renderSuggestionOption moved to suggestions.js module
 
-	/**
-	 * Render a message
-	 */
-	function renderMessage(message, isStreaming) {
-		const icons = {
-			'user': 'dashicons-admin-users',
-			'assistant': 'dashicons-admin-site-alt3',
-			'system': 'dashicons-info'
-		};
+	// Pending change and field update functions moved to suggestions.js module:
+	// showPendingChange, hidePendingChange, clearPendingChanges, updatePendingSummary,
+	// updateProductField, updateCategoryField, saveProductField, saveCategoryField
 
-		let html = templates.message
-			.replace('{role}', message.role)
-			.replace('{id}', message.id)
-			.replace('{icon}', icons[message.role] || 'dashicons-format-chat')
-			.replace('{content}', formatMessageContent(message.content))
-			.replace('{time}', formatTime(message.created_at))
-			.replace('{tokens}', message.tokens_input ?
-				'<span class="aisales-message__tokens">' + message.tokens_input + ' + ' + message.tokens_output + ' ' + aisalesChat.i18n.tokensUsed + '</span>' :
-				''
-			);
-
-		const $message = $(html);
-
-		// Add attachment indicators for user messages
-		if (message.attachments && message.attachments.length > 0) {
-			let attachmentHtml = '<div class="aisales-message__attachments">';
-			message.attachments.forEach(function(att) {
-				const isImage = att.mime_type && att.mime_type.startsWith('image/');
-				const isPdf = att.mime_type === 'application/pdf';
-				const icon = isImage ? 'dashicons-format-image' : (isPdf ? 'dashicons-pdf' : 'dashicons-media-default');
-				attachmentHtml += '<span class="aisales-message__attachment"><span class="dashicons ' + icon + '"></span>' + escapeHtml(att.filename) + '</span>';
-			});
-			attachmentHtml += '</div>';
-			$message.find('.aisales-message__content').prepend(attachmentHtml);
-		}
-
-		if (isStreaming) {
-			$message.addClass('aisales-message--streaming');
-			$message.attr('data-streaming', 'true');
-		}
-
-		return $message;
-	}
-
-	/**
-	 * Update streaming message content
-	 */
-	function updateStreamingMessage(content) {
-		const $streaming = elements.messagesContainer.find('[data-streaming="true"]');
-		if ($streaming.length) {
-			$streaming.find('.aisales-message__text').html(formatMessageContent(content));
-			scrollToBottom();
-		}
-	}
-
-	/**
-	 * Render suggestion in message - groups multiple suggestions of same type
-	 */
-	function renderSuggestionInMessage(suggestion) {
-		const typeLabels = {
-			// Product fields
-			'title': aisalesChat.i18n.improveTitle || 'Improve Title',
-			'description': aisalesChat.i18n.improveDescription || 'Improve Description',
-			'short_description': 'Short Description',
-			'tags': aisalesChat.i18n.suggestTags || 'Tags',
-			'categories': aisalesChat.i18n.suggestCategories || 'Categories',
-			'meta_description': 'Meta Description',
-			// Category fields
-			'name': 'Category Name',
-			'seo_title': 'SEO Title',
-			'seo_description': 'SEO Description',
-			'subcategories': 'Subcategories'
-		};
-
-		const $container = elements.messagesContainer.find('[data-streaming="true"]').length
-			? elements.messagesContainer.find('[data-streaming="true"] .aisales-message__content')
-			: elements.messagesContainer.find('.aisales-message--assistant').last().find('.aisales-message__content');
-
-		if (!$container.length) return;
-
-		// Check if there's already a group for this suggestion type
-		let $group = $container.find('.aisales-suggestions-group[data-type="' + suggestion.suggestion_type + '"]');
-
-		if ($group.length) {
-			// Add to existing group
-			const $options = $group.find('.aisales-suggestions-group__options');
-			const optionNumber = $options.find('.aisales-suggestion').length + 1;
-			
-			const optionHtml = renderSuggestionOption(suggestion, optionNumber);
-			$options.append(optionHtml);
-			
-			// Update count
-			$group.find('.aisales-suggestions-group__count').text(optionNumber + ' options');
-		} else {
-			// Create new group
-			const groupHtml = '<div class="aisales-suggestions-group" data-type="' + suggestion.suggestion_type + '">' +
-				'<div class="aisales-suggestions-group__header">' +
-					'<div class="aisales-suggestions-group__title">' +
-						'<span class="dashicons dashicons-lightbulb"></span>' +
-						'<span>' + (typeLabels[suggestion.suggestion_type] || suggestion.suggestion_type) + '</span>' +
-					'</div>' +
-					'<span class="aisales-suggestions-group__count">1 option</span>' +
-				'</div>' +
-				'<div class="aisales-suggestions-group__current">' +
-					'<div class="aisales-suggestions-group__current-label">Current value</div>' +
-					'<div class="aisales-suggestions-group__current-value">' + escapeHtml(suggestion.current_value || 'None') + '</div>' +
-				'</div>' +
-				'<div class="aisales-suggestions-group__options">' +
-					renderSuggestionOption(suggestion, 1) +
-				'</div>' +
-			'</div>';
-
-			$container.append(groupHtml);
-		}
-	}
-
-	/**
-	 * Render a single suggestion option within a group
-	 */
-	function renderSuggestionOption(suggestion, number) {
-		return '<div class="aisales-suggestion" data-suggestion-id="' + suggestion.id + '" data-suggestion-type="' + suggestion.suggestion_type + '">' +
-			'<span class="aisales-suggestion__number">' + number + '</span>' +
-			'<div class="aisales-suggestion__content">' +
-				'<div class="aisales-suggestion__value">' + escapeHtml(suggestion.suggested_value) + '</div>' +
-			'</div>' +
-			'<div class="aisales-suggestion__actions">' +
-				'<button type="button" class="aisales-btn aisales-btn--success aisales-btn--sm" data-action="apply">' +
-					'<span class="dashicons dashicons-yes"></span> Apply' +
-				'</button>' +
-				'<button type="button" class="aisales-btn aisales-btn--outline aisales-btn--sm" data-action="discard">' +
-					'<span class="dashicons dashicons-no"></span>' +
-				'</button>' +
-			'</div>' +
-		'</div>';
-	}
-
-	/**
-	 * Render all messages
-	 */
-	function renderMessages() {
-		clearMessages();
-
-		if (state.messages.length === 0) {
-			return;
-		}
-
-		state.messages.forEach(function(message) {
-			addMessage(message);
-		});
-
-		// Add pending suggestions to their messages
-		Object.values(state.pendingSuggestions).forEach(function(suggestion) {
-			renderSuggestionInMessage(suggestion);
-			showPendingChange(suggestion);
-		});
-	}
-
-	/**
-	 * Clear messages container
-	 */
-	function clearMessages() {
-		elements.messagesContainer.empty();
-	}
-
-	/**
-	 * Show welcome message
-	 */
-	function showWelcomeMessage() {
-		// Show the welcome element that's already in the template
-		elements.chatWelcome.show();
-	}
-
-	/**
-	 * Show thinking indicator
-	 */
-	function showThinking() {
-		elements.messagesContainer.find('.aisales-message--thinking').remove();
-		elements.messagesContainer.append(templates.thinking);
-		scrollToBottom();
-	}
-
-	/**
-	 * Hide thinking indicator
-	 */
-	function hideThinking() {
-		elements.messagesContainer.find('.aisales-message--thinking').remove();
-	}
-
-	/**
-	 * Add error message
-	 */
-	function addErrorMessage(text) {
-		const $error = $('<div class="aisales-message aisales-message--error">' +
-			'<div class="aisales-message__avatar"><span class="dashicons dashicons-warning"></span></div>' +
-			'<div class="aisales-message__content">' +
-			'<div class="aisales-message__text">' + escapeHtml(text) + '</div>' +
-			'</div></div>');
-		elements.messagesContainer.append($error);
-		scrollToBottom();
-	}
-
-	/**
-	 * Show pending change in entity panel
-	 */
-	function showPendingChange(suggestion) {
-		// Determine which panel to update
-		const $panel = state.entityType === 'category' ? elements.categoryInfo : elements.productInfo;
-		const $field = $panel.find('[data-field="' + suggestion.suggestion_type + '"]');
-		if (!$field.length) return;
-
-		$field.addClass('aisales-product-info__field--has-pending aisales-category-info__field--has-pending');
-		const $pending = $field.find('.aisales-product-info__pending, .aisales-category-info__pending');
-
-		if (suggestion.suggestion_type === 'tags' || suggestion.suggestion_type === 'categories' || suggestion.suggestion_type === 'subcategories') {
-			// Handle array fields
-			const currentArr = (suggestion.current_value || '').split(',').map(s => s.trim()).filter(Boolean);
-			const suggestedArr = (suggestion.suggested_value || '').split(',').map(s => s.trim()).filter(Boolean);
-			const added = suggestedArr.filter(t => !currentArr.includes(t));
-			const removed = currentArr.filter(t => !suggestedArr.includes(t));
-
-			$pending.find('.aisales-pending-change__added').html(
-				added.map(t => '<span class="aisales-tag aisales-tag--added">+ ' + escapeHtml(t) + '</span>').join('')
-			);
-			$pending.find('.aisales-pending-change__removed').html(
-				removed.map(t => '<span class="aisales-tag aisales-tag--removed">- ' + escapeHtml(t) + '</span>').join('')
-			);
-		} else {
-			// Handle text fields - only show new value
-			$pending.find('.aisales-pending-change__new').text(suggestion.suggested_value);
-		}
-
-		$pending.slideDown(200);
-	}
-
-	/**
-	 * Hide pending change in entity panel
-	 */
-	function hidePendingChange(fieldType) {
-		const $panel = state.entityType === 'category' ? elements.categoryInfo : elements.productInfo;
-		const $field = $panel.find('[data-field="' + fieldType + '"]');
-		$field.removeClass('aisales-product-info__field--has-pending aisales-category-info__field--has-pending');
-		$field.find('.aisales-product-info__pending, .aisales-category-info__pending').slideUp(200);
-	}
-
-	/**
-	 * Clear all pending changes from entity panel
-	 */
-	function clearPendingChanges() {
-		elements.productInfo.find('.aisales-product-info__field--has-pending').removeClass('aisales-product-info__field--has-pending');
-		elements.productInfo.find('.aisales-product-info__pending').hide();
-		elements.categoryInfo.find('.aisales-category-info__field--has-pending').removeClass('aisales-category-info__field--has-pending');
-		elements.categoryInfo.find('.aisales-category-info__pending').hide();
-	}
-
-	/**
-	 * Update pending summary
-	 */
-	function updatePendingSummary() {
-		const count = Object.keys(state.pendingSuggestions).filter(function(id) {
-			return state.pendingSuggestions[id].status === 'pending';
-		}).length;
-
-		if (state.entityType === 'category') {
-			$('#aisales-category-pending-count').text(count);
-			if (count > 0) {
-				elements.categoryPendingSummary.slideDown(200);
-			} else {
-				elements.categoryPendingSummary.slideUp(200);
-			}
-			elements.pendingSummary.hide();
-		} else {
-			$('#aisales-pending-count').text(count);
-			if (count > 0) {
-				elements.pendingSummary.slideDown(200);
-			} else {
-				elements.pendingSummary.slideUp(200);
-			}
-			elements.categoryPendingSummary.hide();
-		}
-	}
-
-	/**
-	 * Update product field in local state
-	 */
-	function updateProductField(fieldType, value) {
-		if (!state.selectedProduct) return;
-
-		const fieldMap = {
-			'title': 'title',
-			'description': 'description',
-			'short_description': 'short_description',
-			'tags': 'tags',
-			'categories': 'categories'
-		};
-
-		const field = fieldMap[fieldType];
-		if (!field) return;
-
-		if (field === 'tags' || field === 'categories') {
-			state.selectedProduct[field] = value.split(',').map(s => s.trim()).filter(Boolean);
-		} else {
-			state.selectedProduct[field] = value;
-		}
-
-		// Update display
-		updateProductPanel(state.selectedProduct);
-	}
-
-	/**
-	 * Update category field in local state
-	 */
-	function updateCategoryField(fieldType, value) {
-		if (!state.selectedCategory) return;
-
-		const fieldMap = {
-			'name': 'name',
-			'description': 'description',
-			'seo_title': 'seo_title',
-			'meta_description': 'meta_description',
-			'subcategories': 'subcategories'
-		};
-
-		const field = fieldMap[fieldType];
-		if (!field) return;
-
-		if (field === 'subcategories') {
-			state.selectedCategory[field] = value.split(',').map(s => ({ name: s.trim() })).filter(s => s.name);
-		} else {
-			state.selectedCategory[field] = value;
-		}
-
-		// Update display
-		updateCategoryPanel(state.selectedCategory);
-	}
-
-	/**
-	 * Save product field via WordPress AJAX
-	 */
-	function saveProductField(fieldType, value) {
-		if (!state.selectedProduct) return;
-
-		$.ajax({
-			url: aisalesChat.ajaxUrl,
-			method: 'POST',
-			data: {
-				action: 'aisales_update_product_field',
-				nonce: aisalesChat.nonce,
-				product_id: state.selectedProduct.id,
-				field: fieldType,
-				value: value
-			},
-			success: function(response) {
-				if (!response.success) {
-					console.error('Failed to save product field:', response.data);
-				}
-			},
-			error: function(xhr) {
-				console.error('AJAX error:', xhr);
-			}
-		});
-	}
-
-	/**
-	 * Save category field via WordPress AJAX
-	 */
-	function saveCategoryField(fieldType, value) {
-		if (!state.selectedCategory) return;
-
-		$.ajax({
-			url: aisalesChat.ajaxUrl,
-			method: 'POST',
-			data: {
-				action: 'aisales_update_category_field',
-				nonce: aisalesChat.nonce,
-				category_id: state.selectedCategory.id,
-				field: fieldType,
-				value: value
-			},
-			success: function(response) {
-				if (!response.success) {
-					console.error('Failed to save category field:', response.data);
-				}
-			},
-			error: function(xhr) {
-				console.error('AJAX error:', xhr);
-			}
-		});
-	}
-
-	/**
-	 * Update tokens used display
-	 */
-	function updateTokensUsed(tokens) {
-		elements.tokensUsed.text(tokens.total + ' ' + aisalesChat.i18n.tokensUsed);
-	}
-
-	/**
-	 * Update balance display
-	 */
-	function updateBalance(change) {
-		state.balance += change;
-		if (state.balance < 0) state.balance = 0;
-		elements.balanceDisplay.text(numberFormat(state.balance));
-	}
-
-	/**
-	 * Sync balance to WordPress for persistence across page refreshes
-	 */
-	function syncBalanceToWordPress(balance) {
-		$.ajax({
-			url: aisalesChat.ajaxUrl,
-			type: 'POST',
-			data: {
-				action: 'aisales_sync_balance',
-				nonce: aisalesChat.nonce,
-				balance: balance
-			}
-		});
-	}
+	// syncBalanceToWordPress moved to utils.js module
 
 	/**
 	 * Save AI-generated image to WordPress media library
@@ -2486,10 +1946,10 @@
 				},
 				success: function(response) {
 					if (response.success) {
-						showNotice(response.data.message || 'Image saved to media library', 'success');
+						app.ui.showNotice(response.data.message || 'Image saved to media library', 'success');
 						resolve(response.data);
 					} else {
-						showNotice(response.data.message || 'Failed to save image', 'error');
+						app.ui.showNotice(response.data.message || 'Failed to save image', 'error');
 						reject(new Error(response.data.message || 'Failed to save image'));
 					}
 				},
@@ -2498,7 +1958,7 @@
 					if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
 						message = xhr.responseJSON.data.message;
 					}
-					showNotice(message, 'error');
+					app.ui.showNotice(message, 'error');
 					reject(new Error(message));
 				}
 			});
@@ -2579,214 +2039,621 @@
 		}
 	}
 
+	// scrollToBottom, autoResizeTextarea, and handleError moved to ui.js module
+
+	// Formatting functions moved to formatting.js module:
+	// formatMessageContent, renderInlineOptions, formatTime, formatPrice, formatCurrency,
+	// formatStock, formatStatus, escapeHtml, truncate, numberFormat, animateBalance
+
+	// showImageGenerationModal and closeImageGenerationModal moved to images.js module
+
+	/* ==========================================================================
+	   WIZARD FUNCTIONS
+	   Step-by-step guided flow for task and entity selection
+	   ========================================================================== */
+
 	/**
-	 * Scroll chat to bottom
+	 * Initialize the wizard
+	 * Checks for preselected entities and shows/hides wizard accordingly
 	 */
-	function scrollToBottom() {
-		elements.messagesContainer.scrollTop(elements.messagesContainer[0].scrollHeight);
+	function initWizard() {
+		// Check if there's a preselected product or category (skip wizard)
+		if (typeof window.aisalesPreselectedProduct !== 'undefined' && window.aisalesPreselectedProduct) {
+			state.wizardComplete = true;
+			state.wizardTask = 'product';
+			hideWizard();
+			updateBreadcrumb('product', window.aisalesPreselectedProduct.title);
+			return;
+		}
+		
+		if (typeof window.aisalesPreselectedCategory !== 'undefined' && window.aisalesPreselectedCategory) {
+			state.wizardComplete = true;
+			state.wizardTask = 'category';
+			hideWizard();
+			updateBreadcrumb('category', window.aisalesPreselectedCategory.name);
+			return;
+		}
+		
+		// Check localStorage for last session (optional persistence)
+		const lastSession = localStorage.getItem('aisales_wizard_session');
+		if (lastSession) {
+			try {
+				const session = JSON.parse(lastSession);
+				// Only restore if it was recent (within 30 minutes)
+				if (session.timestamp && (Date.now() - session.timestamp) < 30 * 60 * 1000) {
+					// Don't auto-restore, just let them pick fresh
+				}
+			} catch (e) {
+				// Ignore parse errors
+			}
+		}
+		
+		// Show wizard if no preselection
+		showWizard();
+		bindWizardEvents();
 	}
 
 	/**
-	 * Auto-resize textarea
+	 * Bind wizard event handlers
 	 */
-	function autoResizeTextarea() {
-		elements.messageInput.on('input', function() {
-			this.style.height = 'auto';
-			this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+	function bindWizardEvents() {
+		// Task card selection (Step 1)
+		elements.wizardCards.on('click', function() {
+			const task = $(this).data('task');
+			selectWizardTask(task);
+		});
+		
+		// Back button (Step 2)
+		elements.wizardBack.on('click', function() {
+			goToWizardStep(1);
+		});
+		
+		// Search input
+		elements.wizardSearch.on('input', debounce(filterWizardItems, 200));
+		
+		// Entity item selection (delegated)
+		elements.wizardItems.on('click', '.aisales-wizard__item', function() {
+			const $item = $(this);
+			const entityId = $item.data('id');
+			const entityData = $item.data('entity');
+			selectWizardEntity(entityId, entityData);
+		});
+		
+		// Breadcrumb change button
+		elements.breadcrumbChange.on('click', function() {
+			showWizard();
+		});
+		
+		// Setup context link in wizard
+		elements.wizardSetupContext.on('click', function() {
+			openContextPanel();
+		});
+		
+		// Escape key to close wizard (if allowed)
+		$(document).on('keydown.wizard', function(e) {
+			if (e.key === 'Escape' && state.wizardComplete) {
+				hideWizard();
+			}
 		});
 	}
 
 	/**
-	 * Handle error response
+	 * Select a task in the wizard (Step 1)
 	 */
-	function handleError(xhr) {
-		let message = aisalesChat.i18n.errorOccurred;
-
-		if (xhr.responseJSON && xhr.responseJSON.error) {
-			message = xhr.responseJSON.error.message || message;
-
-			if (xhr.responseJSON.error.code === 'INSUFFICIENT_BALANCE') {
-				message = aisalesChat.i18n.insufficientBalance;
+	function selectWizardTask(task) {
+		state.wizardTask = task;
+		state.entityType = task;
+		
+		// Update legacy entity tabs for compatibility
+		updateEntityTabs();
+		
+		if (task === 'agent') {
+			// Agent mode skips step 2 - go directly to chat
+			completeWizard();
+			selectAgent();
+		} else {
+			// Go to Step 2 for product/category selection
+			goToWizardStep(2);
+			populateWizardItems();
+			
+			// Update title and subtitle based on task
+			if (task === 'product') {
+				elements.wizardTitle.text(aisalesChat.i18n.selectProduct || 'Select a Product');
+				elements.wizardSubtitle.text(aisalesChat.i18n.selectProductHint || 'Choose a product to optimize with AI');
+			} else {
+				elements.wizardTitle.text(aisalesChat.i18n.selectCategory || 'Select a Category');
+				elements.wizardSubtitle.text(aisalesChat.i18n.selectCategoryHint || 'Choose a category to optimize with AI');
 			}
 		}
-
-		addErrorMessage(message);
 	}
 
 	/**
-	 * Format message content (handle markdown-like formatting)
+	 * Navigate to a specific wizard step
 	 */
-	function formatMessageContent(content) {
-		if (!content) return '';
-
-		// Escape HTML first
-		let formatted = escapeHtml(content);
-
-		// Convert basic markdown
-		// Bold: **text**
-		formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-
-		// Italic: *text*
-		formatted = formatted.replace(/\*(.+?)\*/g, '<em>$1</em>');
-
-		// Code: `code`
-		formatted = formatted.replace(/`(.+?)`/g, '<code>$1</code>');
-
-		// Line breaks
-		formatted = formatted.replace(/\n/g, '<br>');
-
-		return formatted;
-	}
-
-	/**
-	 * Format time
-	 */
-	function formatTime(isoString) {
-		if (!isoString) return '';
-		const date = new Date(isoString);
-		return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-	}
-
-	/**
-	 * Format price display
-	 */
-	function formatPrice(regularPrice, salePrice, price) {
-		if (!price && !regularPrice) return '<span class="aisales-no-value">Not set</span>';
-
-		if (salePrice && regularPrice && salePrice !== regularPrice) {
-			return '<del>' + formatCurrency(regularPrice) + '</del> ' + formatCurrency(salePrice);
-		}
-
-		return formatCurrency(price || regularPrice);
-	}
-
-	/**
-	 * Format currency
-	 */
-	function formatCurrency(amount) {
-		if (!amount) return '';
-		const num = parseFloat(amount);
-		return isNaN(num) ? amount : '$' + num.toFixed(2);
-	}
-
-	/**
-	 * Format stock display
-	 */
-	function formatStock(status, quantity) {
-		const statusLabels = {
-			'instock': '<span class="aisales-stock aisales-stock--instock">In Stock</span>',
-			'outofstock': '<span class="aisales-stock aisales-stock--outofstock">Out of Stock</span>',
-			'onbackorder': '<span class="aisales-stock aisales-stock--backorder">On Backorder</span>'
-		};
-
-		let html = statusLabels[status] || '<span class="aisales-no-value">Unknown</span>';
-
-		if (quantity !== null && quantity !== undefined && status === 'instock') {
-			html += ' <span class="aisales-stock__qty">(' + quantity + ')</span>';
-		}
-
-		return html;
-	}
-
-	/**
-	 * Format status display
-	 */
-	function formatStatus(status) {
-		const statusClasses = {
-			'publish': 'aisales-status--published',
-			'draft': 'aisales-status--draft',
-			'pending': 'aisales-status--pending',
-			'private': 'aisales-status--private'
-		};
-
-		const statusLabels = {
-			'publish': 'Published',
-			'draft': 'Draft',
-			'pending': 'Pending',
-			'private': 'Private'
-		};
-
-		const cls = statusClasses[status] || '';
-		const label = statusLabels[status] || status || 'Unknown';
-
-		return '<span class="aisales-status ' + cls + '">' + label + '</span>';
-	}
-
-	/**
-	 * Escape HTML
-	 */
-	function escapeHtml(str) {
-		if (!str) return '';
-		return str
-			.replace(/&/g, '&amp;')
-			.replace(/</g, '&lt;')
-			.replace(/>/g, '&gt;')
-			.replace(/"/g, '&quot;')
-			.replace(/'/g, '&#039;');
-	}
-
-	/**
-	 * Truncate string
-	 */
-	function truncate(str, len) {
-		if (!str) return '';
-		return str.length > len ? str.substring(0, len) + '...' : str;
-	}
-
-	/**
-	 * Format number with commas
-	 */
-	function numberFormat(num) {
-		return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-	}
-
-	/**
-	 * Animate balance counter from current value to new value
-	 */
-	function animateBalance(newBalance, duration) {
-		duration = duration || 800;
-		var $el = elements.balanceDisplay;
-		var startBalance = state.balance;
-		var difference = newBalance - startBalance;
+	function goToWizardStep(step) {
+		state.wizardStep = step;
 		
-		// If no change, just update
-		if (difference === 0) {
+		// Update step indicators
+		elements.wizardSteps.each(function() {
+			const $step = $(this);
+			const stepNum = parseInt($step.data('step'), 10);
+			
+			$step.removeClass('aisales-wizard__step--active aisales-wizard__step--completed');
+			
+			if (stepNum < step) {
+				$step.addClass('aisales-wizard__step--completed');
+			} else if (stepNum === step) {
+				$step.addClass('aisales-wizard__step--active');
+			}
+		});
+		
+		// Update panels
+		elements.wizardPanels.removeClass('aisales-wizard__panel--active');
+		$('.aisales-wizard__panel[data-panel="' + step + '"]').addClass('aisales-wizard__panel--active');
+		
+		// Clear search when going back
+		if (step === 1) {
+			elements.wizardSearch.val('');
+			state.wizardTask = null;
+		}
+	}
+
+	/**
+	 * Populate wizard items list (Step 2)
+	 */
+	function populateWizardItems() {
+		const $container = elements.wizardItems;
+		const isProduct = state.wizardTask === 'product';
+		const items = isProduct ? state.products : state.categories;
+		
+		// Show loading skeleton first
+		showWizardLoadingSkeleton();
+		
+		// Simulate brief loading for smoother UX (items are already loaded, but skeleton looks better)
+		setTimeout(function() {
+			$container.empty();
+			
+			// Remove any existing results count
+			$('.aisales-wizard__results-count').remove();
+			
+			if (!items || items.length === 0) {
+				// Enhanced empty state
+				const emptyIcon = isProduct ? 'dashicons-products' : 'dashicons-category';
+				const emptyTitle = isProduct 
+					? (aisalesChat.i18n.noProductsTitle || 'No products yet')
+					: (aisalesChat.i18n.noCategoriesTitle || 'No categories yet');
+				const emptyText = isProduct
+					? (aisalesChat.i18n.noProductsText || 'Create your first product to start optimizing with AI.')
+					: (aisalesChat.i18n.noCategoriesText || 'Create categories to organize your products.');
+				const emptyAction = isProduct
+					? (aisalesChat.i18n.createProduct || 'Create Product')
+					: (aisalesChat.i18n.createCategory || 'Create Category');
+				const emptyUrl = isProduct 
+					? (aisalesChat.urls?.newProduct || 'post-new.php?post_type=product')
+					: (aisalesChat.urls?.newCategory || 'edit-tags.php?taxonomy=product_cat&post_type=product');
+				
+				$container.html(
+					'<div class="aisales-wizard__empty">' +
+						'<div class="aisales-wizard__empty-icon">' +
+							'<span class="dashicons ' + emptyIcon + '"></span>' +
+						'</div>' +
+						'<h4 class="aisales-wizard__empty-title">' + escapeHtml(emptyTitle) + '</h4>' +
+						'<p class="aisales-wizard__empty-text">' + escapeHtml(emptyText) + '</p>' +
+						'<a href="' + escapeHtml(emptyUrl) + '" class="aisales-wizard__empty-action">' +
+							'<span class="dashicons dashicons-plus-alt2"></span>' +
+							escapeHtml(emptyAction) +
+						'</a>' +
+					'</div>'
+				);
+				return;
+			}
+			
+			// Populate items
+			items.forEach(function(item) {
+				const $item = createWizardItem(item);
+				$container.append($item);
+			});
+			
+			// Check for scroll overflow to show fade gradient
+			checkWizardItemsOverflow();
+			
+		}, 150); // Brief delay for skeleton visibility
+	}
+
+	/**
+	 * Show loading skeleton in wizard items
+	 */
+	function showWizardLoadingSkeleton() {
+		const $container = elements.wizardItems;
+		$container.empty();
+		
+		// Generate 4 skeleton items
+		for (var i = 0; i < 4; i++) {
+			$container.append(
+				'<div class="aisales-wizard__skeleton">' +
+					'<div class="aisales-wizard__skeleton-image"></div>' +
+					'<div class="aisales-wizard__skeleton-content">' +
+						'<div class="aisales-wizard__skeleton-line aisales-wizard__skeleton-line--title"></div>' +
+						'<div class="aisales-wizard__skeleton-line aisales-wizard__skeleton-line--meta"></div>' +
+					'</div>' +
+				'</div>'
+			);
+		}
+	}
+
+	/**
+	 * Check if wizard items container has overflow (to show fade gradient)
+	 */
+	function checkWizardItemsOverflow() {
+		const $wrapper = elements.wizardItems.parent();
+		const container = elements.wizardItems[0];
+		
+		if (container && container.scrollHeight > container.clientHeight) {
+			$wrapper.addClass('has-overflow');
+		} else {
+			$wrapper.removeClass('has-overflow');
+		}
+		
+		// Update on scroll
+		elements.wizardItems.off('scroll.wizardOverflow').on('scroll.wizardOverflow', function() {
+			const scrollBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+			if (scrollBottom < 10) {
+				$wrapper.removeClass('has-overflow');
+			} else {
+				$wrapper.addClass('has-overflow');
+			}
+		});
+	}
+
+	/**
+	 * Create a wizard item element
+	 */
+	function createWizardItem(item) {
+		const isProduct = state.wizardTask === 'product';
+		const name = isProduct ? item.title : item.name;
+		const image = isProduct ? item.image : (item.thumbnail || '');
+		const subtitle = isProduct 
+			? (item.price ? item.price : '') 
+			: (item.count !== undefined ? item.count + ' ' + (item.count === 1 ? 'product' : 'products') : '');
+		
+		// Handle category depth indentation via CSS margin instead of HTML entities
+		const depthClass = (!isProduct && item.depth) ? ' aisales-wizard__item--depth-' + Math.min(item.depth, 3) : '';
+		
+		const $item = $('<button type="button" class="aisales-wizard__item' + depthClass + '">')
+			.data('id', item.id)
+			.data('entity', item)
+			.data('name', name); // Store name for search highlighting
+		
+		// Image/icon with task-aware variant
+		if (image) {
+			$item.append('<img class="aisales-wizard__item-image" src="' + escapeHtml(image) + '" alt="">');
+		} else {
+			const icon = isProduct ? 'dashicons-products' : 'dashicons-category';
+			const iconVariant = isProduct ? 'aisales-wizard__item-icon--product' : 'aisales-wizard__item-icon--category';
+			$item.append('<span class="aisales-wizard__item-icon ' + iconVariant + '"><span class="dashicons ' + icon + '"></span></span>');
+		}
+		
+		// Content
+		const $content = $('<div class="aisales-wizard__item-content">');
+		$content.append('<span class="aisales-wizard__item-name">' + escapeHtml(name) + '</span>');
+		
+		if (subtitle) {
+			// Add icon prefix to meta
+			const metaIcon = isProduct ? 'dashicons-tag' : 'dashicons-archive';
+			$content.append(
+				'<span class="aisales-wizard__item-meta">' +
+					'<span class="dashicons ' + metaIcon + '"></span>' +
+					escapeHtml(subtitle) +
+				'</span>'
+			);
+		}
+		$item.append($content);
+		
+		// Arrow
+		$item.append('<span class="aisales-wizard__item-arrow"><span class="dashicons dashicons-arrow-right-alt2"></span></span>');
+		
+		return $item;
+	}
+
+	/**
+	 * Filter wizard items based on search
+	 */
+	function filterWizardItems() {
+		const query = elements.wizardSearch.val().toLowerCase().trim();
+		const $items = elements.wizardItems.find('.aisales-wizard__item');
+		const isProduct = state.wizardTask === 'product';
+		
+		// Remove existing results count
+		$('.aisales-wizard__results-count').remove();
+		$('.aisales-wizard__no-results').remove();
+		
+		if (!query) {
+			// Show all items, restore original names (remove highlight)
+			$items.each(function() {
+				const $item = $(this);
+				const originalName = $item.data('name');
+				$item.find('.aisales-wizard__item-name').html(escapeHtml(originalName));
+			});
+			$items.show();
+			checkWizardItemsOverflow();
 			return;
 		}
 		
-		var startTime = null;
-		var isDecreasing = difference < 0;
+		var visibleCount = 0;
 		
-		// Add visual feedback class
-		$el.parent().addClass(isDecreasing ? 'aisales-balance--decreasing' : 'aisales-balance--increasing');
-		
-		function step(timestamp) {
-			if (!startTime) startTime = timestamp;
-			var elapsed = timestamp - startTime;
-			var progress = Math.min(elapsed / duration, 1);
+		$items.each(function() {
+			const $item = $(this);
+			const entity = $item.data('entity');
+			const name = (isProduct ? entity.title : entity.name) || '';
+			const nameLower = name.toLowerCase();
+			const matches = nameLower.indexOf(query) !== -1;
 			
-			// Ease out cubic for smooth deceleration
-			var easeProgress = 1 - Math.pow(1 - progress, 3);
-			
-			var currentValue = Math.round(startBalance + (difference * easeProgress));
-			$el.text(numberFormat(currentValue));
-			
-			if (progress < 1) {
-				requestAnimationFrame(step);
-			} else {
-				// Ensure final value is exact
-				$el.text(numberFormat(newBalance));
-				state.balance = newBalance;
+			if (matches) {
+				visibleCount++;
+				$item.show();
 				
-				// Remove visual feedback class after a short delay
-				setTimeout(function() {
-					$el.parent().removeClass('aisales-balance--decreasing aisales-balance--increasing');
-				}, 300);
+				// Highlight matching text
+				const highlightedName = highlightSearchMatch(name, query);
+				$item.find('.aisales-wizard__item-name').html(highlightedName);
+			} else {
+				$item.hide();
+				// Restore original name
+				$item.find('.aisales-wizard__item-name').html(escapeHtml(name));
 			}
+		});
+		
+		// Show results count or no results message
+		if (visibleCount > 0) {
+			const itemType = isProduct 
+				? (visibleCount === 1 ? 'product' : 'products')
+				: (visibleCount === 1 ? 'category' : 'categories');
+			const resultsHtml = 
+				'<div class="aisales-wizard__results-count">' +
+					'<span class="dashicons dashicons-search"></span>' +
+					visibleCount + ' ' + itemType + ' found' +
+				'</div>';
+			elements.wizardItems.prepend(resultsHtml);
+		} else {
+			const noResultsHtml = 
+				'<div class="aisales-wizard__no-results">' +
+					'<div class="aisales-wizard__no-results-icon">&#128269;</div>' +
+					'<p class="aisales-wizard__no-results-text">' +
+						'No ' + (isProduct ? 'products' : 'categories') + ' match "<strong>' + escapeHtml(query) + '</strong>"' +
+					'</p>' +
+				'</div>';
+			elements.wizardItems.append(noResultsHtml);
 		}
 		
-		requestAnimationFrame(step);
+		checkWizardItemsOverflow();
 	}
+
+	// highlightSearchMatch moved to utils.js module
+
+	/**
+	 * Select an entity from the wizard (complete Step 2)
+	 */
+	function selectWizardEntity(entityId, entityData) {
+		if (state.wizardTask === 'product') {
+			selectProduct(entityData);
+			updateBreadcrumb('product', entityData.title);
+		} else {
+			selectCategory(entityData);
+			updateBreadcrumb('category', entityData.name);
+		}
+		
+		// Save to localStorage for session persistence
+		localStorage.setItem('aisales_wizard_session', JSON.stringify({
+			task: state.wizardTask,
+			entityId: entityId,
+			timestamp: Date.now()
+		}));
+		
+		completeWizard();
+	}
+
+	/**
+	 * Complete the wizard and show the chat interface
+	 */
+	function completeWizard() {
+		state.wizardComplete = true;
+		state.wizardStep = 3;
+		
+		// Update step indicators to show completion
+		elements.wizardSteps.each(function() {
+			const $step = $(this);
+			const stepNum = parseInt($step.data('step'), 10);
+			$step.removeClass('aisales-wizard__step--active');
+			if (stepNum <= 3) {
+				$step.addClass('aisales-wizard__step--completed');
+			}
+		});
+		
+		// Hide wizard with animation
+		hideWizard();
+		
+		// Show breadcrumb
+		if (state.wizardTask !== 'agent') {
+			elements.breadcrumb.show();
+		}
+	}
+
+	/**
+	 * Show the wizard overlay
+	 */
+	function showWizard() {
+		// Reset to step 1 if starting fresh
+		if (!state.wizardTask) {
+			goToWizardStep(1);
+		}
+		
+		elements.wizard.show();
+		elements.breadcrumb.hide();
+		
+		// Focus search if on step 2
+		if (state.wizardStep === 2) {
+			setTimeout(function() {
+				elements.wizardSearch.focus();
+			}, 100);
+		}
+	}
+
+	/**
+	 * Hide the wizard overlay
+	 */
+	function hideWizard() {
+		elements.wizard.hide();
+		
+		// Show breadcrumb if wizard was completed
+		if (state.wizardComplete && state.wizardTask !== 'agent') {
+			elements.breadcrumb.show();
+		}
+	}
+
+	/**
+	 * Update the breadcrumb display
+	 */
+	function updateBreadcrumb(type, name) {
+		const typeLabels = {
+			'product': aisalesChat.i18n.product || 'Product',
+			'category': aisalesChat.i18n.category || 'Category',
+			'agent': aisalesChat.i18n.agent || 'Marketing Agent'
+		};
+		
+		elements.breadcrumbType.text(typeLabels[type] || type);
+		elements.breadcrumbName.text(name || '');
+		
+		if (type === 'agent') {
+			elements.breadcrumb.hide();
+		}
+	}
+
+	/**
+	 * Reset wizard to initial state (for New Chat)
+	 */
+	function resetWizard() {
+		state.wizardStep = 1;
+		state.wizardTask = null;
+		state.wizardComplete = false;
+		
+		// Reset step indicators
+		elements.wizardSteps.removeClass('aisales-wizard__step--active aisales-wizard__step--completed');
+		$('.aisales-wizard__step[data-step="1"]').addClass('aisales-wizard__step--active');
+		
+		// Reset panels
+		elements.wizardPanels.removeClass('aisales-wizard__panel--active');
+		$('.aisales-wizard__panel[data-panel="1"]').addClass('aisales-wizard__panel--active');
+		
+		// Clear search
+		elements.wizardSearch.val('');
+		elements.wizardItems.empty();
+		
+		// Clear localStorage
+		localStorage.removeItem('aisales_wizard_session');
+		
+		// Hide breadcrumb
+		elements.breadcrumb.hide();
+	}
+
+	// debounce moved to utils.js module (referenced via const wrapper at top)
+
+	// Expose functions needed by modules
+	app.selectProduct = selectProduct;
+	app.selectCategory = selectCategory;
+	app.selectAgent = selectAgent;
+	app.updateEntityTabs = updateEntityTabs;
+	app.openContextPanel = openContextPanel;
+	app.showNotice = showNotice;
+	// Expose functions needed by modules - use messaging module if available
+	app.sendMessage = function(content, quickAction) {
+		if (app.messaging) {
+			return app.messaging.sendMessage(content, quickAction);
+		}
+		return sendMessage(content, quickAction);
+	};
+	app.createSession = function(entity, entityType) {
+		if (app.messaging) {
+			return app.messaging.createSession(entity, entityType);
+		}
+		return createSession(entity, entityType);
+	};
+	app.enableInputs = enableInputs;
+	app.disableInputs = disableInputs;
+	app.clearMessages = function() {
+		return app.ui.clearMessages();
+	};
+	app.showWelcomeMessage = function() {
+		return app.ui.showWelcomeMessage();
+	};
+	app.addMessage = function(message, isStreaming) {
+		return app.ui.addMessage(message, isStreaming);
+	};
+	app.showThinking = function() {
+		return app.ui.showThinking();
+	};
+	app.hideThinking = function() {
+		return app.ui.hideThinking();
+	};
+	app.setLoading = setLoading;
+	app.scrollToBottom = function() {
+		return app.ui.scrollToBottom();
+	};
+	app.showNotice = function(message, type) {
+		return app.ui.showNotice(message, type);
+	};
+	app.addErrorMessage = function(text) {
+		return app.ui.addErrorMessage(text);
+	};
+	app.renderMessages = function() {
+		return app.ui.renderMessages();
+	};
+	app.updateStreamingMessage = function(content) {
+		return app.ui.updateStreamingMessage(content);
+	};
+	app.updateTokensUsed = function(tokens) {
+		return app.ui.updateTokensUsed(tokens);
+	};
+	app.updateBalance = function(change) {
+		return app.ui.updateBalance(change);
+	};
+	app.handleError = function(xhr) {
+		return app.ui.handleError(xhr);
+	};
+	app.autoResizeTextarea = function() {
+		return app.ui.autoResizeTextarea();
+	};
+	
+	// Expose suggestion functions - delegating to suggestions module
+	app.handleSuggestionReceived = function(suggestion) {
+		return app.suggestions.handleSuggestionReceived(suggestion);
+	};
+	app.updatePendingSummary = function() {
+		return app.suggestions.updatePendingSummary();
+	};
+	app.renderSuggestionInMessage = function(suggestion, $container) {
+		return app.suggestions.renderSuggestionInMessage(suggestion, $container);
+	};
+	app.showPendingChange = function(suggestion) {
+		return app.suggestions.showPendingChange(suggestion);
+	};
+	app.renderCatalogSuggestion = function(suggestion) {
+		return app.suggestions.renderCatalogSuggestion(suggestion);
+	};
+	app.showResearchConfirmation = function(data) {
+		return app.suggestions.showResearchConfirmation(data);
+	};
+	// Image functions - delegating to images module
+	app.showImageGeneratingIndicator = function(prompt) {
+		return app.images.showImageGeneratingIndicator(prompt);
+	};
+	app.hideImageGeneratingIndicator = function() {
+		return app.images.hideImageGeneratingIndicator();
+	};
+	app.appendGeneratedImage = function(data) {
+		return app.images.appendGeneratedImage(data);
+	};
+	app.showImageGenerationModal = function(entityType) {
+		return app.images.showImageGenerationModal(entityType);
+	};
 
 	// Initialize when DOM is ready
 	$(document).ready(init);

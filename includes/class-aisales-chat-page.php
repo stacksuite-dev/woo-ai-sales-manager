@@ -111,11 +111,120 @@ class AISales_Chat_Page {
 			? filemtime( AISALES_PLUGIN_DIR . 'assets/js/chat.js' )
 			: AISALES_VERSION;
 
-		// Enqueue chat script.
+		// Enqueue modular JS files in dependency order.
+		// 1. Utils module (no dependencies beyond jQuery).
+		wp_enqueue_script(
+			'aisales-chat-utils',
+			AISALES_PLUGIN_URL . 'assets/js/chat/utils.js',
+			array( 'jquery' ),
+			$js_version,
+			true
+		);
+
+		// 2. Attachments module (depends on utils).
+		wp_enqueue_script(
+			'aisales-chat-attachments',
+			AISALES_PLUGIN_URL . 'assets/js/chat/attachments.js',
+			array( 'jquery', 'aisales-chat-utils' ),
+			$js_version,
+			true
+		);
+
+		// 3. Context panel module (depends on utils).
+		wp_enqueue_script(
+			'aisales-chat-context',
+			AISALES_PLUGIN_URL . 'assets/js/chat/context.js',
+			array( 'jquery', 'aisales-chat-utils' ),
+			$js_version,
+			true
+		);
+
+		// 4. Entities module (depends on utils).
+		wp_enqueue_script(
+			'aisales-chat-entities',
+			AISALES_PLUGIN_URL . 'assets/js/chat/entities.js',
+			array( 'jquery', 'aisales-chat-utils' ),
+			$js_version,
+			true
+		);
+
+		// 5. Wizard module (depends on utils, entities).
+		wp_enqueue_script(
+			'aisales-chat-wizard',
+			AISALES_PLUGIN_URL . 'assets/js/chat/wizard.js',
+			array( 'jquery', 'aisales-chat-utils', 'aisales-chat-entities' ),
+			$js_version,
+			true
+		);
+
+		// 6. Messaging module (depends on utils).
+		wp_enqueue_script(
+			'aisales-chat-messaging',
+			AISALES_PLUGIN_URL . 'assets/js/chat/messaging.js',
+			array( 'jquery', 'aisales-chat-utils' ),
+			$js_version,
+			true
+		);
+
+		// 7. Suggestions module (depends on utils, messaging).
+		wp_enqueue_script(
+			'aisales-chat-suggestions',
+			AISALES_PLUGIN_URL . 'assets/js/chat/suggestions.js',
+			array( 'jquery', 'aisales-chat-utils', 'aisales-chat-messaging' ),
+			$js_version,
+			true
+		);
+
+		// 8. Images module (depends on utils).
+		wp_enqueue_script(
+			'aisales-chat-images',
+			AISALES_PLUGIN_URL . 'assets/js/chat/images.js',
+			array( 'jquery', 'aisales-chat-utils' ),
+			$js_version,
+			true
+		);
+
+		// 9. Formatting module (depends on utils).
+		wp_enqueue_script(
+			'aisales-chat-formatting',
+			AISALES_PLUGIN_URL . 'assets/js/chat/formatting.js',
+			array( 'jquery', 'aisales-chat-utils' ),
+			$js_version,
+			true
+		);
+
+		// 10. Panels module (depends on utils, formatting).
+		wp_enqueue_script(
+			'aisales-chat-panels',
+			AISALES_PLUGIN_URL . 'assets/js/chat/panels.js',
+			array( 'jquery', 'aisales-chat-utils', 'aisales-chat-formatting' ),
+			$js_version,
+			true
+		);
+
+		// 11. UI module (depends on utils, formatting).
+		wp_enqueue_script(
+			'aisales-chat-ui',
+			AISALES_PLUGIN_URL . 'assets/js/chat/ui.js',
+			array( 'jquery', 'aisales-chat-utils', 'aisales-chat-formatting' ),
+			$js_version,
+			true
+		);
+
+		// 12. Quick Actions module (depends on utils, suggestions, images).
+		wp_enqueue_script(
+			'aisales-chat-quick-actions',
+			AISALES_PLUGIN_URL . 'assets/js/chat/quick-actions.js',
+			array( 'jquery', 'aisales-chat-utils', 'aisales-chat-suggestions', 'aisales-chat-images' ),
+			$js_version,
+			true
+		);
+
+		// 13. Main chat script (depends on all modules).
 		wp_enqueue_script(
 			'aisales-chat',
 			AISALES_PLUGIN_URL . 'assets/js/chat.js',
-			array( 'jquery' ),
+			array( 'jquery', 'aisales-chat-utils', 'aisales-chat-attachments', 'aisales-chat-context', 'aisales-chat-entities', 'aisales-chat-wizard', 'aisales-chat-messaging', 'aisales-chat-suggestions', 'aisales-chat-images', 'aisales-chat-formatting', 'aisales-chat-panels', 'aisales-chat-ui', 'aisales-chat-quick-actions' ),
 			$js_version,
 			true
 		);
