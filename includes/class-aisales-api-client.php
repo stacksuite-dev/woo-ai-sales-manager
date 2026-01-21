@@ -321,6 +321,20 @@ class AISales_API_Client {
 		return $this->request( '/ai/email/generate', 'POST', $data );
 	}
 
+	/**
+	 * Analyze store brand and suggest settings
+	 *
+	 * @param array $context Store analysis context data.
+	 * @return array|WP_Error
+	 */
+	public function analyze_brand( $context ) {
+		if ( $this->use_mock ) {
+			return $this->mock_analyze_brand( $context );
+		}
+
+		return $this->request( '/ai/brand/analyze', 'POST', $context );
+	}
+
 	// =========================================================================
 	// BILLING & AUTO TOP-UP METHODS
 	// =========================================================================
@@ -1153,6 +1167,118 @@ class AISales_API_Client {
 			'api_key' => $new_api_key,
 			'email'   => $stored['email'],
 			'message' => __( 'API key recovered successfully.', 'ai-sales-manager-for-woocommerce' ),
+		);
+	}
+
+	/**
+	 * Mock analyze brand response
+	 *
+	 * @param array $context Store analysis context.
+	 * @return array
+	 */
+	private function mock_analyze_brand( $context ) {
+		$this->deduct_mock_tokens( 500 );
+
+		// Use provided context to generate suggestions
+		$store_name = isset( $context['store_name'] ) ? $context['store_name'] : get_bloginfo( 'name' );
+		$products   = isset( $context['products'] ) ? $context['products'] : array();
+
+		// Try to infer industry from products
+		$industry = 'general';
+		if ( ! empty( $products ) ) {
+			// Simple keyword matching for demo
+			$product_text = strtolower( implode( ' ', wp_list_pluck( $products, 'name' ) ) );
+			if ( strpos( $product_text, 'shirt' ) !== false || strpos( $product_text, 'dress' ) !== false || strpos( $product_text, 'clothing' ) !== false ) {
+				$industry = 'fashion';
+			} elseif ( strpos( $product_text, 'phone' ) !== false || strpos( $product_text, 'laptop' ) !== false || strpos( $product_text, 'computer' ) !== false ) {
+				$industry = 'electronics';
+			} elseif ( strpos( $product_text, 'cream' ) !== false || strpos( $product_text, 'beauty' ) !== false || strpos( $product_text, 'skin' ) !== false ) {
+				$industry = 'beauty';
+			} elseif ( strpos( $product_text, 'food' ) !== false || strpos( $product_text, 'organic' ) !== false || strpos( $product_text, 'coffee' ) !== false ) {
+				$industry = 'food';
+			} elseif ( strpos( $product_text, 'furniture' ) !== false || strpos( $product_text, 'decor' ) !== false || strpos( $product_text, 'home' ) !== false ) {
+				$industry = 'home';
+			}
+		}
+
+		// Generate target audience based on industry
+		$audiences = array(
+			'fashion'     => 'Style-conscious individuals aged 25-45 who value quality and contemporary fashion trends.',
+			'electronics' => 'Tech-savvy consumers aged 20-50 looking for reliable electronics and innovative gadgets.',
+			'beauty'      => 'Health and beauty enthusiasts aged 25-55 who prioritize self-care and premium skincare products.',
+			'food'        => 'Health-conscious foodies aged 25-60 who appreciate quality ingredients and artisanal products.',
+			'home'        => 'Homeowners and design enthusiasts aged 30-55 looking to create comfortable, stylish living spaces.',
+			'general'     => 'Quality-focused shoppers aged 25-55 who value reliable products and excellent customer service.',
+		);
+
+		// Use theme colors if available
+		$primary_color = isset( $context['theme_colors']['primary'] ) ? $context['theme_colors']['primary'] : '#7f54b3';
+		$text_color    = isset( $context['theme_colors']['text'] ) ? $context['theme_colors']['text'] : '#3c3c3c';
+		$bg_color      = isset( $context['theme_colors']['background'] ) ? $context['theme_colors']['background'] : '#f7f7f7';
+
+		// Generate taglines based on industry
+		$taglines = array(
+			'fashion'     => 'Elevate Your Style, Define Your Look',
+			'electronics' => 'Innovation at Your Fingertips',
+			'beauty'      => 'Discover Your Natural Radiance',
+			'food'        => 'Fresh Quality, Delivered to You',
+			'home'        => 'Where Comfort Meets Style',
+			'general'     => 'Quality Products, Exceptional Service',
+		);
+
+		// Generate differentiators based on industry
+		$differentiators = array(
+			'fashion'     => 'Curated collections with a focus on sustainable, ethically-sourced materials and timeless design.',
+			'electronics' => 'Expert product selection with hands-on testing and dedicated post-purchase support.',
+			'beauty'      => 'Clean beauty formulations backed by science, with personalized skincare recommendations.',
+			'food'        => 'Direct relationships with local producers ensuring freshness and supporting small businesses.',
+			'home'        => 'Designer-curated pieces at accessible prices with free interior design consultations.',
+			'general'     => 'Personalized shopping experience with expert product recommendations and hassle-free returns.',
+		);
+
+		// Generate pain points based on industry
+		$pain_points = array(
+			'fashion'     => 'Finding quality pieces that fit well, staying stylish on a budget, wardrobe clutter',
+			'electronics' => 'Tech overwhelm, fear of buying outdated products, complicated setup processes',
+			'beauty'      => 'Ingredient confusion, finding products for specific skin concerns, product overload',
+			'food'        => 'Finding fresh quality ingredients, dietary restrictions, meal planning stress',
+			'home'        => 'Creating cohesive design, quality vs price tradeoffs, assembly and delivery hassles',
+			'general'     => 'Product quality uncertainty, difficult returns, impersonal shopping experiences',
+		);
+
+		// Price positions based on industry
+		$price_positions = array(
+			'fashion'     => 'mid_range',
+			'electronics' => 'value',
+			'beauty'      => 'premium',
+			'food'        => 'value',
+			'home'        => 'mid_range',
+			'general'     => 'value',
+		);
+
+		return array(
+			'suggestions' => array(
+				'store_name'      => $store_name,
+				'tagline'         => $taglines[ $industry ],
+				'business_niche'  => $industry,
+				'target_audience' => $audiences[ $industry ],
+				'price_position'  => $price_positions[ $industry ],
+				'differentiator'  => $differentiators[ $industry ],
+				'pain_points'     => $pain_points[ $industry ],
+				'brand_tone'      => 'friendly',
+				'words_to_avoid'  => 'cheap, discount, budget, basic',
+				'promotion_style' => 'moderate',
+				'primary_color'   => $primary_color,
+				'text_color'      => $text_color,
+				'bg_color'        => $bg_color,
+				'font_family'     => 'system',
+				'brand_values'    => array( 'Quality', 'Trust', 'Service', 'Innovation' ),
+			),
+			'tokens_used' => array(
+				'input'  => 300,
+				'output' => 200,
+				'total'  => 500,
+			),
 		);
 	}
 }

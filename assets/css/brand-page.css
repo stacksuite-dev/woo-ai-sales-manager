@@ -1,0 +1,1702 @@
+/**
+ * Brand Settings Page Styles
+ *
+ * Modern, refined design for the brand settings wizard and form.
+ * Features: AI-accent gradient, softer shadows, larger radii, timeline UI.
+ *
+ * @package AISales_Sales_Manager
+ */
+
+/* ==========================================================================
+   Local Design Tokens (Brand Page Scope)
+   ========================================================================== */
+
+.aisales-brand-page {
+	/* AI Accent - Indigo to Blue gradient for AI-powered elements */
+	--brand-ai-gradient: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+	--brand-ai-primary: #6366f1;
+	--brand-ai-secondary: #3b82f6;
+	--brand-ai-light: #eef2ff;
+	
+	/* Softer neutrals */
+	--brand-border: #e5e7eb;
+	--brand-border-light: #f3f4f6;
+	--brand-bg-subtle: #f9fafb;
+	
+	/* Enhanced shadows (Tailwind-inspired) */
+	--brand-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+	--brand-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+	--brand-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+	--brand-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+	
+	/* Larger radii for modern feel */
+	--brand-radius-md: 8px;
+	--brand-radius-lg: 12px;
+	--brand-radius-xl: 16px;
+	--brand-radius-2xl: 20px;
+}
+
+/* ==========================================================================
+   Page Layout
+   ========================================================================== */
+
+.aisales-brand-page {
+	max-width: 1000px;
+	margin: 0;
+	padding: 0 var(--aisales-space-4);
+}
+
+.aisales-brand-page .aisales-notices-anchor {
+	height: 0;
+	margin: 0;
+	padding: 0;
+}
+
+/* ==========================================================================
+   Page Header
+   ========================================================================== */
+
+.aisales-brand-page__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: var(--aisales-space-5) 0;
+	margin-bottom: var(--aisales-space-5);
+	border-bottom: 1px solid var(--brand-border);
+}
+
+.aisales-brand-page__header-left {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-3);
+}
+
+.aisales-brand-page__title {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-3);
+	font-size: var(--aisales-font-xl);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-brand-page__title .dashicons {
+	font-size: 24px;
+	width: 24px;
+	height: 24px;
+	background: var(--brand-ai-gradient);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.aisales-brand-page__header-right {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-3);
+}
+
+/* Re-analyze Button (pill style like balance indicator) */
+.aisales-brand-reanalyze-trigger {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	padding: var(--aisales-space-2) var(--aisales-space-4);
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--brand-border);
+	border-radius: var(--aisales-radius-full, 9999px);
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-medium);
+	color: var(--aisales-text-secondary);
+	box-shadow: var(--brand-shadow-sm);
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.aisales-brand-reanalyze-trigger:hover {
+	border-color: var(--brand-ai-primary);
+	color: var(--brand-ai-primary);
+	box-shadow: var(--brand-shadow-md);
+}
+
+.aisales-brand-reanalyze-trigger:active {
+	transform: scale(0.98);
+}
+
+.aisales-brand-reanalyze-trigger .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	color: var(--brand-ai-primary);
+	line-height: 1;
+}
+
+/* ==========================================================================
+   AI Button Styles
+   ========================================================================== */
+
+.aisales-btn--ai {
+	background: var(--brand-ai-gradient);
+	border: none;
+	color: #fff;
+	font-weight: var(--aisales-font-weight-semibold);
+	box-shadow: var(--brand-shadow-md), 0 0 0 0 rgba(99, 102, 241, 0.4);
+	transition: all 0.2s ease;
+}
+
+.aisales-btn--ai:hover {
+	transform: translateY(-1px);
+	box-shadow: var(--brand-shadow-lg), 0 0 20px 0 rgba(99, 102, 241, 0.3);
+}
+
+.aisales-btn--ai:active {
+	transform: translateY(0);
+}
+
+.aisales-btn--ai .dashicons {
+	color: inherit;
+}
+
+/* ==========================================================================
+   Not Connected State
+   ========================================================================== */
+
+.aisales-brand-page__not-connected {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 400px;
+}
+
+/* ==========================================================================
+   Empty State (Welcome Screen) - Modernized
+   ========================================================================== */
+
+.aisales-brand-page__empty-state {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 520px;
+	padding: var(--aisales-space-6);
+}
+
+.aisales-brand-welcome {
+	text-align: center;
+	max-width: 520px;
+	padding: var(--aisales-space-8) var(--aisales-space-7);
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--brand-border);
+	border-radius: var(--brand-radius-2xl);
+	box-shadow: var(--brand-shadow-lg);
+}
+
+.aisales-brand-welcome__icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 88px;
+	height: 88px;
+	background: var(--brand-ai-gradient);
+	border-radius: var(--brand-radius-xl);
+	margin-bottom: var(--aisales-space-6);
+	box-shadow: 0 8px 24px -4px rgba(99, 102, 241, 0.35);
+}
+
+.aisales-brand-welcome__icon .dashicons {
+	font-size: 40px;
+	width: 40px;
+	height: 40px;
+	color: #fff;
+}
+
+.aisales-brand-welcome__title {
+	margin: 0 0 var(--aisales-space-3);
+	font-size: 22px;
+	font-weight: var(--aisales-font-weight-bold);
+	color: var(--aisales-text-primary);
+	line-height: 1.3;
+}
+
+.aisales-brand-welcome__description {
+	margin: 0 0 var(--aisales-space-7);
+	font-size: var(--aisales-font-md);
+	color: var(--aisales-text-secondary);
+	line-height: 1.6;
+}
+
+.aisales-brand-welcome__actions {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--aisales-space-3);
+	margin-bottom: var(--aisales-space-7);
+}
+
+/* Primary AI Analyze Button */
+.aisales-brand-welcome__actions .aisales-btn--primary {
+	background: var(--brand-ai-gradient);
+	border: none;
+	padding: var(--aisales-space-4) var(--aisales-space-7);
+	font-size: var(--aisales-font-md);
+	font-weight: var(--aisales-font-weight-semibold);
+	border-radius: var(--brand-radius-lg);
+	box-shadow: var(--brand-shadow-md), 0 0 0 0 rgba(99, 102, 241, 0.4);
+	transition: all 0.2s ease;
+}
+
+.aisales-brand-welcome__actions .aisales-btn--primary:hover {
+	transform: translateY(-2px);
+	box-shadow: var(--brand-shadow-lg), 0 0 24px 0 rgba(99, 102, 241, 0.35);
+}
+
+/* Features Grid */
+.aisales-brand-welcome__features {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: var(--aisales-space-4);
+	padding-top: var(--aisales-space-6);
+	border-top: 1px solid var(--brand-border);
+}
+
+.aisales-brand-welcome__feature {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	padding: var(--aisales-space-3);
+	font-size: var(--aisales-font-xs);
+	color: var(--aisales-text-secondary);
+	text-align: center;
+	line-height: 1.4;
+}
+
+.aisales-brand-welcome__feature .dashicons {
+	font-size: 20px;
+	width: 20px;
+	height: 20px;
+	color: var(--brand-ai-primary);
+}
+
+/* ==========================================================================
+   Analyzing State - Timeline UI
+   ========================================================================== */
+
+.aisales-brand-page__analyzing-state {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 520px;
+	padding: var(--aisales-space-6);
+}
+
+.aisales-brand-analyzing {
+	text-align: center;
+	max-width: 440px;
+	padding: var(--aisales-space-8) var(--aisales-space-7);
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--brand-border);
+	border-radius: var(--brand-radius-2xl);
+	box-shadow: var(--brand-shadow-lg);
+}
+
+.aisales-brand-analyzing__spinner {
+	display: flex;
+	justify-content: center;
+	margin-bottom: var(--aisales-space-5);
+}
+
+/* AI-themed spinner */
+.aisales-brand-analyzing__spinner .aisales-spinner {
+	border-color: var(--brand-border);
+	border-top-color: var(--brand-ai-primary);
+}
+
+.aisales-brand-analyzing__title {
+	margin: 0 0 var(--aisales-space-7);
+	font-size: var(--aisales-font-lg);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+}
+
+/* Timeline Steps */
+.aisales-brand-analyzing__steps {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	text-align: left;
+	position: relative;
+}
+
+/* Vertical timeline line */
+.aisales-brand-analyzing__steps::before {
+	content: '';
+	position: absolute;
+	left: 15px;
+	top: 24px;
+	bottom: 24px;
+	width: 2px;
+	background: var(--brand-border);
+	border-radius: 1px;
+}
+
+.aisales-brand-analyzing__step {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-4);
+	padding: var(--aisales-space-4) 0;
+	position: relative;
+	z-index: 1;
+	opacity: 0.4;
+	transition: opacity 0.3s ease;
+}
+
+.aisales-brand-analyzing__step--active,
+.aisales-brand-analyzing__step--complete {
+	opacity: 1;
+}
+
+.aisales-brand-analyzing__step-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	background: var(--aisales-bg-white);
+	border: 2px solid var(--brand-border);
+	border-radius: 50%;
+	flex-shrink: 0;
+	transition: all 0.3s ease;
+}
+
+.aisales-brand-analyzing__step--active .aisales-brand-analyzing__step-icon {
+	background: var(--brand-ai-light);
+	border-color: var(--brand-ai-primary);
+	animation: pulse-ring 1.5s ease-in-out infinite;
+}
+
+.aisales-brand-analyzing__step--complete .aisales-brand-analyzing__step-icon {
+	background: var(--aisales-success);
+	border-color: var(--aisales-success);
+}
+
+@keyframes pulse-ring {
+	0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+	50% { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
+}
+
+.aisales-brand-analyzing__step-icon .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	color: var(--aisales-text-muted);
+	transition: color 0.3s ease;
+}
+
+.aisales-brand-analyzing__step--active .aisales-brand-analyzing__step-icon .dashicons {
+	color: var(--brand-ai-primary);
+}
+
+.aisales-brand-analyzing__step--complete .aisales-brand-analyzing__step-icon .dashicons {
+	color: #fff;
+}
+
+.aisales-brand-analyzing__step-text {
+	font-size: var(--aisales-font-sm);
+	color: var(--aisales-text-muted);
+	transition: color 0.3s ease;
+}
+
+.aisales-brand-analyzing__step--active .aisales-brand-analyzing__step-text {
+	color: var(--aisales-text-primary);
+	font-weight: var(--aisales-font-weight-medium);
+}
+
+.aisales-brand-analyzing__step--complete .aisales-brand-analyzing__step-text {
+	color: var(--aisales-text-secondary);
+}
+
+/* ==========================================================================
+   Review State - AI Result Card
+   ========================================================================== */
+
+.aisales-brand-page__review-state {
+	display: flex;
+	align-items: flex-start;
+	justify-content: flex-start;
+	padding-top: var(--aisales-space-4);
+}
+
+.aisales-brand-review {
+	width: 100%;
+	max-width: 800px;
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--brand-border);
+	border-radius: var(--brand-radius-xl);
+	box-shadow: var(--brand-shadow-lg);
+	overflow: hidden;
+}
+
+.aisales-brand-review__header {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-4);
+	padding: var(--aisales-space-5) var(--aisales-space-6);
+	background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 50%, #faf5ff 100%);
+	border-bottom: 1px solid var(--brand-border-light);
+}
+
+.aisales-brand-review__header > .dashicons {
+	font-size: 28px;
+	width: 28px;
+	height: 28px;
+	background: var(--brand-ai-gradient);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	flex-shrink: 0;
+}
+
+.aisales-brand-review__header-text {
+	flex: 1;
+}
+
+.aisales-brand-review__title {
+	margin: 0 0 var(--aisales-space-1);
+	font-size: var(--aisales-font-lg);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-brand-review__description {
+	margin: 0;
+	font-size: var(--aisales-font-sm);
+	color: var(--aisales-text-secondary);
+}
+
+.aisales-brand-review__content {
+	padding: 0;
+}
+
+.aisales-brand-review__suggestions {
+	display: flex;
+	flex-direction: column;
+}
+
+.aisales-brand-review__actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: var(--aisales-space-3);
+	padding: var(--aisales-space-5) var(--aisales-space-6);
+	background: var(--brand-bg-subtle);
+	border-top: 1px solid var(--brand-border);
+}
+
+/* Continue button with arrow */
+.aisales-brand-review__actions .aisales-btn--ai {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+}
+
+.aisales-brand-review__actions .aisales-btn--ai .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	transition: transform 0.2s ease;
+}
+
+.aisales-brand-review__actions .aisales-btn--ai:hover .dashicons {
+	transform: translateX(3px);
+}
+
+/* ==========================================================================
+   Review Sections
+   ========================================================================== */
+
+.aisales-review-section {
+	padding: var(--aisales-space-5) var(--aisales-space-6);
+	border-bottom: 1px solid var(--brand-border-light);
+}
+
+.aisales-review-section:last-child {
+	border-bottom: none;
+}
+
+.aisales-review-section__title {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	margin: 0 0 var(--aisales-space-4);
+	font-size: 11px;
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+}
+
+.aisales-review-section__title .dashicons {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+	background: var(--brand-ai-gradient);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.aisales-review-section__content {
+	display: flex;
+	flex-direction: column;
+	gap: var(--aisales-space-4);
+}
+
+/* Suggestion Items */
+.aisales-brand-suggestion {
+	display: flex;
+	flex-direction: column;
+	gap: var(--aisales-space-2);
+}
+
+.aisales-brand-suggestion__label {
+	font-size: 11px;
+	font-weight: var(--aisales-font-weight-medium);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--aisales-text-muted);
+}
+
+.aisales-brand-suggestion__value {
+	font-size: var(--aisales-font-md);
+	font-weight: var(--aisales-font-weight-medium);
+	color: var(--aisales-text-primary);
+	line-height: 1.5;
+}
+
+/* Tagline Variant */
+.aisales-brand-suggestion--tagline .aisales-brand-suggestion__value {
+	font-size: var(--aisales-font-lg);
+	font-style: italic;
+	background: var(--brand-ai-gradient);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+/* Tone Badge */
+.aisales-brand-suggestion--tone .aisales-brand-suggestion__tone-value {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-3);
+	flex-wrap: wrap;
+}
+
+/* Badge base styles */
+.aisales-tone-badge,
+.aisales-position-badge,
+.aisales-promo-badge {
+	display: inline-flex;
+	align-items: center;
+	padding: 6px 14px;
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-semibold);
+	border-radius: 999px;
+}
+
+.aisales-tone-badge {
+	text-transform: capitalize;
+}
+
+.aisales-promo-badge {
+	gap: var(--aisales-space-2);
+}
+
+.aisales-promo-badge .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	line-height: 16px;
+}
+
+/* Tone badge variants */
+.aisales-tone-badge--professional {
+	background: #dbeafe;
+	color: #1e40af;
+}
+
+.aisales-tone-badge--friendly {
+	background: #fef3c7;
+	color: #b45309;
+}
+
+.aisales-tone-badge--casual {
+	background: #d1fae5;
+	color: #065f46;
+}
+
+.aisales-tone-badge--luxury {
+	background: #ede9fe;
+	color: #6d28d9;
+}
+
+.aisales-tone-badge--playful {
+	background: #fce7f3;
+	color: #be185d;
+}
+
+.aisales-brand-suggestion__tone-desc {
+	font-size: var(--aisales-font-sm);
+	color: var(--aisales-text-secondary);
+}
+
+/* Brand Values Tags */
+.aisales-brand-suggestion__values {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--aisales-space-2);
+}
+
+/* Tag base styles */
+.aisales-value-tag,
+.aisales-avoid-tag {
+	display: inline-flex;
+	align-items: center;
+	padding: 5px 12px;
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-medium);
+	border-radius: 999px;
+}
+
+.aisales-value-tag {
+	background: var(--brand-bg-subtle);
+	border: 1px solid var(--brand-border);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-avoid-tag {
+	background: #fef2f2;
+	border: 1px solid #fecaca;
+	color: #991b1b;
+}
+
+/* Price Position Badges */
+.aisales-brand-suggestion__badge-value {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-3);
+}
+
+.aisales-position-badge--budget {
+	background: #dcfce7;
+	color: #166534;
+}
+
+.aisales-position-badge--value {
+	background: #d1fae5;
+	color: #065f46;
+}
+
+.aisales-position-badge--mid_range {
+	background: #dbeafe;
+	color: #1e40af;
+}
+
+.aisales-position-badge--premium {
+	background: #ede9fe;
+	color: #6d28d9;
+}
+
+.aisales-position-badge--luxury {
+	background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+	color: #92400e;
+}
+
+/* Promotion Style Badges */
+.aisales-promo-badge--aggressive {
+	background: #fee2e2;
+	color: #991b1b;
+}
+
+.aisales-promo-badge--moderate {
+	background: #fef3c7;
+	color: #92400e;
+}
+
+.aisales-promo-badge--minimal {
+	background: #dbeafe;
+	color: #1e40af;
+}
+
+.aisales-promo-badge--never {
+	background: #f3f4f6;
+	color: #374151;
+}
+
+/* Color Palette - Circle Swatches */
+.aisales-color-palette {
+	display: flex;
+	gap: var(--aisales-space-5);
+	flex-wrap: wrap;
+}
+
+.aisales-color-swatch {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-3);
+}
+
+.aisales-color-swatch__preview {
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	flex-shrink: 0;
+	box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1), var(--brand-shadow-sm);
+}
+
+.aisales-color-swatch__info {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.aisales-color-swatch__name {
+	font-size: 11px;
+	font-weight: var(--aisales-font-weight-medium);
+	color: var(--aisales-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+}
+
+.aisales-color-swatch__value {
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+	font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+/* Font Preview */
+.aisales-font-preview {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--aisales-space-4);
+	padding: var(--aisales-space-3) var(--aisales-space-5);
+	background: var(--brand-bg-subtle);
+	border-radius: var(--brand-radius-lg);
+}
+
+.aisales-font-preview__sample {
+	font-size: 36px;
+	font-weight: var(--aisales-font-weight-medium);
+	color: var(--aisales-text-primary);
+	line-height: 1;
+}
+
+.aisales-font-preview__name {
+	font-size: var(--aisales-font-md);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+}
+
+/* Email Preview - Browser Frame */
+.aisales-review-section--preview {
+	background: var(--brand-bg-subtle);
+	padding-bottom: var(--aisales-space-6);
+}
+
+.aisales-review-preview {
+	display: flex;
+	justify-content: center;
+}
+
+.aisales-review-preview__frame {
+	width: 100%;
+	max-width: 380px;
+	background: #fff;
+	border-radius: var(--brand-radius-lg);
+	box-shadow: var(--brand-shadow-xl);
+	overflow: hidden;
+}
+
+/* Browser chrome header */
+.aisales-review-preview__chrome {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 10px 14px;
+	background: #f3f4f6;
+	border-bottom: 1px solid var(--brand-border);
+}
+
+.aisales-review-preview__dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+}
+
+.aisales-review-preview__dot--red { background: #ef4444; }
+.aisales-review-preview__dot--yellow { background: #f59e0b; }
+.aisales-review-preview__dot--green { background: #22c55e; }
+
+.aisales-review-preview__email {
+	border-radius: 0;
+}
+
+.aisales-review-preview__header {
+	padding: var(--aisales-space-5);
+	font-weight: var(--aisales-font-weight-semibold);
+	text-align: center;
+	font-size: var(--aisales-font-md);
+}
+
+.aisales-review-preview__body {
+	padding: var(--aisales-space-5) var(--aisales-space-6);
+	background: #ffffff;
+}
+
+.aisales-review-preview__greeting {
+	margin: 0 0 var(--aisales-space-2);
+	font-size: var(--aisales-font-lg);
+	font-weight: var(--aisales-font-weight-semibold);
+}
+
+.aisales-review-preview__text {
+	margin: 0 0 var(--aisales-space-5);
+	font-size: var(--aisales-font-sm);
+	line-height: 1.6;
+	opacity: 0.8;
+}
+
+.aisales-review-preview__cta {
+	display: inline-block;
+	padding: 10px 24px;
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-semibold);
+	border: none;
+	border-radius: 6px;
+	cursor: default;
+}
+
+/* ==========================================================================
+   Form State
+   ========================================================================== */
+
+.aisales-brand-page__form-state {
+	padding-bottom: var(--aisales-space-8);
+}
+
+.aisales-brand-form {
+	display: flex;
+	flex-direction: column;
+	gap: var(--aisales-space-6);
+}
+
+/* ==========================================================================
+   Brand Settings - Unified Card (mirrors Review card structure)
+   ========================================================================== */
+
+.aisales-brand-settings {
+	width: 100%;
+	max-width: 800px;
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--brand-border);
+	border-radius: var(--brand-radius-xl);
+	box-shadow: var(--brand-shadow-lg);
+	overflow: hidden;
+}
+
+.aisales-brand-settings__header {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-4);
+	padding: var(--aisales-space-5) var(--aisales-space-6);
+	background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 50%, #faf5ff 100%);
+	border-bottom: 1px solid var(--brand-border-light);
+}
+
+.aisales-brand-settings__header > .dashicons {
+	font-size: 28px;
+	width: 28px;
+	height: 28px;
+	background: var(--brand-ai-gradient);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	flex-shrink: 0;
+}
+
+.aisales-brand-settings__header-text {
+	flex: 1;
+}
+
+.aisales-brand-settings__title {
+	margin: 0 0 var(--aisales-space-1);
+	font-size: var(--aisales-font-lg);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-brand-settings__description {
+	margin: 0;
+	font-size: var(--aisales-font-sm);
+	color: var(--aisales-text-secondary);
+}
+
+.aisales-brand-settings__content {
+	padding: 0;
+}
+
+/* Settings Sections (internal dividers) */
+.aisales-settings-section {
+	padding: var(--aisales-space-5) var(--aisales-space-6);
+	border-bottom: 1px solid var(--brand-border-light);
+}
+
+.aisales-settings-section:last-child {
+	border-bottom: none;
+}
+
+.aisales-settings-section__title {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	margin: 0 0 var(--aisales-space-4);
+	font-size: 11px;
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+}
+
+.aisales-settings-section__title .dashicons {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+	background: var(--brand-ai-gradient);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.aisales-settings-section__content {
+	display: flex;
+	flex-direction: column;
+	gap: var(--aisales-space-5);
+}
+
+/* Settings Actions Footer */
+.aisales-brand-settings__actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: var(--aisales-space-3);
+	padding: var(--aisales-space-5) var(--aisales-space-6);
+	background: var(--brand-bg-subtle);
+	border-top: 1px solid var(--brand-border);
+}
+
+/* ==========================================================================
+   Legacy Brand Cards (deprecated - kept for compatibility)
+   ========================================================================== */
+
+.aisales-brand-cards {
+	display: flex;
+	flex-direction: column;
+	gap: var(--aisales-space-5);
+}
+
+/* Brand Card - Unified AI Theme */
+.aisales-brand-card {
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--brand-border);
+	border-radius: var(--brand-radius-xl);
+	box-shadow: var(--brand-shadow-sm);
+	overflow: hidden;
+}
+
+.aisales-brand-card__header {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--aisales-space-4);
+	padding: var(--aisales-space-5) var(--aisales-space-6);
+	background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 50%, #faf5ff 100%);
+	border-bottom: 1px solid var(--brand-border-light);
+}
+
+.aisales-brand-card__header > .dashicons {
+	font-size: 22px;
+	width: 22px;
+	height: 22px;
+	background: var(--brand-ai-gradient);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	flex-shrink: 0;
+	margin-top: 2px;
+}
+
+.aisales-brand-card__header h3 {
+	margin: 0 0 var(--aisales-space-1);
+	font-size: var(--aisales-font-md);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-brand-card__header p {
+	margin: 0;
+	font-size: var(--aisales-font-sm);
+	color: var(--aisales-text-secondary);
+}
+
+.aisales-brand-card__content {
+	padding: var(--aisales-space-6);
+	display: flex;
+	flex-direction: column;
+	gap: var(--aisales-space-5);
+}
+
+/* ==========================================================================
+   Form Elements
+   ========================================================================== */
+
+.aisales-form-group {
+	display: flex;
+	flex-direction: column;
+	gap: var(--aisales-space-2);
+}
+
+.aisales-form-label {
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-medium);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-form-input,
+.aisales-form-select,
+.aisales-form-textarea {
+	width: 100%;
+	padding: 10px 14px;
+	font-size: var(--aisales-font-md);
+	border: 1px solid var(--brand-border);
+	border-radius: var(--brand-radius-md);
+	background: var(--aisales-bg-white);
+	color: var(--aisales-text-primary);
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.aisales-form-input:focus,
+.aisales-form-select:focus,
+.aisales-form-textarea:focus {
+	border-color: var(--brand-ai-primary);
+	box-shadow: 0 0 0 3px var(--brand-ai-light);
+	outline: none;
+}
+
+.aisales-form-input::placeholder,
+.aisales-form-textarea::placeholder {
+	color: var(--aisales-text-muted);
+}
+
+.aisales-form-select {
+	cursor: pointer;
+	appearance: none;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 14px center;
+	padding-right: 40px;
+}
+
+.aisales-form-textarea {
+	resize: vertical;
+	min-height: 88px;
+}
+
+.aisales-form-help {
+	margin: 0;
+	font-size: var(--aisales-font-xs);
+	color: var(--aisales-text-muted);
+}
+
+/* ==========================================================================
+   Brand Tone Options - Card Style
+   ========================================================================== */
+
+.aisales-tone-options {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	gap: var(--aisales-space-3);
+}
+
+.aisales-tone-option {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--aisales-space-3);
+	padding: var(--aisales-space-4);
+	background: var(--aisales-bg-white);
+	border: 2px solid var(--brand-border);
+	border-radius: var(--brand-radius-lg);
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.aisales-tone-option:hover {
+	border-color: var(--brand-ai-light);
+	background: var(--brand-ai-light);
+}
+
+.aisales-tone-option--selected {
+	border-color: var(--brand-ai-primary);
+	background: var(--brand-ai-light);
+}
+
+.aisales-tone-option--selected:hover {
+	border-color: var(--brand-ai-primary);
+	background: var(--brand-ai-light);
+}
+
+.aisales-tone-option input[type="radio"] {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.aisales-tone-option__icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	background: var(--brand-bg-subtle);
+	border-radius: var(--brand-radius-md);
+	flex-shrink: 0;
+	transition: all 0.2s ease;
+}
+
+.aisales-tone-option--selected .aisales-tone-option__icon {
+	background: var(--brand-ai-gradient);
+}
+
+.aisales-tone-option__icon .dashicons {
+	font-size: 20px;
+	width: 20px;
+	height: 20px;
+	color: var(--aisales-text-secondary);
+	transition: color 0.2s ease;
+}
+
+.aisales-tone-option--selected .aisales-tone-option__icon .dashicons {
+	color: #fff;
+}
+
+.aisales-tone-option__content {
+	display: flex;
+	flex-direction: column;
+	gap: var(--aisales-space-1);
+	min-width: 0;
+}
+
+.aisales-tone-option__label {
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-tone-option__desc {
+	font-size: var(--aisales-font-xs);
+	color: var(--aisales-text-secondary);
+	line-height: 1.4;
+}
+
+/* ==========================================================================
+   Brand Colors
+   ========================================================================== */
+
+.aisales-brand-colors {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: var(--aisales-space-5);
+}
+
+@media (max-width: 600px) {
+	.aisales-brand-colors {
+		grid-template-columns: 1fr;
+	}
+}
+
+.aisales-form-group--color {
+	gap: var(--aisales-space-2);
+}
+
+/* ==========================================================================
+   Custom Color Picker - Modern Popover Design
+   ========================================================================== */
+
+.aisales-color-field {
+	position: relative;
+}
+
+/* Trigger Button */
+.aisales-color-trigger {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-3);
+	width: 100%;
+	padding: 8px 12px;
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--brand-border);
+	border-radius: var(--brand-radius-md);
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.aisales-color-trigger:hover {
+	border-color: #d1d5db;
+	box-shadow: var(--brand-shadow-sm);
+}
+
+.aisales-color-trigger:focus {
+	outline: none;
+	border-color: var(--brand-ai-primary);
+	box-shadow: 0 0 0 3px var(--brand-ai-light);
+}
+
+.aisales-color-trigger--active {
+	border-color: var(--brand-ai-primary);
+	box-shadow: 0 0 0 3px var(--brand-ai-light);
+}
+
+/* Color Swatch Preview */
+.aisales-color-trigger__swatch {
+	position: relative;
+	width: 28px;
+	height: 28px;
+	border-radius: 6px;
+	flex-shrink: 0;
+	overflow: hidden;
+	/* Checkerboard for transparency indication */
+	background-color: #fff;
+	background-image: 
+		linear-gradient(45deg, #e5e7eb 25%, transparent 25%),
+		linear-gradient(-45deg, #e5e7eb 25%, transparent 25%),
+		linear-gradient(45deg, transparent 75%, #e5e7eb 75%),
+		linear-gradient(-45deg, transparent 75%, #e5e7eb 75%);
+	background-size: 8px 8px;
+	background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.aisales-color-trigger__swatch-color {
+	position: absolute;
+	inset: 0;
+	border-radius: 6px;
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+/* Hex Value Display */
+.aisales-color-trigger__value {
+	flex: 1;
+	font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--aisales-text-primary);
+	text-transform: uppercase;
+	letter-spacing: 0.02em;
+}
+
+/* Chevron Icon */
+.aisales-color-trigger__icon {
+	color: var(--aisales-text-muted);
+	transition: transform 0.2s ease;
+}
+
+.aisales-color-trigger__icon .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+.aisales-color-trigger--active .aisales-color-trigger__icon {
+	transform: rotate(180deg);
+}
+
+/* Popover Container */
+.aisales-color-popover {
+	position: absolute;
+	top: calc(100% + 8px);
+	left: 0;
+	z-index: 1000;
+	width: 240px;
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--brand-border);
+	border-radius: var(--brand-radius-lg);
+	box-shadow: var(--brand-shadow-xl);
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(-8px);
+	transition: all 0.2s ease;
+}
+
+.aisales-color-popover--open {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY(0);
+}
+
+/* Popover Arrow */
+.aisales-color-popover::before {
+	content: '';
+	position: absolute;
+	top: -6px;
+	left: 20px;
+	width: 12px;
+	height: 12px;
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--brand-border);
+	border-right: none;
+	border-bottom: none;
+	transform: rotate(45deg);
+}
+
+/* Popover Content */
+.aisales-color-popover__content {
+	padding: var(--aisales-space-4);
+}
+
+/* Saturation/Brightness Picker Area */
+.aisales-color-picker__saturation {
+	position: relative;
+	width: 100%;
+	height: 140px;
+	border-radius: var(--brand-radius-md);
+	cursor: crosshair;
+	overflow: hidden;
+	margin-bottom: var(--aisales-space-3);
+}
+
+.aisales-color-picker__saturation-gradient {
+	position: absolute;
+	inset: 0;
+	background: 
+		linear-gradient(to top, #000, transparent),
+		linear-gradient(to right, #fff, transparent);
+}
+
+/* Saturation Cursor */
+.aisales-color-picker__saturation-cursor {
+	position: absolute;
+	width: 14px;
+	height: 14px;
+	border: 2px solid #fff;
+	border-radius: 50%;
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.2);
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+}
+
+/* Hue Slider */
+.aisales-color-picker__hue {
+	position: relative;
+	width: 100%;
+	height: 14px;
+	border-radius: 7px;
+	cursor: pointer;
+	margin-bottom: var(--aisales-space-3);
+	background: linear-gradient(
+		to right,
+		#ff0000 0%,
+		#ffff00 17%,
+		#00ff00 33%,
+		#00ffff 50%,
+		#0000ff 67%,
+		#ff00ff 83%,
+		#ff0000 100%
+	);
+}
+
+/* Hue Cursor */
+.aisales-color-picker__hue-cursor {
+	position: absolute;
+	top: 50%;
+	width: 18px;
+	height: 18px;
+	background: #fff;
+	border: 2px solid #fff;
+	border-radius: 50%;
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.15);
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+}
+
+/* Hex Input Row */
+.aisales-color-picker__input-row {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+}
+
+.aisales-color-picker__input-label {
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--aisales-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.aisales-color-picker__hex-input {
+	flex: 1;
+	padding: 6px 10px;
+	font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+	font-size: 13px;
+	font-weight: 500;
+	text-transform: uppercase;
+	border: 1px solid var(--brand-border);
+	border-radius: 6px;
+	background: var(--brand-bg-subtle);
+	color: var(--aisales-text-primary);
+	transition: all 0.15s ease;
+}
+
+.aisales-color-picker__hex-input:focus {
+	outline: none;
+	border-color: var(--brand-ai-primary);
+	background: var(--aisales-bg-white);
+	box-shadow: 0 0 0 2px var(--brand-ai-light);
+}
+
+/* Preset Colors */
+.aisales-color-picker__presets {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	padding-top: var(--aisales-space-3);
+	margin-top: var(--aisales-space-3);
+	border-top: 1px solid var(--brand-border-light);
+}
+
+.aisales-color-picker__preset {
+	width: 22px;
+	height: 22px;
+	border-radius: 4px;
+	border: none;
+	cursor: pointer;
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+	transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.aisales-color-picker__preset:hover {
+	transform: scale(1.15);
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.aisales-color-picker__preset:focus {
+	outline: none;
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1), 0 0 0 2px var(--brand-ai-light);
+}
+
+.aisales-color-picker__preset--active {
+	box-shadow: inset 0 0 0 2px #fff, 0 0 0 2px var(--brand-ai-primary);
+}
+
+/* Backdrop for closing */
+.aisales-color-backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 999;
+	background: transparent;
+}
+
+/* Reset Colors Button */
+#aisales-reset-colors-btn {
+	align-self: flex-start;
+	margin-top: calc(-1 * var(--aisales-space-2));
+}
+
+/* ==========================================================================
+   Brand Preview
+   ========================================================================== */
+
+.aisales-brand-preview {
+	margin-top: var(--aisales-space-3);
+}
+
+.aisales-brand-preview__box {
+	border: 1px solid var(--brand-border);
+	border-radius: var(--brand-radius-lg);
+	overflow: hidden;
+	background: #f7f7f7;
+	box-shadow: var(--brand-shadow-md);
+}
+
+.aisales-brand-preview__header {
+	padding: var(--aisales-space-4) var(--aisales-space-5);
+	background: #7f54b3;
+	color: #ffffff;
+	font-weight: var(--aisales-font-weight-semibold);
+	text-align: center;
+}
+
+.aisales-brand-preview__body {
+	padding: var(--aisales-space-5);
+	background: #ffffff;
+	margin: var(--aisales-space-4);
+	border-radius: var(--brand-radius-md);
+}
+
+.aisales-brand-preview__heading {
+	margin: 0 0 var(--aisales-space-2);
+	font-size: var(--aisales-font-lg);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: #3c3c3c;
+}
+
+.aisales-brand-preview__text {
+	margin: 0 0 var(--aisales-space-4);
+	font-size: var(--aisales-font-sm);
+	color: #3c3c3c;
+	line-height: 1.5;
+}
+
+.aisales-brand-preview__button {
+	display: inline-block;
+	padding: 10px 20px;
+	background: #7f54b3;
+	color: #ffffff;
+	border: none;
+	border-radius: 6px;
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-medium);
+	cursor: default;
+}
+
+/* ==========================================================================
+   Form Actions
+   ========================================================================== */
+
+.aisales-brand-form__actions {
+	display: flex;
+	justify-content: flex-end;
+	padding-top: var(--aisales-space-5);
+	border-top: 1px solid var(--brand-border);
+}
+
+/* ==========================================================================
+   Button Sizes
+   ========================================================================== */
+
+.aisales-btn--lg {
+	padding: var(--aisales-space-4) var(--aisales-space-7);
+	font-size: var(--aisales-font-md);
+}
+
+/* ==========================================================================
+   Toast Notification
+   ========================================================================== */
+
+.aisales-toast {
+	position: fixed;
+	bottom: var(--aisales-space-6);
+	right: var(--aisales-space-6);
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-3);
+	padding: var(--aisales-space-4) var(--aisales-space-5);
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--brand-border);
+	border-radius: var(--brand-radius-lg);
+	box-shadow: var(--brand-shadow-xl);
+	z-index: 99999;
+	animation: aisales-toast-in 0.3s ease;
+}
+
+.aisales-toast--success {
+	border-color: #a7f3d0;
+	background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+}
+
+.aisales-toast--error {
+	border-color: #fecaca;
+	background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+}
+
+.aisales-toast__icon .dashicons {
+	font-size: 20px;
+	width: 20px;
+	height: 20px;
+}
+
+.aisales-toast--success .aisales-toast__icon .dashicons {
+	color: #059669;
+}
+
+.aisales-toast--error .aisales-toast__icon .dashicons {
+	color: #dc2626;
+}
+
+.aisales-toast__message {
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-medium);
+	color: var(--aisales-text-primary);
+}
+
+@keyframes aisales-toast-in {
+	from {
+		opacity: 0;
+		transform: translateY(16px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* ==========================================================================
+   Responsive Adjustments
+   ========================================================================== */
+
+@media (max-width: 782px) {
+	.aisales-brand-page__header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--aisales-space-4);
+	}
+
+	.aisales-brand-page__header-right {
+		width: 100%;
+		justify-content: space-between;
+	}
+
+	.aisales-brand-welcome__features {
+		grid-template-columns: 1fr;
+		gap: var(--aisales-space-3);
+	}
+
+	.aisales-brand-welcome__feature {
+		flex-direction: row;
+		text-align: left;
+	}
+
+	.aisales-tone-options {
+		grid-template-columns: 1fr;
+	}
+
+	.aisales-brand-review__actions {
+		flex-direction: column;
+	}
+
+	.aisales-brand-review__actions .aisales-btn {
+		width: 100%;
+		justify-content: center;
+	}
+
+	.aisales-color-palette {
+		flex-direction: column;
+		gap: var(--aisales-space-4);
+	}
+
+	.aisales-brand-suggestion__tone-value {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--aisales-space-2);
+	}
+
+	.aisales-brand-colors {
+		grid-template-columns: 1fr;
+	}
+}
