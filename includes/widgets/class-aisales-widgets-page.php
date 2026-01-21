@@ -76,6 +76,7 @@ class AISales_Widgets_Page {
 				'description' => __( 'Display total units sold for any product to build social proof.', 'ai-sales-manager-for-woocommerce' ),
 				'shortcode'   => 'aisales_total_sold',
 				'category'    => 'social_proof',
+				'type'        => 'shortcode',
 				'icon'        => 'dashicons-chart-bar',
 				'attributes'  => array(
 					'product_id' => array(
@@ -101,10 +102,11 @@ class AISales_Widgets_Page {
 				),
 			),
 			'recent_purchase'  => array(
-				'name'        => __( 'Recent Purchase', 'ai-sales-manager-for-woocommerce' ),
-				'description' => __( 'Show recent purchase notifications as popups or inline to create urgency.', 'ai-sales-manager-for-woocommerce' ),
+				'name'        => __( 'Recent Purchase Popups', 'ai-sales-manager-for-woocommerce' ),
+				'description' => __( 'Auto-display recent purchase notifications as popups across your store.', 'ai-sales-manager-for-woocommerce' ),
 				'shortcode'   => 'aisales_recent_purchase',
 				'category'    => 'social_proof',
+				'type'        => 'feature',
 				'icon'        => 'dashicons-megaphone',
 				'attributes'  => array(
 					'limit'         => array(
@@ -133,9 +135,10 @@ class AISales_Widgets_Page {
 			),
 			'live_viewers'     => array(
 				'name'        => __( 'Live Viewers', 'ai-sales-manager-for-woocommerce' ),
-				'description' => __( 'Show real-time visitor count to create social proof and urgency.', 'ai-sales-manager-for-woocommerce' ),
+				'description' => __( 'Auto-display real-time visitor count on product pages.', 'ai-sales-manager-for-woocommerce' ),
 				'shortcode'   => 'aisales_live_viewers',
 				'category'    => 'social_proof',
+				'type'        => 'feature',
 				'icon'        => 'dashicons-visibility',
 				'attributes'  => array(
 					'product_id' => array(
@@ -160,6 +163,7 @@ class AISales_Widgets_Page {
 				'description' => __( 'Display low stock warnings to create purchase urgency.', 'ai-sales-manager-for-woocommerce' ),
 				'shortcode'   => 'aisales_stock_urgency',
 				'category'    => 'social_proof',
+				'type'        => 'shortcode',
 				'icon'        => 'dashicons-warning',
 				'attributes'  => array(
 					'threshold' => array(
@@ -184,6 +188,7 @@ class AISales_Widgets_Page {
 				'description' => __( 'Show aggregated review stats with star ratings and highlights.', 'ai-sales-manager-for-woocommerce' ),
 				'shortcode'   => 'aisales_review_summary',
 				'category'    => 'social_proof',
+				'type'        => 'shortcode',
 				'icon'        => 'dashicons-star-filled',
 				'attributes'  => array(
 					'product_id'   => array(
@@ -212,9 +217,10 @@ class AISales_Widgets_Page {
 			// Conversion Widgets.
 			'shipping_bar'     => array(
 				'name'        => __( 'Free Shipping Bar', 'ai-sales-manager-for-woocommerce' ),
-				'description' => __( 'Progress bar showing how much more to spend for free shipping.', 'ai-sales-manager-for-woocommerce' ),
+				'description' => __( 'Auto-display progress bar on cart showing distance to free shipping.', 'ai-sales-manager-for-woocommerce' ),
 				'shortcode'   => 'aisales_shipping_bar',
 				'category'    => 'conversion',
+				'type'        => 'feature',
 				'icon'        => 'dashicons-car',
 				'attributes'  => array(
 					'threshold' => array(
@@ -244,6 +250,7 @@ class AISales_Widgets_Page {
 				'description' => __( 'Create urgency with sale or offer expiration countdown.', 'ai-sales-manager-for-woocommerce' ),
 				'shortcode'   => 'aisales_countdown',
 				'category'    => 'conversion',
+				'type'        => 'shortcode',
 				'icon'        => 'dashicons-clock',
 				'attributes'  => array(
 					'end_date' => array(
@@ -275,6 +282,7 @@ class AISales_Widgets_Page {
 				'description' => __( 'Highlight price reductions with eye-catching badges.', 'ai-sales-manager-for-woocommerce' ),
 				'shortcode'   => 'aisales_price_drop',
 				'category'    => 'conversion',
+				'type'        => 'shortcode',
 				'icon'        => 'dashicons-tag',
 				'attributes'  => array(
 					'product_id'      => array(
@@ -306,6 +314,7 @@ class AISales_Widgets_Page {
 				'description' => __( 'Show multi-buy discounts and bundle savings calculator.', 'ai-sales-manager-for-woocommerce' ),
 				'shortcode'   => 'aisales_bundle_savings',
 				'category'    => 'conversion',
+				'type'        => 'shortcode',
 				'icon'        => 'dashicons-products',
 				'attributes'  => array(
 					'product_id' => array(
@@ -329,6 +338,7 @@ class AISales_Widgets_Page {
 				'description' => __( 'Show cart reservation timer to prevent abandonment.', 'ai-sales-manager-for-woocommerce' ),
 				'shortcode'   => 'aisales_cart_urgency',
 				'category'    => 'conversion',
+				'type'        => 'shortcode',
 				'icon'        => 'dashicons-backup',
 				'attributes'  => array(
 					'duration' => array(
@@ -354,6 +364,7 @@ class AISales_Widgets_Page {
 				'description' => __( 'Display top-selling products to guide purchase decisions.', 'ai-sales-manager-for-woocommerce' ),
 				'shortcode'   => 'aisales_bestsellers',
 				'category'    => 'discovery',
+				'type'        => 'shortcode',
 				'icon'        => 'dashicons-awards',
 				'attributes'  => array(
 					'limit'    => array(
@@ -384,6 +395,7 @@ class AISales_Widgets_Page {
 				'description' => __( 'Show products with high recent sales velocity.', 'ai-sales-manager-for-woocommerce' ),
 				'shortcode'   => 'aisales_trending',
 				'category'    => 'discovery',
+				'type'        => 'shortcode',
 				'icon'        => 'dashicons-chart-line',
 				'attributes'  => array(
 					'limit'  => array(
@@ -410,6 +422,7 @@ class AISales_Widgets_Page {
 				'description' => __( 'Show products the customer has recently browsed.', 'ai-sales-manager-for-woocommerce' ),
 				'shortcode'   => 'aisales_recently_viewed',
 				'category'    => 'discovery',
+				'type'        => 'shortcode',
 				'icon'        => 'dashicons-backup',
 				'attributes'  => array(
 					'limit'           => array(
@@ -434,6 +447,7 @@ class AISales_Widgets_Page {
 				'description' => __( 'Display products frequently purchased together.', 'ai-sales-manager-for-woocommerce' ),
 				'shortcode'   => 'aisales_bought_together',
 				'category'    => 'discovery',
+				'type'        => 'shortcode',
 				'icon'        => 'dashicons-networking',
 				'attributes'  => array(
 					'product_id' => array(
@@ -459,6 +473,7 @@ class AISales_Widgets_Page {
 				'description' => __( 'Showcase recently added products to your store.', 'ai-sales-manager-for-woocommerce' ),
 				'shortcode'   => 'aisales_new_arrivals',
 				'category'    => 'discovery',
+				'type'        => 'shortcode',
 				'icon'        => 'dashicons-star-empty',
 				'attributes'  => array(
 					'limit'    => array(
