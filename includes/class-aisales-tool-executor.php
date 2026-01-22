@@ -9,10 +9,27 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// Load catalog tool for catalog analysis and actions.
+require_once __DIR__ . '/class-aisales-tool-catalog.php';
+
 /**
  * Tool Executor class
  */
 class AISales_Tool_Executor {
+
+	/**
+	 * Catalog tool instance
+	 *
+	 * @var AISales_Tool_Catalog
+	 */
+	private $catalog_tool;
+
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		$this->catalog_tool = new AISales_Tool_Catalog();
+	}
 
 	/**
 	 * Available tools
@@ -24,6 +41,8 @@ class AISales_Tool_Executor {
 		'get_categories',
 		'get_products_by_category',
 		'get_page_content',
+		'analyze_catalog_structure',
+		'apply_catalog_change',
 	);
 
 	/**
@@ -644,5 +663,28 @@ class AISales_Tool_Executor {
 			'text_content'     => $content,
 			'url'              => get_term_link( $term ),
 		);
+	}
+
+	// =========================================================================
+	// Catalog Organization Tools
+	// =========================================================================
+
+	/**
+	 * Execute analyze_catalog_structure tool
+	 *
+	 * @param array $params Parameters.
+	 * @return array Catalog analysis result.
+	 */
+	private function execute_analyze_catalog_structure( $params ) {
+		return $this->catalog_tool->analyze_structure( $params );
+	}
+	/**
+	 * Execute apply_catalog_change tool
+	 *
+	 * @param array $params Parameters with action details.
+	 * @return array|WP_Error Result of the operation.
+	 */
+	private function execute_apply_catalog_change( $params ) {
+		return $this->catalog_tool->apply_change( $params );
 	}
 }
