@@ -9,7 +9,7 @@
  * - Frequently Bought Together
  * - New Arrivals
  *
- * @package AI_Sales_Manager_For_WooCommerce
+ * @package AISales_Sales_Manager
  * @since 1.2.0
  */
 
