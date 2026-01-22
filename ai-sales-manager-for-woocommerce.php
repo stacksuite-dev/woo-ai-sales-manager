@@ -103,7 +103,7 @@ final class AISales_Sales_Manager {
 	private function includes() {
 		require_once AISALES_PLUGIN_DIR . 'includes/class-aisales-api-client.php';
 		require_once AISALES_PLUGIN_DIR . 'includes/class-aisales-admin-settings.php';
-		require_once AISALES_PLUGIN_DIR . 'includes/class-aisales-ajax-handlers.php';
+		require_once AISALES_PLUGIN_DIR . 'includes/ajax/class-aisales-ajax-loader.php';
 		require_once AISALES_PLUGIN_DIR . 'includes/class-aisales-mail-provider.php';
 		require_once AISALES_PLUGIN_DIR . 'includes/class-aisales-email-manager.php';
 		require_once AISALES_PLUGIN_DIR . 'includes/class-aisales-branding-extractor.php';
@@ -146,7 +146,7 @@ final class AISales_Sales_Manager {
 
 		// Initialize components
 		AISales_Admin_Settings::instance();
-		AISales_Ajax_Handlers::instance();
+		AISales_Ajax_Loader::instance();
 		AISales_Mail_Provider::instance();
 		AISales_Email_Manager::instance();
 		AISales_Abandoned_Cart_DB::maybe_create_tables();

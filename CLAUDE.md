@@ -6,10 +6,20 @@
 plugin/
 ├── ai-sales-manager-for-woocommerce.php  # Main plugin file
 ├── includes/                              # PHP classes
+│   ├── ajax/                              # AJAX handlers (modular)
+│   │   ├── class-aisales-ajax-base.php    # Abstract base class
+│   │   ├── class-aisales-ajax-loader.php  # Loader/initializer
+│   │   ├── class-aisales-ajax-auth.php    # Auth & account handlers
+│   │   ├── class-aisales-ajax-billing.php # Billing & payment handlers
+│   │   ├── class-aisales-ajax-ai.php      # AI generation handlers
+│   │   ├── class-aisales-ajax-products.php# Product & category handlers
+│   │   ├── class-aisales-ajax-email.php   # Email template handlers
+│   │   ├── class-aisales-ajax-support.php # Support ticket handlers
+│   │   ├── class-aisales-ajax-brand.php   # Brand settings handlers
+│   │   └── class-aisales-ajax-store.php   # Store context handlers
 │   ├── widgets/                           # Widgets subsystem
 │   │   └── class-aisales-widgets-page.php
 │   ├── class-aisales-admin-settings.php
-│   ├── class-aisales-ajax-handlers.php
 │   ├── class-aisales-email-page.php
 │   ├── class-aisales-brand-page.php
 │   └── ...
@@ -130,26 +140,60 @@ For custom badges that look like `.aisales-balance-indicator` but don't share it
 }
 ```
 
-## JavaScript Patterns
+## AJAX Architecture
 
-### AJAX Handlers
+AJAX handlers are organized into domain-specific classes in `includes/ajax/`:
 
-Register in PHP constructor:
+### Handler Classes
+
+| Class | Domain | Handlers |
+|-------|--------|----------|
+| `AISales_Ajax_Auth` | Authentication | connect, get_balance, recovery |
+| `AISales_Ajax_Billing` | Payments | topup, auto_topup, payment_method |
+| `AISales_Ajax_AI` | AI Generation | generate_content, suggest_taxonomy, images |
+| `AISales_Ajax_Products` | Products/Categories | update fields, thumbnails, batch |
+| `AISales_Ajax_Email` | Email Templates | templates, wizard, test emails |
+| `AISales_Ajax_Support` | Support Tickets | draft, submit, list, upload |
+| `AISales_Ajax_Brand` | Brand Settings | save settings, AI analysis |
+| `AISales_Ajax_Store` | Store Context | sync, balance, tool data |
+
+### Creating New AJAX Handlers
+
+1. Extend `AISales_Ajax_Base`
+2. Implement `register_actions()` method
+3. Use helper methods from base class
+
 ```php
-add_action( 'wp_ajax_aisales_action_name', array( $this, 'ajax_handler_method' ) );
-```
-
-Handler pattern:
-```php
-public function ajax_handler_method() {
-    check_ajax_referer( 'aisales_nonce', 'nonce' );
-    if ( ! current_user_can( 'manage_woocommerce' ) ) {
-        wp_send_json_error( array( 'message' => __( 'Permission denied.', 'ai-sales-manager-for-woocommerce' ) ) );
+class AISales_Ajax_Example extends AISales_Ajax_Base {
+    protected function register_actions() {
+        $this->add_action( 'my_action', 'handle_my_action' );
     }
-    // ... handle request
-    wp_send_json_success( array( 'message' => __( 'Success', 'ai-sales-manager-for-woocommerce' ) ) );
+
+    public function handle_my_action() {
+        $this->verify_request();
+        $value = $this->get_post( 'field_name', 'text' );
+        // ... handle request
+        $this->success( array( 'result' => $value ) );
+    }
 }
 ```
+
+### Base Class Helpers
+
+- `verify_request()` - Check nonce and capability
+- `get_post( $key, $type, $default )` - Get sanitized POST value
+- `require_post( $key, $type, $error )` - Get required POST value
+- `success( $data )` - Send JSON success response
+- `error( $message, $data )` - Send JSON error response
+- `handle_api_result( $result )` - Handle API response with error checking
+- `get_validated_product( $id )` - Get and validate WC_Product
+- `get_validated_category( $id )` - Get and validate product category
+
+## JavaScript Patterns
+
+### AJAX Calls
+
+All AJAX actions use the `aisales_` prefix:
 
 ### Localized Script Data
 
