@@ -96,41 +96,6 @@
 	gap: var(--aisales-space-3);
 }
 
-/* Re-analyze Button (pill style like balance indicator) */
-.aisales-brand-reanalyze-trigger {
-	display: inline-flex;
-	align-items: center;
-	gap: var(--aisales-space-2);
-	padding: var(--aisales-space-2) var(--aisales-space-4);
-	background: var(--aisales-bg-white);
-	border: 1px solid var(--brand-border);
-	border-radius: var(--aisales-radius-full, 9999px);
-	font-size: var(--aisales-font-sm);
-	font-weight: var(--aisales-font-weight-medium);
-	color: var(--aisales-text-secondary);
-	box-shadow: var(--brand-shadow-sm);
-	cursor: pointer;
-	transition: all 0.2s ease;
-}
-
-.aisales-brand-reanalyze-trigger:hover {
-	border-color: var(--brand-ai-primary);
-	color: var(--brand-ai-primary);
-	box-shadow: var(--brand-shadow-md);
-}
-
-.aisales-brand-reanalyze-trigger:active {
-	transform: scale(0.98);
-}
-
-.aisales-brand-reanalyze-trigger .dashicons {
-	font-size: 16px;
-	width: 16px;
-	height: 16px;
-	color: var(--brand-ai-primary);
-	line-height: 1;
-}
-
 /* ==========================================================================
    AI Button Styles
    ========================================================================== */

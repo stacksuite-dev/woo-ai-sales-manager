@@ -1,0 +1,199 @@
+/* ==========================================================================
+   Chat Input - Floating Style
+   ========================================================================== */
+
+.aisales-chat-input {
+	padding: 0;
+	background: transparent;
+	border-top: none;
+	flex-shrink: 0;
+}
+
+.aisales-chat-input__wrapper {
+	display: flex;
+	gap: var(--aisales-space-3);
+	align-items: center;
+	margin: var(--aisales-space-4) var(--aisales-space-5);
+	padding: var(--aisales-space-3);
+	background: var(--aisales-bg-white);
+	border: none;
+	border-radius: var(--aisales-radius-xl);
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+	transition: all var(--aisales-transition-fast);
+}
+
+.aisales-chat-input textarea {
+	flex: 1;
+	padding: var(--aisales-space-2) var(--aisales-space-3);
+	border: none;
+	border-radius: var(--aisales-radius-md);
+	font-size: var(--aisales-font-md);
+	font-family: inherit;
+	resize: none;
+	min-height: 28px;
+	max-height: 120px;
+	background: transparent;
+	transition: all var(--aisales-transition-fast);
+}
+
+.aisales-chat-input textarea,
+.aisales-chat-input textarea:focus,
+.aisales-chat-input textarea:active {
+	outline: none !important;
+	border: none !important;
+	box-shadow: none !important;
+}
+
+.aisales-chat-input textarea:disabled {
+	background: transparent;
+	cursor: not-allowed;
+	color: var(--aisales-text-muted);
+}
+
+.aisales-chat-input__wrapper:has(textarea:disabled) {
+	background: var(--aisales-bg-muted);
+	box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
+	border-color: var(--aisales-border-light);
+}
+
+/* Subtle shimmer when loading */
+.aisales-chat-input__wrapper:has(textarea:disabled):has(+ .aisales-btn--loading),
+.aisales-chat-input__wrapper:has(.aisales-btn--loading) {
+	position: relative;
+	overflow: hidden;
+}
+
+.aisales-chat-input__wrapper:has(.aisales-btn--loading)::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(
+		90deg,
+		transparent 0%,
+		rgba(34, 113, 177, 0.05) 50%,
+		transparent 100%
+	);
+	animation: inputShimmer 2s ease-in-out infinite;
+	pointer-events: none;
+}
+
+@keyframes inputShimmer {
+	0% { left: -100%; }
+	100% { left: 100%; }
+}
+
+.aisales-chat-input textarea::placeholder {
+	color: var(--aisales-text-muted);
+}
+
+/* Send Button - Circular */
+.aisales-chat-input .aisales-btn--primary {
+	position: relative;
+	flex-shrink: 0;
+	width: 40px;
+	height: 40px;
+	padding: 0;
+	border-radius: 50%;
+	background: linear-gradient(135deg, var(--aisales-primary) 0%, var(--aisales-primary-hover) 100%);
+	border: none;
+	box-shadow: 0 2px 8px rgba(34, 113, 177, 0.3);
+	transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+	overflow: hidden;
+}
+
+.aisales-chat-input .aisales-btn--primary .aisales-btn__text {
+	display: none;
+}
+
+.aisales-chat-input .aisales-btn--primary .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	transition: transform 0.2s ease;
+}
+
+/* Shine effect on hover */
+.aisales-chat-input .aisales-btn--primary::before {
+	content: '';
+	position: absolute;
+	top: -50%;
+	left: -50%;
+	width: 200%;
+	height: 200%;
+	background: linear-gradient(
+		45deg,
+		transparent 40%,
+		rgba(255, 255, 255, 0.2) 50%,
+		transparent 60%
+	);
+	transform: translateX(-100%);
+	transition: transform 0.5s ease;
+}
+
+.aisales-chat-input .aisales-btn--primary:not(:disabled):hover {
+	transform: scale(1.1);
+	box-shadow:
+		0 4px 16px rgba(34, 113, 177, 0.4),
+		0 0 20px rgba(34, 113, 177, 0.15);
+}
+
+.aisales-chat-input .aisales-btn--primary:not(:disabled):hover::before {
+	transform: translateX(100%);
+}
+
+.aisales-chat-input .aisales-btn--primary:not(:disabled):hover .dashicons {
+	transform: translateX(2px);
+}
+
+.aisales-chat-input .aisales-btn--primary:not(:disabled):active {
+	transform: scale(0.95);
+}
+
+.aisales-chat-input .aisales-btn--primary:disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+	box-shadow: none;
+}
+
+/* Send Button Loading State */
+.aisales-chat-input .aisales-btn--primary.aisales-btn--loading {
+	opacity: 1;
+	pointer-events: none;
+	background: linear-gradient(135deg, var(--aisales-primary) 0%, var(--aisales-primary-hover) 100%);
+	box-shadow: 0 2px 12px rgba(34, 113, 177, 0.4);
+}
+
+.aisales-chat-input .aisales-btn--primary.aisales-btn--loading .dashicons {
+	display: none;
+}
+
+/* Override the hover shine effect */
+.aisales-chat-input .aisales-btn--primary.aisales-btn--loading::before {
+	display: none;
+}
+
+/* Spinning loader - centered in 40x40 circular button */
+.aisales-chat-input .aisales-btn--primary.aisales-btn--loading::after {
+	content: '';
+	display: block;
+	position: absolute;
+	inset: 0;
+	margin: auto;
+	width: 18px;
+	height: 18px;
+	border: 2px solid rgba(255, 255, 255, 0.25);
+	border-radius: 50%;
+	border-top-color: #fff;
+	animation: btnSpin 0.6s linear infinite;
+}
+
+.aisales-chat-input__hint {
+	margin: var(--aisales-space-1) var(--aisales-space-5) var(--aisales-space-3);
+	padding: 0;
+	font-size: var(--aisales-font-xs);
+	color: var(--aisales-text-muted);
+	opacity: 0.7;
+}

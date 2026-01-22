@@ -55,11 +55,7 @@ $aisales_show_onboarding = empty( $aisales_has_visited ) && 'missing' === $aisal
 				<span class="aisales-context-status aisales-context-status--<?php echo esc_attr( $aisales_context_status ); ?>"></span>
 			</button>
 			<!-- Balance Indicator -->
-			<span class="aisales-balance-indicator">
-				<span class="dashicons dashicons-money-alt"></span>
-				<span id="aisales-balance-display"><?php echo esc_html( number_format( $balance ) ); ?></span>
-				<?php esc_html_e( 'tokens', 'ai-sales-manager-for-woocommerce' ); ?>
-			</span>
+			<?php include AISALES_PLUGIN_DIR . 'templates/partials/balance-indicator.php'; ?>
 		</div>
 	</header>
 
@@ -95,13 +91,135 @@ $aisales_show_onboarding = empty( $aisales_has_visited ) && 'missing' === $aisal
 	<!-- Balance Top-Up Modal (Shared Partial) -->
 	<?php include AISALES_PLUGIN_DIR . 'templates/partials/balance-modal.php'; ?>
 
+	<!-- Task Selection Wizard -->
+	<div class="aisales-wizard" id="aisales-wizard" <?php echo ( $product_id || $category_id ) ? 'style="display:none"' : ''; ?>>
+		<div class="aisales-wizard__backdrop"></div>
+		<div class="aisales-wizard__container">
+			<!-- Step Indicator -->
+			<div class="aisales-wizard__steps">
+				<div class="aisales-wizard__step aisales-wizard__step--active" data-step="1">
+					<span class="aisales-wizard__step-dot">1</span>
+					<span class="aisales-wizard__step-label"><?php esc_html_e( 'Choose Task', 'ai-sales-manager-for-woocommerce' ); ?></span>
+				</div>
+				<div class="aisales-wizard__step-line"></div>
+				<div class="aisales-wizard__step" data-step="2">
+					<span class="aisales-wizard__step-dot">2</span>
+					<span class="aisales-wizard__step-label"><?php esc_html_e( 'Select Item', 'ai-sales-manager-for-woocommerce' ); ?></span>
+				</div>
+				<div class="aisales-wizard__step-line"></div>
+				<div class="aisales-wizard__step" data-step="3">
+					<span class="aisales-wizard__step-dot">
+						<span class="dashicons dashicons-yes"></span>
+					</span>
+					<span class="aisales-wizard__step-label"><?php esc_html_e( 'Start', 'ai-sales-manager-for-woocommerce' ); ?></span>
+				</div>
+			</div>
+
+			<!-- Panel 1: Task Selection -->
+			<div class="aisales-wizard__panel aisales-wizard__panel--active" data-panel="1">
+				<div class="aisales-wizard__header">
+					<h2><?php esc_html_e( 'What would you like to do?', 'ai-sales-manager-for-woocommerce' ); ?></h2>
+					<p><?php esc_html_e( 'Choose a task to get started with AI assistance', 'ai-sales-manager-for-woocommerce' ); ?></p>
+				</div>
+				
+				<div class="aisales-wizard__cards">
+					<button type="button" class="aisales-wizard__card" data-task="product">
+						<div class="aisales-wizard__card-icon aisales-wizard__card-icon--product">
+							<span class="dashicons dashicons-products"></span>
+						</div>
+						<div class="aisales-wizard__card-content">
+							<h3><?php esc_html_e( 'Optimize Products', 'ai-sales-manager-for-woocommerce' ); ?></h3>
+							<p><?php esc_html_e( 'Improve titles, descriptions, SEO, and images for better conversions', 'ai-sales-manager-for-woocommerce' ); ?></p>
+						</div>
+						<span class="aisales-wizard__card-arrow">
+							<span class="dashicons dashicons-arrow-right-alt2"></span>
+						</span>
+					</button>
+					
+					<button type="button" class="aisales-wizard__card" data-task="category">
+						<div class="aisales-wizard__card-icon aisales-wizard__card-icon--category">
+							<span class="dashicons dashicons-category"></span>
+						</div>
+						<div class="aisales-wizard__card-content">
+							<h3><?php esc_html_e( 'Optimize Categories', 'ai-sales-manager-for-woocommerce' ); ?></h3>
+							<p><?php esc_html_e( 'Generate compelling descriptions and SEO content for category pages', 'ai-sales-manager-for-woocommerce' ); ?></p>
+						</div>
+						<span class="aisales-wizard__card-arrow">
+							<span class="dashicons dashicons-arrow-right-alt2"></span>
+						</span>
+					</button>
+					
+					<button type="button" class="aisales-wizard__card aisales-wizard__card--agent" data-task="agent">
+						<div class="aisales-wizard__card-icon aisales-wizard__card-icon--agent">
+							<span class="dashicons dashicons-superhero-alt"></span>
+						</div>
+						<div class="aisales-wizard__card-content">
+							<h3><?php esc_html_e( 'Marketing Agent', 'ai-sales-manager-for-woocommerce' ); ?></h3>
+							<p><?php esc_html_e( 'Create campaigns, social content, emails, and analyze store performance', 'ai-sales-manager-for-woocommerce' ); ?></p>
+						</div>
+						<span class="aisales-wizard__card-arrow">
+							<span class="dashicons dashicons-arrow-right-alt2"></span>
+						</span>
+					</button>
+				</div>
+
+				<?php if ( 'missing' === $aisales_context_status || 'partial' === $aisales_context_status ) : ?>
+				<div class="aisales-wizard__hint">
+					<span class="dashicons dashicons-info-outline"></span>
+					<span><?php esc_html_e( 'Tip: Set up your store context for better AI results', 'ai-sales-manager-for-woocommerce' ); ?></span>
+					<button type="button" class="aisales-btn aisales-btn--link aisales-wizard-setup-context">
+						<?php esc_html_e( 'Set up now', 'ai-sales-manager-for-woocommerce' ); ?>
+					</button>
+				</div>
+				<?php endif; ?>
+			</div>
+
+			<!-- Panel 2: Entity Selection -->
+			<div class="aisales-wizard__panel" data-panel="2">
+				<button type="button" class="aisales-wizard__back">
+					<span class="dashicons dashicons-arrow-left-alt2"></span>
+					<?php esc_html_e( 'Back', 'ai-sales-manager-for-woocommerce' ); ?>
+				</button>
+				
+				<div class="aisales-wizard__header">
+					<h2 id="aisales-wizard-title"><?php esc_html_e( 'Select a Product', 'ai-sales-manager-for-woocommerce' ); ?></h2>
+					<p id="aisales-wizard-subtitle"><?php esc_html_e( 'Choose a product to optimize with AI', 'ai-sales-manager-for-woocommerce' ); ?></p>
+				</div>
+				
+				<div class="aisales-wizard__search">
+					<span class="dashicons dashicons-search"></span>
+					<input type="text" id="aisales-wizard-search" placeholder="<?php esc_attr_e( 'Search...', 'ai-sales-manager-for-woocommerce' ); ?>" autocomplete="off">
+				</div>
+				
+				<div class="aisales-wizard__items-wrapper">
+					<div class="aisales-wizard__items" id="aisales-wizard-items">
+						<!-- Populated dynamically -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<!-- Main Chat Container -->
 	<div class="aisales-chat-container">
 		<!-- Chat Panel (Left - 70%) -->
 		<div class="aisales-chat-panel">
-			<!-- Entity Switcher & Selector -->
+			<!-- Chat Header with Breadcrumb -->
 			<div class="aisales-chat-header">
-				<div class="aisales-entity-switcher">
+				<!-- Breadcrumb Navigation (shown after wizard completion) -->
+				<div class="aisales-chat-breadcrumb" id="aisales-chat-breadcrumb" style="display: none;">
+					<span class="aisales-breadcrumb__type" id="aisales-breadcrumb-type"><?php esc_html_e( 'Products', 'ai-sales-manager-for-woocommerce' ); ?></span>
+					<span class="aisales-breadcrumb__separator">
+						<span class="dashicons dashicons-arrow-right-alt2"></span>
+					</span>
+					<span class="aisales-breadcrumb__name" id="aisales-breadcrumb-name"></span>
+					<button type="button" class="aisales-breadcrumb__change" id="aisales-breadcrumb-change">
+						<?php esc_html_e( 'Change', 'ai-sales-manager-for-woocommerce' ); ?>
+					</button>
+				</div>
+
+				<!-- Legacy Entity Switcher (hidden, kept for JS compatibility) -->
+				<div class="aisales-entity-switcher" style="display: none;">
 					<div class="aisales-entity-tabs">
 						<button type="button" class="aisales-entity-tab <?php echo 'product' === $entity_type ? 'aisales-entity-tab--active' : ''; ?>" data-type="product">
 							<span class="dashicons dashicons-products"></span>
@@ -122,6 +240,7 @@ $aisales_show_onboarding = empty( $aisales_has_visited ) && 'missing' === $aisal
 						</select>
 					</div>
 				</div>
+
 				<div class="aisales-chat-actions">
 					<button type="button" id="aisales-new-chat" class="aisales-btn aisales-btn--secondary aisales-btn--sm">
 						<span class="dashicons dashicons-plus-alt2"></span>
@@ -132,62 +251,13 @@ $aisales_show_onboarding = empty( $aisales_has_visited ) && 'missing' === $aisal
 
 			<!-- Chat Messages -->
 			<div class="aisales-chat-messages" id="aisales-chat-messages">
-				<!-- Welcome State with Entity Cards -->
+				<!-- Welcome State (simplified - wizard handles task selection) -->
 				<div class="aisales-chat-welcome" id="aisales-chat-welcome">
 					<div class="aisales-chat-welcome__icon">
-						<span class="dashicons dashicons-lightbulb"></span>
+						<span class="dashicons dashicons-format-chat"></span>
 					</div>
-					<h3><?php esc_html_e( 'What would you like to improve?', 'ai-sales-manager-for-woocommerce' ); ?></h3>
-					<p><?php esc_html_e( 'Select an entity type and item above, or choose from below to get started.', 'ai-sales-manager-for-woocommerce' ); ?></p>
-					
-					<div class="aisales-welcome-cards">
-						<button type="button" class="aisales-welcome-card" data-entity="product">
-							<div class="aisales-welcome-card__icon">
-								<span class="dashicons dashicons-products"></span>
-							</div>
-							<div class="aisales-welcome-card__content">
-								<h4><?php esc_html_e( 'Products', 'ai-sales-manager-for-woocommerce' ); ?></h4>
-								<p><?php esc_html_e( 'Improve titles, descriptions, and tags for better conversions', 'ai-sales-manager-for-woocommerce' ); ?></p>
-							</div>
-							<span class="aisales-welcome-card__arrow">
-								<span class="dashicons dashicons-arrow-right-alt2"></span>
-							</span>
-						</button>
-						<button type="button" class="aisales-welcome-card" data-entity="category">
-							<div class="aisales-welcome-card__icon aisales-welcome-card__icon--category">
-								<span class="dashicons dashicons-category"></span>
-							</div>
-							<div class="aisales-welcome-card__content">
-								<h4><?php esc_html_e( 'Categories', 'ai-sales-manager-for-woocommerce' ); ?></h4>
-								<p><?php esc_html_e( 'Generate compelling category descriptions and SEO content', 'ai-sales-manager-for-woocommerce' ); ?></p>
-							</div>
-							<span class="aisales-welcome-card__arrow">
-								<span class="dashicons dashicons-arrow-right-alt2"></span>
-							</span>
-						</button>
-						<button type="button" class="aisales-welcome-card aisales-welcome-card--agent" data-entity="agent">
-							<div class="aisales-welcome-card__icon aisales-welcome-card__icon--agent">
-								<span class="dashicons dashicons-superhero-alt"></span>
-							</div>
-							<div class="aisales-welcome-card__content">
-								<h4><?php esc_html_e( 'Marketing Agent', 'ai-sales-manager-for-woocommerce' ); ?></h4>
-								<p><?php esc_html_e( 'Create campaigns, social content, emails, and marketing images', 'ai-sales-manager-for-woocommerce' ); ?></p>
-							</div>
-							<span class="aisales-welcome-card__arrow">
-								<span class="dashicons dashicons-arrow-right-alt2"></span>
-							</span>
-						</button>
-					</div>
-
-					<?php if ( 'missing' === $aisales_context_status || 'partial' === $aisales_context_status ) : ?>
-					<div class="aisales-welcome-context-hint">
-						<span class="dashicons dashicons-info-outline"></span>
-						<span><?php esc_html_e( 'Tip: Set up your store context for better AI-generated content', 'ai-sales-manager-for-woocommerce' ); ?></span>
-						<button type="button" class="aisales-btn aisales-btn--link" id="aisales-welcome-setup-context">
-							<?php esc_html_e( 'Set up now', 'ai-sales-manager-for-woocommerce' ); ?>
-						</button>
-					</div>
-					<?php endif; ?>
+					<h3><?php esc_html_e( 'Ready to assist you', 'ai-sales-manager-for-woocommerce' ); ?></h3>
+					<p><?php esc_html_e( 'Select an item from the wizard to start optimizing with AI.', 'ai-sales-manager-for-woocommerce' ); ?></p>
 				</div>
 			</div>
 
@@ -215,6 +285,14 @@ $aisales_show_onboarding = empty( $aisales_has_visited ) && 'missing' === $aisal
 						<span class="dashicons dashicons-category"></span>
 						<?php esc_html_e( 'Suggest Categories', 'ai-sales-manager-for-woocommerce' ); ?>
 					</button>
+					<button type="button" class="aisales-btn aisales-btn--outline aisales-btn--sm" data-action="generate_product_image" disabled>
+						<span class="dashicons dashicons-format-image"></span>
+						<?php esc_html_e( 'Generate Image', 'ai-sales-manager-for-woocommerce' ); ?>
+					</button>
+					<button type="button" class="aisales-btn aisales-btn--outline aisales-btn--sm" data-action="enhance_product_image" disabled>
+						<span class="dashicons dashicons-image-filter"></span>
+						<?php esc_html_e( 'Enhance Image', 'ai-sales-manager-for-woocommerce' ); ?>
+					</button>
 					<button type="button" class="aisales-btn aisales-btn--outline aisales-btn--sm" data-action="generate_content" disabled>
 						<span class="dashicons dashicons-lightbulb"></span>
 						<?php esc_html_e( 'Generate Content', 'ai-sales-manager-for-woocommerce' ); ?>
@@ -237,6 +315,10 @@ $aisales_show_onboarding = empty( $aisales_has_visited ) && 'missing' === $aisal
 					<button type="button" class="aisales-btn aisales-btn--outline aisales-btn--sm" data-action="cat_seo_optimize" disabled>
 						<span class="dashicons dashicons-search"></span>
 						<?php esc_html_e( 'SEO Optimize', 'ai-sales-manager-for-woocommerce' ); ?>
+					</button>
+					<button type="button" class="aisales-btn aisales-btn--outline aisales-btn--sm" data-action="generate_category_image" disabled>
+						<span class="dashicons dashicons-format-image"></span>
+						<?php esc_html_e( 'Generate Thumbnail', 'ai-sales-manager-for-woocommerce' ); ?>
 					</button>
 					<button type="button" class="aisales-btn aisales-btn--outline aisales-btn--sm" data-action="generate_cat_content" disabled>
 						<span class="dashicons dashicons-lightbulb"></span>
@@ -692,9 +774,21 @@ $aisales_show_onboarding = empty( $aisales_has_visited ) && 'missing' === $aisal
 							<span class="dashicons dashicons-email"></span>
 							<?php esc_html_e( 'Draft email campaigns', 'ai-sales-manager-for-woocommerce' ); ?>
 						</button>
+						<button type="button" class="aisales-capability-btn aisales-open-email-panel">
+							<span class="dashicons dashicons-email-alt"></span>
+							<?php esc_html_e( 'Email templates', 'ai-sales-manager-for-woocommerce' ); ?>
+						</button>
 						<button type="button" class="aisales-capability-btn" data-action="generate_image">
 							<span class="dashicons dashicons-format-image"></span>
 							<?php esc_html_e( 'Generate marketing images', 'ai-sales-manager-for-woocommerce' ); ?>
+						</button>
+						<button type="button" class="aisales-capability-btn" data-action="catalog_organize">
+							<span class="dashicons dashicons-category"></span>
+							<?php esc_html_e( 'Organize catalog', 'ai-sales-manager-for-woocommerce' ); ?>
+						</button>
+						<button type="button" class="aisales-capability-btn" data-action="catalog_research">
+							<span class="dashicons dashicons-search"></span>
+							<?php esc_html_e( 'Market research', 'ai-sales-manager-for-woocommerce' ); ?>
 						</button>
 						<button type="button" class="aisales-capability-btn" data-action="store_analysis">
 							<span class="dashicons dashicons-chart-bar"></span>

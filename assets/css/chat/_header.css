@@ -1,0 +1,78 @@
+/**
+ * Page Header - Enhanced with Store Context
+ *
+ * Header section with title, balance indicator, and store context.
+ *
+ * @package AISales_Sales_Manager
+ */
+
+/* ==========================================================================
+   Page Header - Enhanced with Store Context
+   ========================================================================== */
+
+.aisales-chat-page-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--aisales-space-4);
+	margin-bottom: var(--aisales-space-5);
+	padding-bottom: var(--aisales-space-4);
+	border-bottom: 1px solid var(--aisales-border-light);
+}
+
+.aisales-chat-page-header__left {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-3);
+}
+
+.aisales-chat-page-header__left h1 {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-3);
+	margin: 0;
+	padding: 0;
+	font-size: var(--aisales-font-2xl);
+	font-weight: var(--aisales-font-weight-bold);
+	color: var(--aisales-text-primary);
+	border: none;
+}
+
+.aisales-chat-page-header__left h1 .dashicons {
+	font-size: 28px;
+	width: 28px;
+	height: 28px;
+	color: var(--aisales-primary);
+}
+
+.aisales-chat-page-header__right {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-3);
+}
+
+/* Store Context Button & Status - Styles in shared-components.css */
+
+/* ==========================================================================
+   Hide default WordPress h1 when using custom header
+   ========================================================================== */
+
+.aisales-admin-wrap.aisales-chat-wrap > h1:not(.aisales-chat-page-header__left h1) {
+	display: none;
+}
+
+/* Store Context Slide-out Panel - Styles in shared-components.css */
+/* Chat-specific sync status styles */
+.aisales-context-sync__status {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	font-size: var(--aisales-font-xs);
+	color: var(--aisales-text-muted);
+}
+
+.aisales-context-sync__status .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}

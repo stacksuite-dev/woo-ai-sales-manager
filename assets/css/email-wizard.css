@@ -1,0 +1,1093 @@
+/**
+ * Email Template Wizard Styles
+ *
+ * A polished, immersive full-page wizard experience for first-time
+ * email template generation. Uses the existing design system variables.
+ *
+ * @package AISales_Sales_Manager
+ */
+
+/* ==========================================================================
+   Wizard Overlay
+   ========================================================================== */
+
+.aisales-wizard-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 100010;
+	background: rgba(30, 30, 30, 0.85);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.aisales-wizard-overlay--open {
+	opacity: 1;
+	visibility: visible;
+}
+
+/* ==========================================================================
+   Wizard Container
+   ========================================================================== */
+
+.aisales-wizard {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%) scale(0.95);
+	z-index: 100011;
+	width: 94%;
+	max-width: 680px;
+	max-height: 90vh;
+	background: var(--aisales-bg-white);
+	border-radius: var(--aisales-radius-xl);
+	box-shadow: 
+		0 25px 50px -12px rgba(0, 0, 0, 0.25),
+		0 0 0 1px rgba(255, 255, 255, 0.1);
+	opacity: 0;
+	visibility: hidden;
+	transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.aisales-wizard-overlay--open .aisales-wizard {
+	opacity: 1;
+	visibility: visible;
+	transform: translate(-50%, -50%) scale(1);
+}
+
+/* ==========================================================================
+   Wizard Header
+   ========================================================================== */
+
+.aisales-wizard__header {
+	position: relative;
+	padding: var(--aisales-space-6) var(--aisales-space-7);
+	background: linear-gradient(135deg, var(--aisales-primary) 0%, #1a5a94 100%);
+	color: var(--aisales-text-inverse);
+}
+
+.aisales-wizard__header::after {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 4px;
+	background: linear-gradient(90deg, 
+		rgba(255,255,255,0.1) 0%, 
+		rgba(255,255,255,0.3) 50%, 
+		rgba(255,255,255,0.1) 100%);
+}
+
+.aisales-wizard__close {
+	position: absolute;
+	top: var(--aisales-space-4);
+	right: var(--aisales-space-4);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	padding: 0;
+	background: rgba(255, 255, 255, 0.15);
+	border: none;
+	border-radius: var(--aisales-radius-md);
+	color: var(--aisales-text-inverse);
+	cursor: pointer;
+	transition: all var(--aisales-transition-fast);
+}
+
+.aisales-wizard__close:hover {
+	background: rgba(255, 255, 255, 0.25);
+	transform: scale(1.05);
+}
+
+.aisales-wizard__close .dashicons {
+	font-size: 20px;
+	width: 20px;
+	height: 20px;
+}
+
+.aisales-wizard__title {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-3);
+	margin: 0 0 var(--aisales-space-2);
+	font-size: var(--aisales-font-xl);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: #fff;
+}
+
+.aisales-wizard__title .dashicons {
+	font-size: 24px;
+	width: 24px;
+	height: 24px;
+	opacity: 0.9;
+}
+
+.aisales-wizard__subtitle {
+	margin: 0;
+	font-size: var(--aisales-font-sm);
+	opacity: 0.85;
+	font-weight: var(--aisales-font-weight-normal);
+}
+
+/* ==========================================================================
+   Progress Indicator
+   ========================================================================== */
+
+.aisales-wizard__progress {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--aisales-space-2);
+	padding: var(--aisales-space-4);
+	background: var(--aisales-bg-muted);
+	border-bottom: 1px solid var(--aisales-border-light);
+}
+
+.aisales-wizard__progress-step {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+}
+
+.aisales-wizard__progress-dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: var(--aisales-border);
+	transition: all 0.3s ease;
+}
+
+.aisales-wizard__progress-step--active .aisales-wizard__progress-dot {
+	background: var(--aisales-primary);
+	box-shadow: 0 0 0 3px var(--aisales-primary-light);
+	transform: scale(1.2);
+}
+
+.aisales-wizard__progress-step--completed .aisales-wizard__progress-dot {
+	background: var(--aisales-success);
+}
+
+.aisales-wizard__progress-label {
+	font-size: var(--aisales-font-xs);
+	color: var(--aisales-text-muted);
+	font-weight: var(--aisales-font-weight-medium);
+	transition: color 0.3s ease;
+}
+
+.aisales-wizard__progress-step--active .aisales-wizard__progress-label {
+	color: var(--aisales-primary);
+}
+
+.aisales-wizard__progress-step--completed .aisales-wizard__progress-label {
+	color: var(--aisales-success);
+}
+
+.aisales-wizard__progress-connector {
+	width: 40px;
+	height: 2px;
+	background: var(--aisales-border-light);
+	border-radius: 1px;
+	transition: background 0.3s ease;
+}
+
+.aisales-wizard__progress-step--completed + .aisales-wizard__progress-connector {
+	background: var(--aisales-success);
+}
+
+/* ==========================================================================
+   Wizard Body / Steps Container
+   ========================================================================== */
+
+.aisales-wizard__body {
+	flex: 1;
+	overflow-y: auto;
+	padding: var(--aisales-space-6) var(--aisales-space-7);
+}
+
+.aisales-wizard__step {
+	display: none;
+	animation: wizardFadeIn 0.4s ease;
+}
+
+.aisales-wizard__step--active {
+	display: block;
+}
+
+@keyframes wizardFadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* ==========================================================================
+   Step 1: Brand Context
+   ========================================================================== */
+
+.aisales-wizard__intro {
+	text-align: center;
+	margin-bottom: var(--aisales-space-6);
+}
+
+.aisales-wizard__intro-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 64px;
+	height: 64px;
+	margin-bottom: var(--aisales-space-4);
+	background: linear-gradient(135deg, var(--aisales-primary-light) 0%, #d4e8f9 100%);
+	border-radius: 50%;
+}
+
+.aisales-wizard__intro-icon .dashicons {
+	font-size: 32px;
+	width: 32px;
+	height: 32px;
+	color: var(--aisales-primary);
+}
+
+.aisales-wizard__intro h3 {
+	margin: 0 0 var(--aisales-space-2);
+	font-size: var(--aisales-font-lg);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-wizard__intro p {
+	margin: 0;
+	font-size: var(--aisales-font-sm);
+	color: var(--aisales-text-secondary);
+	line-height: 1.5;
+}
+
+/* Form Fields */
+.aisales-wizard__form {
+	display: flex;
+	flex-direction: column;
+	gap: var(--aisales-space-5);
+}
+
+.aisales-wizard__field {
+	display: flex;
+	flex-direction: column;
+	gap: var(--aisales-space-2);
+}
+
+.aisales-wizard__field > label {
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-wizard__field input[type="text"],
+.aisales-wizard__field textarea,
+.aisales-wizard__field select {
+	width: 100%;
+	padding: var(--aisales-space-3) var(--aisales-space-4);
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--aisales-border);
+	border-radius: var(--aisales-radius-md);
+	font-size: var(--aisales-font-sm);
+	font-family: inherit;
+	color: var(--aisales-text-primary);
+	transition: border-color var(--aisales-transition-fast), box-shadow var(--aisales-transition-fast);
+}
+
+.aisales-wizard__field input:focus,
+.aisales-wizard__field textarea:focus,
+.aisales-wizard__field select:focus {
+	outline: none;
+	border-color: var(--aisales-primary);
+	box-shadow: 0 0 0 3px var(--aisales-primary-light);
+}
+
+.aisales-wizard__field input::placeholder,
+.aisales-wizard__field textarea::placeholder {
+	color: var(--aisales-text-muted);
+}
+
+.aisales-wizard__field textarea {
+	resize: vertical;
+	min-height: 80px;
+}
+
+.aisales-wizard__field-hint {
+	font-size: var(--aisales-font-xs);
+	color: var(--aisales-text-muted);
+	margin-top: var(--aisales-space-1);
+}
+
+/* Brand Tone Selection */
+.aisales-wizard__tone-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: var(--aisales-space-3);
+}
+
+.aisales-wizard__tone-option {
+	position: relative;
+	cursor: pointer;
+}
+
+.aisales-wizard__tone-option input {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.aisales-wizard__tone-card {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	padding: var(--aisales-space-4);
+	background: var(--aisales-bg-subtle);
+	border: 2px solid transparent;
+	border-radius: var(--aisales-radius-lg);
+	text-align: center;
+	transition: all 0.2s ease;
+}
+
+.aisales-wizard__tone-option:hover .aisales-wizard__tone-card {
+	background: var(--aisales-bg-white);
+	border-color: var(--aisales-border);
+	transform: translateY(-2px);
+}
+
+.aisales-wizard__tone-option input:checked + .aisales-wizard__tone-card {
+	background: var(--aisales-primary-light);
+	border-color: var(--aisales-primary);
+}
+
+.aisales-wizard__tone-icon {
+	font-size: 28px;
+	line-height: 1;
+}
+
+.aisales-wizard__tone-name {
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-wizard__tone-desc {
+	font-size: var(--aisales-font-xs);
+	color: var(--aisales-text-muted);
+	line-height: 1.4;
+}
+
+/* ==========================================================================
+   Step 2: Template Selection
+   ========================================================================== */
+
+.aisales-wizard__template-list {
+	display: flex;
+	flex-direction: column;
+	gap: var(--aisales-space-2);
+}
+
+.aisales-wizard__template-item {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-3);
+	padding: var(--aisales-space-3) var(--aisales-space-4);
+	background: var(--aisales-bg-subtle);
+	border: 1px solid transparent;
+	border-radius: var(--aisales-radius-md);
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.aisales-wizard__template-item:hover {
+	background: var(--aisales-bg-white);
+	border-color: var(--aisales-border);
+}
+
+.aisales-wizard__template-item.is-selected {
+	background: var(--aisales-primary-light);
+	border-color: var(--aisales-primary);
+}
+
+.aisales-wizard__template-checkbox {
+	flex-shrink: 0;
+	width: 20px;
+	height: 20px;
+	border: 2px solid var(--aisales-border);
+	border-radius: var(--aisales-radius-sm);
+	background: var(--aisales-bg-white);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.2s ease;
+}
+
+.aisales-wizard__template-item.is-selected .aisales-wizard__template-checkbox {
+	background: var(--aisales-primary);
+	border-color: var(--aisales-primary);
+}
+
+.aisales-wizard__template-checkbox .dashicons {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+	color: var(--aisales-text-inverse);
+	opacity: 0;
+	transform: scale(0.5);
+	transition: all 0.2s ease;
+}
+
+.aisales-wizard__template-item.is-selected .aisales-wizard__template-checkbox .dashicons {
+	opacity: 1;
+	transform: scale(1);
+}
+
+.aisales-wizard__template-info {
+	flex: 1;
+	min-width: 0;
+}
+
+.aisales-wizard__template-name {
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-medium);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-wizard__template-desc {
+	font-size: var(--aisales-font-xs);
+	color: var(--aisales-text-muted);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.aisales-wizard__template-badge {
+	flex-shrink: 0;
+	padding: var(--aisales-space-1) var(--aisales-space-2);
+	background: var(--aisales-success-light);
+	border-radius: var(--aisales-radius-full);
+	font-size: 10px;
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-success);
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+}
+
+.aisales-wizard__template-badge--existing {
+	background: var(--aisales-warning-light);
+	color: #996b00;
+}
+
+.aisales-wizard__select-actions {
+	display: flex;
+	gap: var(--aisales-space-3);
+	margin-top: var(--aisales-space-3);
+	padding-top: var(--aisales-space-3);
+	border-top: 1px solid var(--aisales-border-light);
+}
+
+.aisales-wizard__select-btn {
+	font-size: var(--aisales-font-xs);
+	color: var(--aisales-primary);
+	background: none;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.aisales-wizard__select-btn:hover {
+	color: var(--aisales-primary-hover);
+}
+
+/* ==========================================================================
+   Step 3: Generation Progress
+   ========================================================================== */
+
+.aisales-wizard__generating {
+	text-align: center;
+	padding: var(--aisales-space-6) 0;
+}
+
+.aisales-wizard__generating-animation {
+	position: relative;
+	width: 120px;
+	height: 120px;
+	margin: 0 auto var(--aisales-space-5);
+}
+
+.aisales-wizard__generating-ring {
+	position: absolute;
+	inset: 0;
+	border: 4px solid var(--aisales-border-light);
+	border-top-color: var(--aisales-primary);
+	border-radius: 50%;
+	animation: wizardSpin 1s linear infinite;
+}
+
+.aisales-wizard__generating-ring:nth-child(2) {
+	inset: 15px;
+	border-width: 3px;
+	border-top-color: var(--aisales-success);
+	animation-duration: 1.5s;
+	animation-direction: reverse;
+}
+
+.aisales-wizard__generating-icon {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-size: 32px;
+	color: var(--aisales-primary);
+}
+
+@keyframes wizardSpin {
+	to { transform: rotate(360deg); }
+}
+
+.aisales-wizard__generating h3 {
+	margin: 0 0 var(--aisales-space-2);
+	font-size: var(--aisales-font-lg);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-wizard__generating p {
+	margin: 0 0 var(--aisales-space-5);
+	font-size: var(--aisales-font-sm);
+	color: var(--aisales-text-secondary);
+}
+
+/* Generation Progress List */
+.aisales-wizard__progress-list {
+	display: flex;
+	flex-direction: column;
+	gap: var(--aisales-space-2);
+	max-width: 360px;
+	margin: 0 auto;
+	text-align: left;
+}
+
+.aisales-wizard__progress-item {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-3);
+	padding: var(--aisales-space-2) var(--aisales-space-3);
+	background: var(--aisales-bg-subtle);
+	border-radius: var(--aisales-radius-md);
+	font-size: var(--aisales-font-sm);
+	color: var(--aisales-text-muted);
+	transition: all 0.3s ease;
+}
+
+.aisales-wizard__progress-item--active {
+	background: var(--aisales-primary-light);
+	color: var(--aisales-primary);
+}
+
+.aisales-wizard__progress-item--completed {
+	background: var(--aisales-success-light);
+	color: var(--aisales-success);
+}
+
+.aisales-wizard__progress-item--error {
+	background: var(--aisales-danger-light);
+	color: var(--aisales-danger);
+}
+
+.aisales-wizard__progress-icon {
+	flex-shrink: 0;
+	width: 20px;
+	height: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.aisales-wizard__progress-icon .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+.aisales-wizard__progress-spinner {
+	width: 16px;
+	height: 16px;
+	border: 2px solid var(--aisales-primary-light);
+	border-top-color: var(--aisales-primary);
+	border-radius: 50%;
+	animation: wizardSpin 0.8s linear infinite;
+}
+
+/* ==========================================================================
+   Step 4: Completion
+   ========================================================================== */
+
+.aisales-wizard__complete {
+	text-align: center;
+	padding: var(--aisales-space-4) 0;
+}
+
+.aisales-wizard__complete-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 80px;
+	height: 80px;
+	margin-bottom: var(--aisales-space-5);
+	background: var(--aisales-success-light);
+	border-radius: 50%;
+	animation: wizardPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.aisales-wizard__complete-icon .dashicons {
+	font-size: 40px;
+	width: 40px;
+	height: 40px;
+	color: var(--aisales-success);
+}
+
+@keyframes wizardPop {
+	0% { transform: scale(0); }
+	50% { transform: scale(1.2); }
+	100% { transform: scale(1); }
+}
+
+.aisales-wizard__complete h3 {
+	margin: 0 0 var(--aisales-space-2);
+	font-size: var(--aisales-font-xl);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-wizard__complete p {
+	margin: 0 0 var(--aisales-space-5);
+	font-size: var(--aisales-font-sm);
+	color: var(--aisales-text-secondary);
+	line-height: 1.5;
+}
+
+/* Summary Stats */
+.aisales-wizard__summary {
+	display: flex;
+	justify-content: center;
+	gap: var(--aisales-space-6);
+	padding: var(--aisales-space-5);
+	background: var(--aisales-bg-subtle);
+	border-radius: var(--aisales-radius-lg);
+	margin-bottom: var(--aisales-space-5);
+}
+
+.aisales-wizard__summary-stat {
+	text-align: center;
+}
+
+.aisales-wizard__summary-value {
+	display: block;
+	font-size: var(--aisales-font-2xl);
+	font-weight: var(--aisales-font-weight-bold);
+	color: var(--aisales-primary);
+	line-height: 1.2;
+}
+
+.aisales-wizard__summary-label {
+	font-size: var(--aisales-font-xs);
+	color: var(--aisales-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+}
+
+/* ==========================================================================
+   Wizard Footer
+   ========================================================================== */
+
+.aisales-wizard__footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: var(--aisales-space-4) var(--aisales-space-7);
+	background: var(--aisales-bg-muted);
+	border-top: 1px solid var(--aisales-border-light);
+}
+
+.aisales-wizard__footer-left {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+}
+
+.aisales-wizard__skip-btn {
+	font-size: var(--aisales-font-sm);
+	color: var(--aisales-text-muted);
+	background: none;
+	border: none;
+	padding: var(--aisales-space-2) var(--aisales-space-3);
+	cursor: pointer;
+	transition: color var(--aisales-transition-fast);
+}
+
+.aisales-wizard__skip-btn:hover {
+	color: var(--aisales-text-secondary);
+}
+
+.aisales-wizard__footer-right {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-3);
+}
+
+/* Wizard Buttons */
+.aisales-wizard__btn {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	padding: var(--aisales-space-3) var(--aisales-space-5);
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-medium);
+	border-radius: var(--aisales-radius-md);
+	cursor: pointer;
+	transition: all var(--aisales-transition-fast);
+}
+
+.aisales-wizard__btn--secondary {
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--aisales-border);
+	color: var(--aisales-text-secondary);
+}
+
+.aisales-wizard__btn--secondary:hover {
+	background: var(--aisales-bg-subtle);
+	border-color: var(--aisales-border);
+}
+
+.aisales-wizard__btn--primary {
+	background: var(--aisales-primary);
+	border: 1px solid var(--aisales-primary);
+	color: var(--aisales-text-inverse);
+}
+
+.aisales-wizard__btn--primary:hover {
+	background: var(--aisales-primary-hover);
+	border-color: var(--aisales-primary-hover);
+}
+
+.aisales-wizard__btn--primary:disabled {
+	background: var(--aisales-border);
+	border-color: var(--aisales-border);
+	cursor: not-allowed;
+	opacity: 0.7;
+}
+
+.aisales-wizard__btn--success {
+	background: var(--aisales-success);
+	border: 1px solid var(--aisales-success);
+	color: var(--aisales-text-inverse);
+}
+
+.aisales-wizard__btn--success:hover {
+	background: var(--aisales-success-hover);
+	border-color: var(--aisales-success-hover);
+}
+
+.aisales-wizard__btn .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+/* ==========================================================================
+   Step 1 Scrollable Content
+   ========================================================================== */
+
+.aisales-wizard__step-scroll {
+	max-height: 100%;
+	overflow-y: auto;
+	padding-right: var(--aisales-space-2);
+}
+
+/* ==========================================================================
+   Branding Section
+   ========================================================================== */
+
+.aisales-wizard__section {
+	margin-top: var(--aisales-space-5);
+	padding-top: var(--aisales-space-5);
+	border-top: 1px solid var(--aisales-border-light);
+}
+
+.aisales-wizard__section-header {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	margin-bottom: var(--aisales-space-4);
+	font-size: var(--aisales-font-md);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-wizard__section-header .dashicons {
+	font-size: 20px;
+	width: 20px;
+	height: 20px;
+	color: var(--aisales-primary);
+}
+
+.aisales-wizard__section-badge {
+	margin-left: auto;
+	padding: var(--aisales-space-1) var(--aisales-space-2);
+	font-size: var(--aisales-font-xs);
+	font-weight: var(--aisales-font-weight-normal);
+	color: var(--aisales-text-muted);
+	background: var(--aisales-bg-muted);
+	border-radius: var(--aisales-radius-sm);
+}
+
+.aisales-wizard__branding-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: var(--aisales-space-4);
+	margin-bottom: var(--aisales-space-4);
+}
+
+/* Color Field */
+.aisales-wizard__color-field {
+	display: flex;
+	flex-direction: column;
+	gap: var(--aisales-space-1);
+}
+
+.aisales-wizard__color-field > label {
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-medium);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-wizard__color-input-wrap {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	padding: var(--aisales-space-2);
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--aisales-border);
+	border-radius: var(--aisales-radius-md);
+	transition: border-color var(--aisales-transition-fast);
+}
+
+.aisales-wizard__color-input-wrap:focus-within {
+	border-color: var(--aisales-primary);
+	box-shadow: 0 0 0 2px var(--aisales-primary-light);
+}
+
+.aisales-wizard__color-picker {
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	border: none;
+	border-radius: var(--aisales-radius-sm);
+	cursor: pointer;
+	background: transparent;
+}
+
+.aisales-wizard__color-picker::-webkit-color-swatch-wrapper {
+	padding: 0;
+}
+
+.aisales-wizard__color-picker::-webkit-color-swatch {
+	border: 1px solid var(--aisales-border-light);
+	border-radius: var(--aisales-radius-sm);
+}
+
+.aisales-wizard__color-picker::-moz-color-swatch {
+	border: 1px solid var(--aisales-border-light);
+	border-radius: var(--aisales-radius-sm);
+}
+
+.aisales-wizard__color-hex {
+	flex: 1;
+	border: none;
+	background: transparent;
+	font-size: var(--aisales-font-sm);
+	font-family: var(--aisales-font-mono, monospace);
+	color: var(--aisales-text-primary);
+	text-transform: uppercase;
+	outline: none;
+	width: 100%;
+	min-width: 0;
+}
+
+.aisales-wizard__color-hint {
+	font-size: 11px;
+	color: var(--aisales-text-muted);
+}
+
+/* Font Field */
+.aisales-wizard__font-field {
+	grid-column: 1 / -1;
+	display: flex;
+	flex-direction: column;
+	gap: var(--aisales-space-2);
+}
+
+.aisales-wizard__font-field > label {
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-medium);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-wizard__font-select {
+	padding: var(--aisales-space-3);
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--aisales-border);
+	border-radius: var(--aisales-radius-md);
+	font-size: var(--aisales-font-sm);
+	color: var(--aisales-text-primary);
+	cursor: pointer;
+	transition: border-color var(--aisales-transition-fast);
+}
+
+.aisales-wizard__font-select:focus {
+	outline: none;
+	border-color: var(--aisales-primary);
+	box-shadow: 0 0 0 2px var(--aisales-primary-light);
+}
+
+.aisales-wizard__font-preview {
+	padding: var(--aisales-space-3);
+	background: var(--aisales-bg-muted);
+	border-radius: var(--aisales-radius-md);
+	font-size: var(--aisales-font-md);
+	color: var(--aisales-text-secondary);
+	text-align: center;
+}
+
+/* Branding Live Preview */
+.aisales-wizard__branding-preview {
+	background: var(--aisales-bg-muted);
+	border-radius: var(--aisales-radius-lg);
+	padding: var(--aisales-space-3);
+}
+
+.aisales-wizard__preview-label {
+	display: block;
+	margin-bottom: var(--aisales-space-2);
+	font-size: var(--aisales-font-xs);
+	font-weight: var(--aisales-font-weight-medium);
+	color: var(--aisales-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.aisales-wizard__preview-email {
+	background: #f7f7f7;
+	border-radius: var(--aisales-radius-md);
+	overflow: hidden;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.aisales-wizard__preview-header {
+	padding: var(--aisales-space-3) var(--aisales-space-4);
+	background: #7f54b3;
+	color: #ffffff;
+	font-size: var(--aisales-font-md);
+	font-weight: var(--aisales-font-weight-semibold);
+	text-align: center;
+}
+
+.aisales-wizard__preview-body {
+	padding: var(--aisales-space-4);
+	background: #ffffff;
+	color: #3c3c3c;
+	font-size: var(--aisales-font-sm);
+	line-height: 1.5;
+}
+
+.aisales-wizard__preview-button {
+	display: block;
+	margin: 0 var(--aisales-space-4) var(--aisales-space-4);
+	padding: var(--aisales-space-2) var(--aisales-space-4);
+	background: #7f54b3;
+	color: #ffffff;
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-medium);
+	text-align: center;
+	border-radius: var(--aisales-radius-sm);
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 600px) {
+	.aisales-wizard {
+		width: 100%;
+		height: 100%;
+		max-height: 100%;
+		border-radius: 0;
+		transform: translate(-50%, -50%);
+	}
+	
+	.aisales-wizard-overlay--open .aisales-wizard {
+		transform: translate(-50%, -50%);
+	}
+	
+	.aisales-wizard__header,
+	.aisales-wizard__body,
+	.aisales-wizard__footer {
+		padding-left: var(--aisales-space-5);
+		padding-right: var(--aisales-space-5);
+	}
+	
+	.aisales-wizard__progress {
+		gap: var(--aisales-space-1);
+	}
+	
+	.aisales-wizard__progress-label {
+		display: none;
+	}
+	
+	.aisales-wizard__branding-grid {
+		grid-template-columns: 1fr;
+	}
+	
+	.aisales-wizard__progress-connector {
+		width: 24px;
+	}
+	
+	.aisales-wizard__tone-grid {
+		grid-template-columns: 1fr;
+	}
+	
+	.aisales-wizard__summary {
+		flex-direction: column;
+		gap: var(--aisales-space-3);
+	}
+	
+	.aisales-wizard__footer {
+		flex-direction: column-reverse;
+		gap: var(--aisales-space-3);
+	}
+	
+	.aisales-wizard__footer-left,
+	.aisales-wizard__footer-right {
+		width: 100%;
+		justify-content: center;
+	}
+	
+	.aisales-wizard__btn {
+		flex: 1;
+		justify-content: center;
+	}
+}

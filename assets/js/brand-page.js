@@ -92,14 +92,6 @@
 		// Live preview updates
 		$(document).on('input change', '#aisales-store-name', updatePreviewStoreName);
 
-		// Balance trigger (shared component)
-		$(document).on('click keydown', '#aisales-balance-trigger', function (e) {
-			if (e.type === 'click' || e.key === 'Enter' || e.key === ' ') {
-				e.preventDefault();
-				$('#aisales-balance-modal').fadeIn(200);
-			}
-		});
-
 		// Warn before leaving with unsaved changes
 		$(window).on('beforeunload', function () {
 			if (pageState.isDirty) {

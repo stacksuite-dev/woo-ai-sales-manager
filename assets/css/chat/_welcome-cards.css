@@ -1,0 +1,141 @@
+/**
+ * Welcome Cards - Entity selection cards
+ *
+ * Cards displayed in welcome state for selecting product, category, or agent mode.
+ *
+ * @package AISales_Sales_Manager
+ */
+
+/* ==========================================================================
+   Welcome Cards
+   ========================================================================== */
+
+.aisales-welcome-cards {
+	display: flex;
+	flex-direction: column;
+	gap: var(--aisales-space-3);
+	margin-top: var(--aisales-space-8);
+	width: 100%;
+	max-width: 480px;
+}
+
+.aisales-welcome-card {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-4);
+	padding: var(--aisales-space-5);
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--aisales-border);
+	border-radius: var(--aisales-radius-lg);
+	text-align: left;
+	cursor: pointer;
+	transition: all var(--aisales-transition-fast);
+	box-shadow: var(--aisales-shadow-xs);
+}
+
+.aisales-welcome-card:hover {
+	border-color: var(--aisales-primary);
+	box-shadow: var(--aisales-shadow-md);
+	transform: translateY(-2px);
+}
+
+.aisales-welcome-card__icon {
+	flex-shrink: 0;
+	width: 48px;
+	height: 48px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: linear-gradient(135deg, var(--aisales-primary-light) 0%, #d4e8f8 100%);
+	border-radius: var(--aisales-radius-lg);
+}
+
+.aisales-welcome-card__icon .dashicons {
+	font-size: 24px;
+	width: 24px;
+	height: 24px;
+	color: var(--aisales-primary);
+}
+
+.aisales-welcome-card__icon--category {
+	background: linear-gradient(135deg, var(--aisales-success-light) 0%, #c8f0d4 100%);
+}
+
+.aisales-welcome-card__icon--category .dashicons {
+	color: var(--aisales-success);
+}
+
+.aisales-welcome-card__content {
+	flex: 1;
+	min-width: 0;
+}
+
+.aisales-welcome-card__content h4 {
+	margin: 0 0 var(--aisales-space-1) 0;
+	font-size: var(--aisales-font-md);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-welcome-card__content p {
+	margin: 0;
+	font-size: var(--aisales-font-sm);
+	color: var(--aisales-text-secondary);
+	line-height: var(--aisales-line-height-normal);
+}
+
+.aisales-welcome-card__arrow {
+	flex-shrink: 0;
+	color: var(--aisales-text-muted);
+	transition: all var(--aisales-transition-fast);
+}
+
+.aisales-welcome-card:hover .aisales-welcome-card__arrow {
+	color: var(--aisales-primary);
+	transform: translateX(4px);
+}
+
+.aisales-welcome-card__arrow .dashicons {
+	font-size: 20px;
+	width: 20px;
+	height: 20px;
+}
+
+/* Welcome Context Hint */
+.aisales-welcome-context-hint {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	margin-top: var(--aisales-space-6);
+	padding: var(--aisales-space-3) var(--aisales-space-4);
+	background: var(--aisales-info-light);
+	border-radius: var(--aisales-radius-md);
+	font-size: var(--aisales-font-sm);
+	color: var(--aisales-text-secondary);
+}
+
+.aisales-welcome-context-hint .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	line-height: 1;
+	color: var(--aisales-info);
+	flex-shrink: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;	
+}
+
+.aisales-welcome-context-hint .aisales-btn--link {
+	background: none;
+	border: none;
+	padding: 0;
+	color: var(--aisales-primary);
+	font-weight: var(--aisales-font-weight-semibold);
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.aisales-welcome-context-hint .aisales-btn--link:hover {
+	color: var(--aisales-primary-hover);
+}

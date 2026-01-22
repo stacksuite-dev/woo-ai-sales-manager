@@ -221,7 +221,9 @@
 		}
 
 		// Auto-resize textarea
-		autoResizeTextarea();
+		if (app.ui && typeof app.ui.autoResizeTextarea === 'function') {
+			app.ui.autoResizeTextarea();
+		}
 
 		// Update UI based on initial entity type
 		if (app.entities) {

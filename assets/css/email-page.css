@@ -1,0 +1,1047 @@
+/**
+ * Email Templates Page Styles
+ *
+ * Dedicated styles for the email templates management page.
+ * Uses design system variables from shared-components.css
+ *
+ * @package AISales_Sales_Manager
+ */
+
+/* ==========================================================================
+   Page Layout
+   ========================================================================== */
+
+body.aisales-modal-open {
+	overflow: hidden;
+}
+
+.aisales-email-page {
+	max-width: 1400px;
+	margin: 0 auto;
+	padding: 0 var(--aisales-space-4);
+}
+
+.aisales-email-page .aisales-notices-anchor {
+	height: 0;
+	margin: 0;
+	padding: 0;
+}
+
+/* ==========================================================================
+   Page Header
+   ========================================================================== */
+
+.aisales-email-page__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: var(--aisales-space-4) 0;
+	margin-bottom: var(--aisales-space-4);
+	border-bottom: 1px solid var(--aisales-border-light);
+}
+
+.aisales-email-page__header-left {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-3);
+}
+
+.aisales-email-page__title {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	font-size: var(--aisales-font-xl);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-email-page__title .dashicons {
+	font-size: 24px;
+	width: 24px;
+	height: 24px;
+	color: var(--aisales-primary);
+}
+
+.aisales-email-page__header-right {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-3);
+}
+
+/* ==========================================================================
+   Not Connected State
+   ========================================================================== */
+
+.aisales-email-page__not-connected {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 400px;
+}
+
+.aisales-empty-state {
+	text-align: center;
+	padding: var(--aisales-space-8);
+}
+
+.aisales-empty-state .dashicons {
+	font-size: 48px;
+	width: 48px;
+	height: 48px;
+	color: var(--aisales-warning);
+	margin-bottom: var(--aisales-space-4);
+}
+
+.aisales-empty-state h2 {
+	margin: 0 0 var(--aisales-space-2);
+	font-size: var(--aisales-font-xl);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-empty-state p {
+	margin: 0 0 var(--aisales-space-5);
+	color: var(--aisales-text-secondary);
+}
+
+/* ==========================================================================
+   Stats Overview
+   ========================================================================== */
+
+.aisales-email-stats {
+	display: flex;
+	gap: var(--aisales-space-4);
+}
+
+.aisales-email-overview {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--aisales-space-4);
+	margin-bottom: var(--aisales-space-5);
+	flex-wrap: wrap;
+}
+
+.aisales-email-stat {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	padding: var(--aisales-space-3) var(--aisales-space-4);
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--aisales-border-light);
+	border-radius: var(--aisales-radius-lg);
+	box-shadow: var(--aisales-shadow-xs);
+}
+
+.aisales-email-stat__icon {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+}
+
+.aisales-email-stat--active .aisales-email-stat__icon {
+	background: var(--aisales-success);
+	box-shadow: 0 0 0 3px var(--aisales-success-light);
+}
+
+.aisales-email-stat--draft .aisales-email-stat__icon {
+	background: var(--aisales-warning);
+	box-shadow: 0 0 0 3px var(--aisales-warning-light);
+}
+
+.aisales-email-stat--none .aisales-email-stat__icon {
+	background: var(--aisales-border);
+	box-shadow: 0 0 0 3px var(--aisales-bg-muted);
+}
+
+.aisales-email-stat__count {
+	font-size: var(--aisales-font-lg);
+	font-weight: var(--aisales-font-weight-bold);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-email-stat__label {
+	font-size: var(--aisales-font-sm);
+	color: var(--aisales-text-secondary);
+}
+
+/* ==========================================================================
+   Quick Actions
+   ========================================================================== */
+
+.aisales-email-actions {
+	display: flex;
+	gap: var(--aisales-space-3);
+}
+
+/* ==========================================================================
+   Templates List
+   ========================================================================== */
+
+.aisales-email-templates {
+	display: flex;
+	flex-direction: column;
+	gap: var(--aisales-space-6);
+}
+
+.aisales-email-category__header {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	margin-bottom: var(--aisales-space-3);
+	padding-bottom: var(--aisales-space-2);
+	border-bottom: 1px solid var(--aisales-border-light);
+}
+
+.aisales-email-category__header .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	color: var(--aisales-primary);
+}
+
+.aisales-email-category__header h2 {
+	margin: 0;
+	font-size: var(--aisales-font-md);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+}
+
+.aisales-email-category__list {
+	display: flex;
+	flex-direction: column;
+	gap: var(--aisales-space-3);
+}
+
+/* ==========================================================================
+   Template Card
+   ========================================================================== */
+
+.aisales-email-template-card {
+	display: grid;
+	grid-template-columns: auto 1fr auto auto;
+	align-items: center;
+	gap: var(--aisales-space-4);
+	padding: var(--aisales-space-4);
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--aisales-border-light);
+	border-radius: var(--aisales-radius-lg);
+	transition: all var(--aisales-transition-fast);
+}
+
+.aisales-email-template-card:hover {
+	border-color: var(--aisales-border);
+	box-shadow: var(--aisales-shadow-sm);
+}
+
+.aisales-email-template-card__icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	background: var(--aisales-primary-light);
+	border-radius: var(--aisales-radius-md);
+}
+
+.aisales-email-template-card__icon .dashicons {
+	font-size: 22px;
+	width: 22px;
+	height: 22px;
+	color: var(--aisales-primary);
+}
+
+.aisales-email-template-card__info {
+	min-width: 0;
+}
+
+.aisales-email-template-card__title {
+	margin: 0 0 var(--aisales-space-1);
+	font-size: var(--aisales-font-md);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-email-template-card__desc {
+	margin: 0;
+	font-size: var(--aisales-font-sm);
+	color: var(--aisales-text-muted);
+	line-height: 1.4;
+}
+
+.aisales-email-template-card__subject {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-1);
+	margin: var(--aisales-space-2) 0 0;
+	font-size: var(--aisales-font-xs);
+	color: var(--aisales-text-secondary);
+	font-style: italic;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 400px;
+}
+
+.aisales-email-template-card__subject .dashicons {
+	font-size: 12px;
+	width: 12px;
+	height: 12px;
+	color: var(--aisales-text-muted);
+	flex-shrink: 0;
+}
+
+.aisales-email-template-card__status {
+	flex-shrink: 0;
+}
+
+.aisales-email-template-card__actions {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+}
+
+.aisales-email-template-card__actions .aisales-btn__text {
+	display: inline;
+}
+
+/* ==========================================================================
+   Help Section
+   ========================================================================== */
+
+.aisales-email-help {
+	display: flex;
+	gap: var(--aisales-space-4);
+	padding: var(--aisales-space-4);
+	margin-top: var(--aisales-space-6);
+	background: var(--aisales-info-light);
+	border-radius: var(--aisales-radius-lg);
+}
+
+.aisales-email-help__icon {
+	flex-shrink: 0;
+}
+
+.aisales-email-help__icon .dashicons {
+	font-size: 20px;
+	width: 20px;
+	height: 20px;
+	color: var(--aisales-info, #0073aa);
+}
+
+.aisales-email-help__content h4 {
+	margin: 0 0 var(--aisales-space-1);
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-email-help__content p {
+	margin: 0;
+	font-size: var(--aisales-font-sm);
+	color: var(--aisales-text-secondary);
+	line-height: 1.5;
+}
+
+/* ==========================================================================
+   Editor View
+   ========================================================================== */
+
+.aisales-email-page__editor-view {
+	display: flex;
+	flex-direction: column;
+	height: calc(100vh - 180px);
+	min-height: 600px;
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--aisales-border-light);
+	border-radius: var(--aisales-radius-lg);
+	overflow: hidden;
+}
+
+/* Editor Header */
+.aisales-email-editor__header {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-4);
+	padding: var(--aisales-space-3) var(--aisales-space-4);
+	background: var(--aisales-bg-muted);
+	border-bottom: 1px solid var(--aisales-border-light);
+}
+
+.aisales-email-editor__title {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-3);
+	flex: 1;
+}
+
+.aisales-email-editor__type-badge {
+	padding: var(--aisales-space-1) var(--aisales-space-3);
+	background: var(--aisales-primary-light);
+	border-radius: var(--aisales-radius-full);
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-medium);
+	color: var(--aisales-primary);
+}
+
+.aisales-email-editor__status {
+	font-size: var(--aisales-font-sm);
+	color: var(--aisales-text-muted);
+}
+
+.aisales-email-editor__header-actions {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+}
+
+.aisales-email-test-modal .aisales-form-input {
+	max-width: 100%;
+}
+
+.aisales-email-test-modal .aisales-modal__body {
+	padding-top: var(--aisales-space-5);
+}
+
+/* Split Pane Layout */
+.aisales-email-editor__split {
+	display: flex;
+	flex: 1;
+	overflow: hidden;
+}
+
+.aisales-email-editor__form-pane {
+	display: flex;
+	flex-direction: column;
+	width: 50%;
+	min-width: 380px;
+	max-width: 60%;
+	border-right: 1px solid var(--aisales-border-light);
+	overflow: hidden;
+}
+
+.aisales-email-editor__form {
+	flex: 1;
+	overflow-y: auto;
+	padding: var(--aisales-space-5);
+	display: flex;
+	flex-direction: column;
+	gap: var(--aisales-space-4);
+}
+
+.aisales-email-editor__form-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: var(--aisales-space-3);
+	padding: var(--aisales-space-4);
+	border-top: 1px solid var(--aisales-border-light);
+	background: var(--aisales-bg-muted);
+}
+
+/* Resizer */
+.aisales-email-editor__resizer {
+	width: 6px;
+	background: var(--aisales-bg-muted);
+	cursor: col-resize;
+	transition: background var(--aisales-transition-fast);
+	flex-shrink: 0;
+}
+
+.aisales-email-editor__resizer:hover,
+.aisales-email-editor__resizer.is-dragging {
+	background: var(--aisales-primary-light);
+}
+
+/* Preview Pane */
+.aisales-email-editor__preview-pane {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	min-width: 300px;
+	overflow: hidden;
+	background: #e5e5e5;
+}
+
+.aisales-email-preview {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.aisales-email-preview__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: var(--aisales-space-3) var(--aisales-space-4);
+	background: var(--aisales-bg-white);
+	border-bottom: 1px solid var(--aisales-border-light);
+}
+
+.aisales-email-preview__title {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-medium);
+	color: var(--aisales-text-secondary);
+}
+
+.aisales-email-preview__title .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	color: var(--aisales-primary);
+}
+
+.aisales-email-preview__device-switcher {
+	display: flex;
+	gap: var(--aisales-space-1);
+}
+
+.aisales-device-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	background: transparent;
+	border: 1px solid transparent;
+	border-radius: var(--aisales-radius-sm);
+	color: var(--aisales-text-muted);
+	cursor: pointer;
+	transition: all var(--aisales-transition-fast);
+}
+
+.aisales-device-btn:hover {
+	color: var(--aisales-text-secondary);
+	background: var(--aisales-bg-muted);
+}
+
+.aisales-device-btn--active {
+	color: var(--aisales-primary);
+	background: var(--aisales-primary-light);
+	border-color: var(--aisales-primary);
+}
+
+.aisales-device-btn .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+}
+
+.aisales-email-preview__subject {
+	padding: var(--aisales-space-2) var(--aisales-space-4);
+	background: var(--aisales-bg-white);
+	border-bottom: 1px solid var(--aisales-border-light);
+	font-size: var(--aisales-font-sm);
+	color: var(--aisales-text-secondary);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.aisales-email-preview__subject strong {
+	color: var(--aisales-text-muted);
+	font-weight: var(--aisales-font-weight-medium);
+}
+
+.aisales-email-preview__frame-container {
+	flex: 1;
+	display: flex;
+	justify-content: center;
+	padding: var(--aisales-space-4);
+	overflow: auto;
+}
+
+.aisales-email-preview__frame-wrapper {
+	width: 375px; /* Mobile default */
+	max-width: 100%;
+	background: var(--aisales-bg-white);
+	border-radius: var(--aisales-radius-md);
+	box-shadow: var(--aisales-shadow-lg);
+	overflow: hidden;
+	transition: width 0.3s ease;
+}
+
+.aisales-email-preview__frame-wrapper[data-device="tablet"] {
+	width: 768px;
+}
+
+.aisales-email-preview__frame-wrapper[data-device="desktop"] {
+	width: 100%;
+	max-width: 900px;
+}
+
+.aisales-email-preview__frame-wrapper iframe {
+	width: 100%;
+	height: 100%;
+	min-height: 500px;
+	border: none;
+}
+
+.aisales-email-preview__footer {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--aisales-space-2);
+	padding: var(--aisales-space-2) var(--aisales-space-4);
+	background: var(--aisales-bg-white);
+	border-top: 1px solid var(--aisales-border-light);
+	font-size: var(--aisales-font-xs);
+	color: var(--aisales-text-muted);
+}
+
+.aisales-email-preview__footer .dashicons {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+}
+
+/* ==========================================================================
+   Form Fields
+   ========================================================================== */
+
+.aisales-email-field {
+	display: flex;
+	flex-direction: column;
+	gap: var(--aisales-space-2);
+}
+
+.aisales-email-field > label {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-email-field > label .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	color: var(--aisales-text-muted);
+}
+
+.aisales-email-field__input-wrap,
+.aisales-email-field__textarea-wrap {
+	position: relative;
+}
+
+.aisales-email-field input[type="text"],
+.aisales-email-field textarea {
+	width: 100%;
+	padding: var(--aisales-space-3);
+	padding-right: 40px;
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--aisales-border);
+	border-radius: var(--aisales-radius-md);
+	font-size: var(--aisales-font-sm);
+	font-family: inherit;
+	color: var(--aisales-text-primary);
+	transition: border-color var(--aisales-transition-fast), box-shadow var(--aisales-transition-fast);
+}
+
+.aisales-email-field textarea {
+	resize: vertical;
+	min-height: 160px;
+	padding-right: var(--aisales-space-3);
+	padding-bottom: 44px;
+}
+
+.aisales-email-field--content {
+	flex: 1;
+	min-height: 200px;
+}
+
+.aisales-email-field--content .aisales-email-field__textarea-wrap {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+.aisales-email-field--content textarea {
+	flex: 1;
+	min-height: 120px;
+}
+
+.aisales-email-field input[type="text"]:focus,
+.aisales-email-field textarea:focus {
+	outline: none;
+	border-color: var(--aisales-primary);
+	box-shadow: 0 0 0 2px var(--aisales-primary-light);
+}
+
+.aisales-email-field input::placeholder,
+.aisales-email-field textarea::placeholder {
+	color: var(--aisales-text-muted);
+}
+
+/* Placeholder Insert Button */
+.aisales-placeholder-insert-btn {
+	position: absolute;
+	right: var(--aisales-space-2);
+	top: 50%;
+	transform: translateY(-50%);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	padding: 0;
+	background: var(--aisales-bg-muted);
+	border: 1px solid var(--aisales-border-light);
+	border-radius: var(--aisales-radius-sm);
+	color: var(--aisales-text-muted);
+	cursor: pointer;
+	transition: all var(--aisales-transition-fast);
+}
+
+.aisales-placeholder-insert-btn:hover {
+	background: var(--aisales-primary-light);
+	border-color: var(--aisales-primary);
+	color: var(--aisales-primary);
+}
+
+.aisales-placeholder-insert-btn .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+.aisales-placeholder-insert-btn--textarea {
+	position: absolute;
+	right: var(--aisales-space-2);
+	bottom: var(--aisales-space-2);
+	top: auto;
+	transform: none;
+	width: auto;
+	padding: var(--aisales-space-1) var(--aisales-space-2);
+	gap: var(--aisales-space-1);
+	font-size: var(--aisales-font-xs);
+}
+
+/* Regenerate Button */
+.aisales-regenerate-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	padding: 0;
+	background: transparent;
+	border: none;
+	border-radius: var(--aisales-radius-sm);
+	color: var(--aisales-text-muted);
+	cursor: pointer;
+	opacity: 0.6;
+	transition: all var(--aisales-transition-fast);
+}
+
+.aisales-regenerate-btn:hover {
+	opacity: 1;
+	color: var(--aisales-primary);
+	background: var(--aisales-primary-light);
+}
+
+.aisales-regenerate-btn .dashicons {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+}
+
+/* AI Improvement Field */
+.aisales-email-field--ai {
+	padding: var(--aisales-space-3);
+	background: linear-gradient(135deg, var(--aisales-primary-light) 0%, var(--aisales-bg-white) 100%);
+	border: 1px solid var(--aisales-primary-light);
+	border-radius: var(--aisales-radius-md);
+}
+
+.aisales-email-field--ai > label {
+	color: var(--aisales-primary);
+}
+
+.aisales-email-field--ai > label .dashicons {
+	color: var(--aisales-primary);
+}
+
+.aisales-email-improve-wrap {
+	display: flex;
+	gap: var(--aisales-space-2);
+}
+
+.aisales-email-improve-wrap input {
+	flex: 1;
+	padding-right: var(--aisales-space-3) !important;
+}
+
+/* ==========================================================================
+   Placeholders Reference
+   ========================================================================== */
+
+.aisales-email-placeholders-ref {
+	margin-top: var(--aisales-space-2);
+}
+
+.aisales-email-placeholders-toggle {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	width: 100%;
+	padding: var(--aisales-space-2) var(--aisales-space-3);
+	background: var(--aisales-bg-muted);
+	border: none;
+	border-radius: var(--aisales-radius-md);
+	font-size: var(--aisales-font-sm);
+	color: var(--aisales-text-secondary);
+	cursor: pointer;
+	transition: all var(--aisales-transition-fast);
+}
+
+.aisales-email-placeholders-toggle:hover {
+	background: var(--aisales-border-light);
+}
+
+.aisales-email-placeholders-toggle .dashicons:last-child {
+	margin-left: auto;
+	transition: transform 0.2s ease;
+}
+
+.aisales-email-placeholders-toggle.is-expanded .dashicons:last-child {
+	transform: rotate(180deg);
+}
+
+.aisales-email-placeholders-list {
+	padding: var(--aisales-space-3);
+	margin-top: var(--aisales-space-2);
+	background: var(--aisales-bg-muted);
+	border-radius: var(--aisales-radius-md);
+	max-height: 200px;
+	overflow-y: auto;
+}
+
+.aisales-placeholder-group {
+	margin-bottom: var(--aisales-space-3);
+}
+
+.aisales-placeholder-group:last-child {
+	margin-bottom: 0;
+}
+
+.aisales-placeholder-group__title {
+	margin: 0 0 var(--aisales-space-2);
+	font-size: var(--aisales-font-xs);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.aisales-placeholder-group__items {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--aisales-space-1);
+}
+
+.aisales-placeholder-chip {
+	padding: var(--aisales-space-1) var(--aisales-space-2);
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--aisales-border-light);
+	border-radius: var(--aisales-radius-sm);
+	font-size: var(--aisales-font-xs);
+	font-family: var(--aisales-font-mono, monospace);
+	color: var(--aisales-text-secondary);
+	cursor: pointer;
+	transition: all var(--aisales-transition-fast);
+}
+
+.aisales-placeholder-chip:hover {
+	background: var(--aisales-primary-light);
+	border-color: var(--aisales-primary);
+	color: var(--aisales-primary);
+}
+
+/* ==========================================================================
+   Placeholder Picker Dropdown
+   ========================================================================== */
+
+.aisales-placeholder-picker {
+	position: absolute;
+	z-index: 100010;
+	width: 280px;
+	max-height: 300px;
+	overflow-y: auto;
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--aisales-border);
+	border-radius: var(--aisales-radius-md);
+	box-shadow: var(--aisales-shadow-lg);
+}
+
+.aisales-placeholder-picker__group {
+	padding: var(--aisales-space-2);
+	border-bottom: 1px solid var(--aisales-border-light);
+}
+
+.aisales-placeholder-picker__group:last-child {
+	border-bottom: none;
+}
+
+.aisales-placeholder-picker__group-title {
+	padding: var(--aisales-space-1) var(--aisales-space-2);
+	font-size: var(--aisales-font-xs);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.aisales-placeholder-picker__item {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 2px;
+	width: 100%;
+	padding: var(--aisales-space-2);
+	background: none;
+	border: none;
+	border-radius: var(--aisales-radius-sm);
+	text-align: left;
+	cursor: pointer;
+	transition: background var(--aisales-transition-fast);
+}
+
+.aisales-placeholder-picker__item:hover {
+	background: var(--aisales-bg-muted);
+}
+
+.aisales-placeholder-picker__item code {
+	font-size: var(--aisales-font-xs);
+	font-family: var(--aisales-font-mono, monospace);
+	color: var(--aisales-primary);
+	background: var(--aisales-primary-light);
+	padding: 1px 4px;
+	border-radius: 2px;
+}
+
+.aisales-placeholder-picker__item span {
+	font-size: 11px;
+	color: var(--aisales-text-muted);
+}
+
+/* ==========================================================================
+   Loading Overlay
+   ========================================================================== */
+
+.aisales-email-loading {
+	position: fixed;
+	inset: 0;
+	z-index: 100005;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(255, 255, 255, 0.9);
+	backdrop-filter: blur(2px);
+}
+
+.aisales-email-loading__content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--aisales-space-4);
+	text-align: center;
+	padding: var(--aisales-space-6);
+	background: var(--aisales-bg-white);
+	border-radius: var(--aisales-radius-lg);
+	box-shadow: var(--aisales-shadow-lg);
+}
+
+.aisales-email-loading__content p {
+	margin: 0;
+	font-size: var(--aisales-font-md);
+	color: var(--aisales-text-secondary);
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 1200px) {
+	.aisales-email-template-card {
+		grid-template-columns: auto 1fr auto;
+		gap: var(--aisales-space-3);
+	}
+
+	.aisales-email-template-card__status {
+		grid-column: 3;
+		grid-row: 1;
+	}
+
+	.aisales-email-template-card__actions {
+		grid-column: 1 / -1;
+		justify-content: flex-end;
+		padding-top: var(--aisales-space-3);
+		border-top: 1px solid var(--aisales-border-light);
+	}
+
+	.aisales-email-template-card__subject {
+		max-width: 250px;
+	}
+}
+
+@media (max-width: 900px) {
+	.aisales-email-stats {
+		flex-wrap: wrap;
+	}
+
+	.aisales-email-editor__split {
+		flex-direction: column;
+	}
+
+	.aisales-email-editor__form-pane {
+		width: 100%;
+		max-width: 100%;
+		min-width: auto;
+		border-right: none;
+		border-bottom: 1px solid var(--aisales-border-light);
+	}
+
+	.aisales-email-editor__resizer {
+		display: none;
+	}
+
+	.aisales-email-editor__preview-pane {
+		min-height: 400px;
+	}
+}
+
+@media (max-width: 782px) {
+	.aisales-email-page {
+		padding: 0 var(--aisales-space-2);
+	}
+
+	.aisales-email-page__header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--aisales-space-3);
+	}
+
+	.aisales-email-template-card {
+		grid-template-columns: 1fr auto;
+	}
+
+	.aisales-email-template-card__icon {
+		display: none;
+	}
+
+	.aisales-email-template-card__subject {
+		display: none;
+	}
+
+	.aisales-email-template-card__actions .aisales-btn__text {
+		display: none;
+	}
+}

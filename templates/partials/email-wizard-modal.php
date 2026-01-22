@@ -1,0 +1,394 @@
+<?php
+/**
+ * Email Template Wizard Modal
+ *
+ * First-time setup wizard for email template generation.
+ * Guides users through brand context setup and template selection.
+ *
+ * Variables passed from parent:
+ * - $templates (array) - Available template types
+ * - $store_context (array) - Existing store context
+ * - $wizard_completed (bool) - Whether wizard has been completed before
+ *
+ * @package AISales_Sales_Manager
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+// Get branding data from extractor
+$branding_extractor = AISales_Branding_Extractor::instance();
+$detected_branding  = $branding_extractor->get_branding();
+$safe_fonts         = $branding_extractor->get_safe_fonts();
+
+// Business niche options
+$niche_options = array(
+	''            => __( 'Select your industry...', 'ai-sales-manager-for-woocommerce' ),
+	'fashion'     => __( 'Fashion & Apparel', 'ai-sales-manager-for-woocommerce' ),
+	'electronics' => __( 'Electronics & Tech', 'ai-sales-manager-for-woocommerce' ),
+	'home'        => __( 'Home & Garden', 'ai-sales-manager-for-woocommerce' ),
+	'beauty'      => __( 'Beauty & Cosmetics', 'ai-sales-manager-for-woocommerce' ),
+	'food'        => __( 'Food & Beverages', 'ai-sales-manager-for-woocommerce' ),
+	'health'      => __( 'Health & Wellness', 'ai-sales-manager-for-woocommerce' ),
+	'sports'      => __( 'Sports & Outdoors', 'ai-sales-manager-for-woocommerce' ),
+	'toys'        => __( 'Toys & Games', 'ai-sales-manager-for-woocommerce' ),
+	'jewelry'     => __( 'Jewelry & Accessories', 'ai-sales-manager-for-woocommerce' ),
+	'books'       => __( 'Books & Media', 'ai-sales-manager-for-woocommerce' ),
+	'automotive'  => __( 'Automotive', 'ai-sales-manager-for-woocommerce' ),
+	'pets'        => __( 'Pet Supplies', 'ai-sales-manager-for-woocommerce' ),
+	'crafts'      => __( 'Arts & Crafts', 'ai-sales-manager-for-woocommerce' ),
+	'services'    => __( 'Digital Services', 'ai-sales-manager-for-woocommerce' ),
+	'other'       => __( 'Other', 'ai-sales-manager-for-woocommerce' ),
+);
+
+// Brand tone options with descriptions
+$tone_options = array(
+	'professional' => array(
+		'icon'  => '👔',
+		'label' => __( 'Professional', 'ai-sales-manager-for-woocommerce' ),
+		'desc'  => __( 'Formal, trustworthy, corporate', 'ai-sales-manager-for-woocommerce' ),
+	),
+	'friendly'     => array(
+		'icon'  => '😊',
+		'label' => __( 'Friendly', 'ai-sales-manager-for-woocommerce' ),
+		'desc'  => __( 'Warm, approachable, helpful', 'ai-sales-manager-for-woocommerce' ),
+	),
+	'casual'       => array(
+		'icon'  => '✌️',
+		'label' => __( 'Casual', 'ai-sales-manager-for-woocommerce' ),
+		'desc'  => __( 'Relaxed, conversational, fun', 'ai-sales-manager-for-woocommerce' ),
+	),
+	'luxury'       => array(
+		'icon'  => '✨',
+		'label' => __( 'Luxury', 'ai-sales-manager-for-woocommerce' ),
+		'desc'  => __( 'Elegant, sophisticated, premium', 'ai-sales-manager-for-woocommerce' ),
+	),
+);
+
+// Default store context values
+$default_context = array(
+	'store_name'      => get_bloginfo( 'name' ),
+	'business_niche'  => '',
+	'brand_tone'      => 'friendly',
+	'target_audience' => '',
+	// Branding - merge detected values with any saved overrides
+	'primary_color'   => $detected_branding['colors']['primary'] ?? '#7f54b3',
+	'text_color'      => $detected_branding['colors']['text'] ?? '#3c3c3c',
+	'bg_color'        => $detected_branding['colors']['background'] ?? '#f7f7f7',
+	'font_family'     => $detected_branding['fonts']['body_slug'] ?? 'system',
+	'logo_url'        => $detected_branding['logo']['url'] ?? '',
+);
+$context = wp_parse_args( $store_context, $default_context );
+
+// Determine branding source for UI hint
+$branding_source = $detected_branding['colors']['source'] ?? 'default';
+$branding_source_label = array(
+	'woocommerce'      => __( 'Imported from WooCommerce email settings', 'ai-sales-manager-for-woocommerce' ),
+	'block_theme'      => __( 'Imported from your theme', 'ai-sales-manager-for-woocommerce' ),
+	'theme_customizer' => __( 'Imported from theme customizer', 'ai-sales-manager-for-woocommerce' ),
+	'default'          => __( 'Using default colors', 'ai-sales-manager-for-woocommerce' ),
+);
+?>
+
+<!-- Wizard Overlay -->
+<div class="aisales-wizard-overlay" id="aisales-wizard-overlay">
+	<div class="aisales-wizard" id="aisales-email-wizard">
+		<!-- Header -->
+		<div class="aisales-wizard__header">
+			<button type="button" class="aisales-wizard__close" aria-label="<?php esc_attr_e( 'Close wizard', 'ai-sales-manager-for-woocommerce' ); ?>">
+				<span class="dashicons dashicons-no-alt"></span>
+			</button>
+			<h2 class="aisales-wizard__title">
+				<span class="dashicons dashicons-email-alt"></span>
+				<span><?php esc_html_e( 'Personalize Your Emails', 'ai-sales-manager-for-woocommerce' ); ?></span>
+			</h2>
+			<p class="aisales-wizard__subtitle"><?php esc_html_e( 'Let\'s create emails that match your brand personality', 'ai-sales-manager-for-woocommerce' ); ?></p>
+		</div>
+
+		<!-- Progress Indicator -->
+		<div class="aisales-wizard__progress">
+			<div class="aisales-wizard__progress-step aisales-wizard__progress-step--active" data-step="1">
+				<span class="aisales-wizard__progress-dot"></span>
+				<span class="aisales-wizard__progress-label"><?php esc_html_e( 'Brand', 'ai-sales-manager-for-woocommerce' ); ?></span>
+			</div>
+			<div class="aisales-wizard__progress-connector"></div>
+			<div class="aisales-wizard__progress-step" data-step="2">
+				<span class="aisales-wizard__progress-dot"></span>
+				<span class="aisales-wizard__progress-label"><?php esc_html_e( 'Templates', 'ai-sales-manager-for-woocommerce' ); ?></span>
+			</div>
+			<div class="aisales-wizard__progress-connector"></div>
+			<div class="aisales-wizard__progress-step" data-step="3">
+				<span class="aisales-wizard__progress-dot"></span>
+				<span class="aisales-wizard__progress-label"><?php esc_html_e( 'Generate', 'ai-sales-manager-for-woocommerce' ); ?></span>
+			</div>
+			<div class="aisales-wizard__progress-connector"></div>
+			<div class="aisales-wizard__progress-step" data-step="4">
+				<span class="aisales-wizard__progress-dot"></span>
+				<span class="aisales-wizard__progress-label"><?php esc_html_e( 'Done', 'ai-sales-manager-for-woocommerce' ); ?></span>
+			</div>
+		</div>
+
+		<!-- Body / Steps -->
+		<div class="aisales-wizard__body">
+			<!-- Step 1: Brand Context -->
+			<div class="aisales-wizard__step aisales-wizard__step--active" data-step="1">
+				<div class="aisales-wizard__step-scroll">
+					<div class="aisales-wizard__intro">
+						<div class="aisales-wizard__intro-icon">
+							<span class="dashicons dashicons-store"></span>
+						</div>
+						<h3><?php esc_html_e( 'Tell us about your store', 'ai-sales-manager-for-woocommerce' ); ?></h3>
+						<p><?php esc_html_e( 'This helps AI craft emails that sound like they\'re written by you.', 'ai-sales-manager-for-woocommerce' ); ?></p>
+					</div>
+
+					<div class="aisales-wizard__form">
+						<!-- Store Name -->
+						<div class="aisales-wizard__field">
+							<label for="aisales-wizard-store-name"><?php esc_html_e( 'Store Name', 'ai-sales-manager-for-woocommerce' ); ?></label>
+							<input type="text" id="aisales-wizard-store-name" 
+								value="<?php echo esc_attr( $context['store_name'] ); ?>" 
+								placeholder="<?php esc_attr_e( 'e.g., Acme Store', 'ai-sales-manager-for-woocommerce' ); ?>">
+						</div>
+
+						<!-- Business Niche -->
+						<div class="aisales-wizard__field">
+							<label for="aisales-wizard-business-niche"><?php esc_html_e( 'What do you sell?', 'ai-sales-manager-for-woocommerce' ); ?></label>
+							<select id="aisales-wizard-business-niche">
+								<?php foreach ( $niche_options as $value => $label ) : ?>
+									<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $context['business_niche'], $value ); ?>>
+										<?php echo esc_html( $label ); ?>
+									</option>
+								<?php endforeach; ?>
+							</select>
+						</div>
+
+						<!-- Brand Tone -->
+						<div class="aisales-wizard__field">
+							<label><?php esc_html_e( 'How should your emails sound?', 'ai-sales-manager-for-woocommerce' ); ?></label>
+							<div class="aisales-wizard__tone-grid">
+								<?php foreach ( $tone_options as $value => $option ) : ?>
+									<label class="aisales-wizard__tone-option">
+										<input type="radio" name="wizard_brand_tone" value="<?php echo esc_attr( $value ); ?>" 
+											<?php checked( $context['brand_tone'], $value ); ?>>
+										<div class="aisales-wizard__tone-card">
+											<span class="aisales-wizard__tone-icon"><?php echo esc_html( $option['icon'] ); ?></span>
+											<span class="aisales-wizard__tone-name"><?php echo esc_html( $option['label'] ); ?></span>
+											<span class="aisales-wizard__tone-desc"><?php echo esc_html( $option['desc'] ); ?></span>
+										</div>
+									</label>
+								<?php endforeach; ?>
+							</div>
+						</div>
+
+						<!-- Branding Section: Colors & Typography -->
+						<div class="aisales-wizard__section">
+							<div class="aisales-wizard__section-header">
+								<span class="dashicons dashicons-art"></span>
+								<span><?php esc_html_e( 'Brand Colors & Typography', 'ai-sales-manager-for-woocommerce' ); ?></span>
+								<?php if ( 'default' !== $branding_source ) : ?>
+									<span class="aisales-wizard__section-badge">
+										<?php echo esc_html( $branding_source_label[ $branding_source ] ); ?>
+									</span>
+								<?php endif; ?>
+							</div>
+
+							<div class="aisales-wizard__branding-grid">
+								<!-- Primary Color -->
+								<div class="aisales-wizard__color-field">
+									<label for="aisales-wizard-primary-color"><?php esc_html_e( 'Primary Color', 'ai-sales-manager-for-woocommerce' ); ?></label>
+									<div class="aisales-wizard__color-input-wrap">
+										<input type="color" id="aisales-wizard-primary-color" 
+											value="<?php echo esc_attr( $context['primary_color'] ); ?>"
+											class="aisales-wizard__color-picker">
+										<input type="text" id="aisales-wizard-primary-color-hex" 
+											value="<?php echo esc_attr( $context['primary_color'] ); ?>"
+											class="aisales-wizard__color-hex"
+											pattern="^#[0-9A-Fa-f]{6}$"
+											maxlength="7">
+									</div>
+									<span class="aisales-wizard__color-hint"><?php esc_html_e( 'Used for buttons, links, and headers', 'ai-sales-manager-for-woocommerce' ); ?></span>
+								</div>
+
+								<!-- Text Color -->
+								<div class="aisales-wizard__color-field">
+									<label for="aisales-wizard-text-color"><?php esc_html_e( 'Text Color', 'ai-sales-manager-for-woocommerce' ); ?></label>
+									<div class="aisales-wizard__color-input-wrap">
+										<input type="color" id="aisales-wizard-text-color" 
+											value="<?php echo esc_attr( $context['text_color'] ); ?>"
+											class="aisales-wizard__color-picker">
+										<input type="text" id="aisales-wizard-text-color-hex" 
+											value="<?php echo esc_attr( $context['text_color'] ); ?>"
+											class="aisales-wizard__color-hex"
+											pattern="^#[0-9A-Fa-f]{6}$"
+											maxlength="7">
+									</div>
+									<span class="aisales-wizard__color-hint"><?php esc_html_e( 'Main body text color', 'ai-sales-manager-for-woocommerce' ); ?></span>
+								</div>
+
+								<!-- Background Color -->
+								<div class="aisales-wizard__color-field">
+									<label for="aisales-wizard-bg-color"><?php esc_html_e( 'Background', 'ai-sales-manager-for-woocommerce' ); ?></label>
+									<div class="aisales-wizard__color-input-wrap">
+										<input type="color" id="aisales-wizard-bg-color" 
+											value="<?php echo esc_attr( $context['bg_color'] ); ?>"
+											class="aisales-wizard__color-picker">
+										<input type="text" id="aisales-wizard-bg-color-hex" 
+											value="<?php echo esc_attr( $context['bg_color'] ); ?>"
+											class="aisales-wizard__color-hex"
+											pattern="^#[0-9A-Fa-f]{6}$"
+											maxlength="7">
+									</div>
+									<span class="aisales-wizard__color-hint"><?php esc_html_e( 'Email wrapper background', 'ai-sales-manager-for-woocommerce' ); ?></span>
+								</div>
+
+								<!-- Font Family -->
+								<div class="aisales-wizard__font-field">
+									<label for="aisales-wizard-font-family"><?php esc_html_e( 'Font Family', 'ai-sales-manager-for-woocommerce' ); ?></label>
+									<select id="aisales-wizard-font-family" class="aisales-wizard__font-select">
+										<?php foreach ( $safe_fonts as $slug => $font_data ) : ?>
+											<option value="<?php echo esc_attr( $slug ); ?>" 
+												<?php selected( $context['font_family'], $slug ); ?>
+												data-family="<?php echo esc_attr( $font_data['family'] ); ?>">
+												<?php echo esc_html( $font_data['label'] ); ?>
+											</option>
+										<?php endforeach; ?>
+									</select>
+									<div class="aisales-wizard__font-preview" id="aisales-wizard-font-preview">
+										<?php esc_html_e( 'The quick brown fox jumps over the lazy dog.', 'ai-sales-manager-for-woocommerce' ); ?>
+									</div>
+								</div>
+							</div>
+
+							<!-- Live Preview Mini -->
+							<div class="aisales-wizard__branding-preview">
+								<span class="aisales-wizard__preview-label"><?php esc_html_e( 'Preview', 'ai-sales-manager-for-woocommerce' ); ?></span>
+								<div class="aisales-wizard__preview-email" id="aisales-wizard-email-preview">
+									<div class="aisales-wizard__preview-header" id="aisales-preview-header">
+										<?php echo esc_html( $context['store_name'] ); ?>
+									</div>
+									<div class="aisales-wizard__preview-body" id="aisales-preview-body">
+										<p style="margin: 0 0 8px; font-weight: 600;"><?php esc_html_e( 'Thank you for your order!', 'ai-sales-manager-for-woocommerce' ); ?></p>
+										<p style="margin: 0; opacity: 0.8;"><?php esc_html_e( 'Your order #1234 has been confirmed.', 'ai-sales-manager-for-woocommerce' ); ?></p>
+									</div>
+									<div class="aisales-wizard__preview-button" id="aisales-preview-button">
+										<?php esc_html_e( 'View Order', 'ai-sales-manager-for-woocommerce' ); ?>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Target Audience (Optional) -->
+						<div class="aisales-wizard__field">
+							<label for="aisales-wizard-target-audience"><?php esc_html_e( 'Who are your customers?', 'ai-sales-manager-for-woocommerce' ); ?> <small>(<?php esc_html_e( 'optional', 'ai-sales-manager-for-woocommerce' ); ?>)</small></label>
+							<input type="text" id="aisales-wizard-target-audience" 
+								value="<?php echo esc_attr( $context['target_audience'] ); ?>" 
+								placeholder="<?php esc_attr_e( 'e.g., Young professionals, busy parents, fitness enthusiasts', 'ai-sales-manager-for-woocommerce' ); ?>">
+							<span class="aisales-wizard__field-hint"><?php esc_html_e( 'Describing your audience helps personalize email tone and language.', 'ai-sales-manager-for-woocommerce' ); ?></span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Step 2: Template Selection -->
+			<div class="aisales-wizard__step" data-step="2">
+				<div class="aisales-wizard__intro">
+					<div class="aisales-wizard__intro-icon">
+						<span class="dashicons dashicons-email-alt2"></span>
+					</div>
+					<h3><?php esc_html_e( 'Choose templates to generate', 'ai-sales-manager-for-woocommerce' ); ?></h3>
+					<p><?php esc_html_e( 'Select the email templates you\'d like AI to create for you.', 'ai-sales-manager-for-woocommerce' ); ?></p>
+				</div>
+
+				<div class="aisales-wizard__template-list">
+					<?php foreach ( $templates as $type => $template_data ) : ?>
+						<div class="aisales-wizard__template-item <?php echo $template_data['has_template'] ? 'is-disabled' : ''; ?>" 
+							data-template-type="<?php echo esc_attr( $type ); ?>">
+							<span class="aisales-wizard__template-checkbox">
+								<span class="dashicons dashicons-yes"></span>
+							</span>
+							<div class="aisales-wizard__template-info">
+								<span class="aisales-wizard__template-name"><?php echo esc_html( $template_data['label'] ); ?></span>
+								<span class="aisales-wizard__template-desc"><?php echo esc_html( $template_data['description'] ); ?></span>
+							</div>
+							<?php if ( $template_data['has_template'] ) : ?>
+								<span class="aisales-wizard__template-badge aisales-wizard__template-badge--existing">
+									<?php esc_html_e( 'Exists', 'ai-sales-manager-for-woocommerce' ); ?>
+								</span>
+							<?php endif; ?>
+						</div>
+					<?php endforeach; ?>
+				</div>
+
+				<div class="aisales-wizard__select-actions">
+					<button type="button" class="aisales-wizard__select-btn" id="aisales-wizard-select-all">
+						<?php esc_html_e( 'Select all missing', 'ai-sales-manager-for-woocommerce' ); ?>
+					</button>
+					<button type="button" class="aisales-wizard__select-btn" id="aisales-wizard-select-none">
+						<?php esc_html_e( 'Clear selection', 'ai-sales-manager-for-woocommerce' ); ?>
+					</button>
+				</div>
+			</div>
+
+			<!-- Step 3: Generation Progress -->
+			<div class="aisales-wizard__step" data-step="3">
+				<div class="aisales-wizard__generating">
+					<div class="aisales-wizard__generating-animation">
+						<div class="aisales-wizard__generating-ring"></div>
+						<div class="aisales-wizard__generating-ring"></div>
+						<span class="aisales-wizard__generating-icon">✨</span>
+					</div>
+					<h3><?php esc_html_e( 'Creating your personalized emails', 'ai-sales-manager-for-woocommerce' ); ?></h3>
+					<p><?php esc_html_e( 'AI is crafting each template based on your brand...', 'ai-sales-manager-for-woocommerce' ); ?></p>
+
+					<div class="aisales-wizard__progress-list" id="aisales-wizard-progress-list">
+						<!-- Populated by JavaScript -->
+					</div>
+				</div>
+			</div>
+
+			<!-- Step 4: Completion -->
+			<div class="aisales-wizard__step" data-step="4">
+				<div class="aisales-wizard__complete">
+					<div class="aisales-wizard__complete-icon">
+						<span class="dashicons dashicons-yes-alt"></span>
+					</div>
+					<h3><?php esc_html_e( 'Your emails are ready!', 'ai-sales-manager-for-woocommerce' ); ?></h3>
+					<p><?php esc_html_e( 'We\'ve created personalized email templates for your store. You can edit and customize them anytime.', 'ai-sales-manager-for-woocommerce' ); ?></p>
+
+					<div class="aisales-wizard__summary">
+						<div class="aisales-wizard__summary-stat">
+							<span class="aisales-wizard__summary-value" id="aisales-wizard-success-count">0</span>
+							<span class="aisales-wizard__summary-label"><?php esc_html_e( 'Generated', 'ai-sales-manager-for-woocommerce' ); ?></span>
+						</div>
+						<div class="aisales-wizard__summary-stat">
+							<span class="aisales-wizard__summary-value" id="aisales-wizard-error-count">0</span>
+							<span class="aisales-wizard__summary-label"><?php esc_html_e( 'Failed', 'ai-sales-manager-for-woocommerce' ); ?></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Footer -->
+		<div class="aisales-wizard__footer">
+			<div class="aisales-wizard__footer-left">
+				<button type="button" class="aisales-wizard__skip-btn">
+					<?php esc_html_e( 'Skip setup', 'ai-sales-manager-for-woocommerce' ); ?>
+				</button>
+			</div>
+			<div class="aisales-wizard__footer-right">
+				<button type="button" class="aisales-wizard__btn aisales-wizard__btn--secondary" id="aisales-wizard-prev" style="display: none;">
+					<span class="dashicons dashicons-arrow-left-alt"></span>
+					<span><?php esc_html_e( 'Back', 'ai-sales-manager-for-woocommerce' ); ?></span>
+				</button>
+				<button type="button" class="aisales-wizard__btn aisales-wizard__btn--primary" id="aisales-wizard-next">
+					<span><?php esc_html_e( 'Continue', 'ai-sales-manager-for-woocommerce' ); ?></span>
+					<span class="dashicons dashicons-arrow-right-alt"></span>
+				</button>
+				<button type="button" class="aisales-wizard__btn aisales-wizard__btn--success" id="aisales-wizard-finish" style="display: none;">
+					<span class="dashicons dashicons-yes-alt"></span>
+					<span><?php esc_html_e( 'View Templates', 'ai-sales-manager-for-woocommerce' ); ?></span>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>

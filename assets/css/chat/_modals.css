@@ -1,0 +1,339 @@
+/* ==========================================================================
+   Image Generation Options Modal
+   ========================================================================== */
+
+/* Override admin.css modal styles - use flexbox centering instead of translate */
+#aisales-image-gen-modal.aisales-modal {
+	position: fixed !important;
+	top: 0 !important;
+	left: 0 !important;
+	right: 0 !important;
+	bottom: 0 !important;
+	width: 100% !important;
+	height: 100% !important;
+	z-index: 999999 !important;
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	transform: none !important;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.3s ease, visibility 0.3s ease;
+	margin: 0 !important;
+	padding: 0 !important;
+	box-sizing: border-box !important;
+	background: transparent !important;
+	border-radius: 0 !important;
+	box-shadow: none !important;
+	max-width: none !important;
+	max-height: none !important;
+}
+
+#aisales-image-gen-modal.aisales-modal--open {
+	opacity: 1;
+	visibility: visible;
+}
+
+#aisales-image-gen-modal .aisales-modal__backdrop {
+	position: fixed !important;
+	top: 0 !important;
+	left: 0 !important;
+	right: 0 !important;
+	bottom: 0 !important;
+	width: 100% !important;
+	height: 100% !important;
+	background: rgba(0, 0, 0, 0.5);
+	backdrop-filter: blur(4px);
+	-webkit-backdrop-filter: blur(4px);
+}
+
+#aisales-image-gen-modal .aisales-modal__content {
+	position: relative;
+	z-index: 1;
+	width: 90%;
+	max-width: 560px;
+	max-height: 85vh;
+	margin: 0 auto;
+	background: var(--aisales-bg-white);
+	border-radius: var(--aisales-radius-xl);
+	box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.1);
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	transform: scale(0.95) translateY(10px);
+	transition: transform 0.3s ease;
+}
+
+#aisales-image-gen-modal.aisales-modal--open .aisales-modal__content {
+	transform: scale(1) translateY(0);
+}
+
+.aisales-modal__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: var(--aisales-space-4) var(--aisales-space-5);
+	border-bottom: 1px solid var(--aisales-border);
+}
+
+.aisales-modal__title {
+	margin: 0;
+	font-size: var(--aisales-font-lg);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+}
+
+.aisales-modal__title .dashicons {
+	color: var(--aisales-primary);
+}
+
+.aisales-modal__close {
+	width: 32px;
+	height: 32px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: transparent;
+	border: none;
+	border-radius: var(--aisales-radius-md);
+	color: var(--aisales-text-secondary);
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.aisales-modal__close:hover {
+	background: var(--aisales-hover-bg);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-modal__body {
+	padding: var(--aisales-space-5);
+	overflow-y: auto;
+	flex: 1;
+}
+
+.aisales-modal__footer {
+	display: flex;
+	justify-content: flex-end;
+	gap: var(--aisales-space-3);
+	padding: var(--aisales-space-4) var(--aisales-space-5);
+	border-top: 1px solid var(--aisales-border);
+	background: var(--aisales-bg-subtle);
+}
+
+/* Form elements in modal */
+.aisales-form-group {
+	margin-bottom: var(--aisales-space-5);
+}
+
+.aisales-form-group:last-child {
+	margin-bottom: 0;
+}
+
+.aisales-form-label {
+	display: block;
+	margin-bottom: var(--aisales-space-3);
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+/* Option grid for style/aspect selection */
+.aisales-option-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+	gap: var(--aisales-space-3);
+}
+
+.aisales-option-grid--compact {
+	grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+}
+
+.aisales-option-btn {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	padding: var(--aisales-space-4);
+	background: var(--aisales-bg);
+	border: 2px solid var(--aisales-border);
+	border-radius: var(--aisales-radius-lg);
+	cursor: pointer;
+	transition: all 0.2s ease;
+	text-align: center;
+}
+
+.aisales-option-btn:hover {
+	border-color: var(--aisales-primary);
+	background: var(--aisales-hover-bg);
+}
+
+.aisales-option-btn--selected {
+	border-color: var(--aisales-primary);
+	background: rgba(var(--aisales-primary-rgb, 79, 70, 229), 0.08);
+	box-shadow: 0 0 0 3px rgba(var(--aisales-primary-rgb, 79, 70, 229), 0.15);
+}
+
+.aisales-option-btn .dashicons {
+	font-size: 24px;
+	width: 24px;
+	height: 24px;
+	color: var(--aisales-text-secondary);
+	transition: color 0.2s ease;
+}
+
+.aisales-option-btn:hover .dashicons,
+.aisales-option-btn--selected .dashicons {
+	color: var(--aisales-primary);
+}
+
+.aisales-option-btn__label {
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-option-btn__desc {
+	font-size: var(--aisales-font-xs);
+	color: var(--aisales-text-muted);
+	line-height: 1.3;
+}
+
+/* Aspect ratio icons */
+.aisales-aspect-icon {
+	display: block;
+	background: var(--aisales-border);
+	border-radius: 2px;
+	transition: background 0.2s ease;
+}
+
+.aisales-option-btn:hover .aisales-aspect-icon,
+.aisales-option-btn--selected .aisales-aspect-icon {
+	background: var(--aisales-primary);
+}
+
+.aisales-aspect-icon--square {
+	width: 24px;
+	height: 24px;
+}
+
+.aisales-aspect-icon--landscape {
+	width: 32px;
+	height: 18px;
+}
+
+.aisales-aspect-icon--portrait {
+	width: 18px;
+	height: 32px;
+}
+
+.aisales-aspect-icon--standard {
+	width: 28px;
+	height: 21px;
+}
+
+.aisales-aspect-icon--tall {
+	width: 21px;
+	height: 28px;
+}
+
+/* Responsive modal */
+@media (max-width: 600px) {
+	.aisales-modal__content {
+		width: 95%;
+		max-height: 95vh;
+	}
+	
+	.aisales-option-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+	
+	.aisales-option-btn {
+		padding: var(--aisales-space-3);
+	}
+}
+/* ==========================================================================
+   Research Confirmation Modal
+   ========================================================================== */
+
+.aisales-research-confirm__intro {
+	font-size: var(--aisales-font-sm);
+	color: var(--aisales-text-secondary);
+	margin-bottom: var(--aisales-space-4);
+}
+
+.aisales-research-confirm__details {
+	background: var(--aisales-bg-secondary);
+	border-radius: var(--aisales-radius-md);
+	padding: var(--aisales-space-3);
+	margin-bottom: var(--aisales-space-4);
+}
+
+.aisales-research-confirm__row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: var(--aisales-space-2) 0;
+	border-bottom: 1px solid var(--aisales-border-light);
+}
+
+.aisales-research-confirm__row:last-child {
+	border-bottom: none;
+}
+
+.aisales-research-confirm__row--highlight {
+	background: var(--aisales-primary-bg);
+	margin: var(--aisales-space-2) calc(var(--aisales-space-3) * -1);
+	margin-bottom: calc(var(--aisales-space-3) * -1);
+	padding: var(--aisales-space-3);
+	border-radius: 0 0 var(--aisales-radius-md) var(--aisales-radius-md);
+	border-bottom: none;
+}
+
+.aisales-research-confirm__label {
+	font-size: var(--aisales-font-sm);
+	color: var(--aisales-text-secondary);
+}
+
+.aisales-research-confirm__value {
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-medium);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-research-confirm__cost {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--aisales-space-1);
+	color: var(--aisales-primary);
+	font-weight: var(--aisales-font-weight-semibold);
+}
+
+.aisales-research-confirm__cost .dashicons {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+}
+
+.aisales-research-confirm__note {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	font-size: var(--aisales-font-xs);
+	color: var(--aisales-text-muted);
+	background: var(--aisales-bg-tertiary);
+	padding: var(--aisales-space-2) var(--aisales-space-3);
+	border-radius: var(--aisales-radius-sm);
+}
+
+.aisales-research-confirm__note .dashicons {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+	color: var(--aisales-primary);
+}

@@ -1,0 +1,191 @@
+/**
+ * Inline Options - Conversational Quick Actions
+ *
+ * Interactive buttons that appear within messages for quick responses.
+ *
+ * @package AISales_Sales_Manager
+ */
+
+/* ==========================================================================
+   Inline Options - Conversational Quick Actions
+   ========================================================================== */
+
+.aisales-inline-options {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--aisales-space-2);
+	margin-top: var(--aisales-space-4);
+	padding-top: var(--aisales-space-3);
+	border-top: 1px dashed var(--aisales-border-light);
+}
+
+.aisales-inline-option {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	padding: var(--aisales-space-2) var(--aisales-space-3);
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-medium);
+	font-family: inherit;
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--aisales-border);
+	border-radius: var(--aisales-radius-md);
+	color: var(--aisales-text-secondary);
+	cursor: pointer;
+	transition: all 0.15s ease;
+	text-align: left;
+	line-height: 1.4;
+}
+
+.aisales-inline-option:hover:not(:disabled) {
+	background: var(--aisales-primary-light);
+	border-color: var(--aisales-primary);
+	color: var(--aisales-primary);
+	transform: translateY(-1px);
+	box-shadow: var(--aisales-shadow-sm);
+}
+
+.aisales-inline-option:active:not(:disabled) {
+	transform: translateY(0);
+	box-shadow: none;
+}
+
+.aisales-inline-option:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+	pointer-events: none;
+}
+
+/* Selected state - shows which option was clicked */
+.aisales-inline-option--selected {
+	background: var(--aisales-primary);
+	border-color: var(--aisales-primary);
+	color: var(--aisales-text-inverse);
+	pointer-events: none;
+}
+
+.aisales-inline-option--selected::after {
+	content: '';
+	display: inline-block;
+	width: 12px;
+	height: 12px;
+	margin-left: var(--aisales-space-1);
+	background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='white'%3E%3Cpath fill-rule='evenodd' d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z' clip-rule='evenodd'/%3E%3C/svg%3E") no-repeat center;
+	background-size: contain;
+}
+
+/* Primary action variant (e.g., "Save to Media Library") */
+.aisales-inline-option--primary {
+	background: linear-gradient(135deg, var(--aisales-primary) 0%, var(--aisales-primary-hover) 100%);
+	border-color: var(--aisales-primary);
+	color: var(--aisales-text-inverse);
+	box-shadow: var(--aisales-shadow-xs);
+}
+
+.aisales-inline-option--primary:hover:not(:disabled) {
+	background: linear-gradient(135deg, var(--aisales-primary-hover) 0%, var(--aisales-primary-active) 100%);
+	border-color: var(--aisales-primary-hover);
+	color: var(--aisales-text-inverse);
+	box-shadow: var(--aisales-shadow-sm);
+}
+
+/* Success variant */
+.aisales-inline-option--success {
+	background: linear-gradient(135deg, var(--aisales-success) 0%, var(--aisales-success-hover) 100%);
+	border-color: var(--aisales-success);
+	color: var(--aisales-text-inverse);
+}
+
+.aisales-inline-option--success:hover:not(:disabled) {
+	background: linear-gradient(135deg, var(--aisales-success-hover) 0%, #006b1d 100%);
+	color: var(--aisales-text-inverse);
+}
+
+/* Option with icon */
+.aisales-inline-option .dashicons {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+	flex-shrink: 0;
+}
+
+/* Category label for grouped options */
+.aisales-inline-options__label {
+	width: 100%;
+	font-size: var(--aisales-font-xs);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin-bottom: var(--aisales-space-1);
+	margin-top: var(--aisales-space-2);
+}
+
+.aisales-inline-options__label:first-child {
+	margin-top: 0;
+}
+
+/* Enhanced quick options for catalog flow - card style */
+.aisales-message--assistant .aisales-inline-options {
+	background: linear-gradient(135deg, var(--aisales-bg-subtle) 0%, #f8fafc 100%);
+	padding: var(--aisales-space-4);
+	border-radius: var(--aisales-radius-lg);
+	border: 1px solid var(--aisales-border-light);
+	margin-top: var(--aisales-space-4);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.aisales-message--assistant .aisales-inline-options::before {
+	content: 'Choose an option';
+	display: block;
+	width: 100%;
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--aisales-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin-bottom: var(--aisales-space-3);
+	padding-bottom: var(--aisales-space-2);
+	border-bottom: 1px solid var(--aisales-border-light);
+}
+
+.aisales-message--assistant .aisales-inline-option {
+	flex: 1 1 calc(50% - var(--aisales-space-2));
+	min-width: 140px;
+	justify-content: center;
+	padding: var(--aisales-space-3) var(--aisales-space-4);
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--aisales-border);
+	border-radius: var(--aisales-radius-md);
+	font-weight: var(--aisales-font-weight-medium);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.aisales-message--assistant .aisales-inline-option:hover:not(:disabled) {
+	background: var(--aisales-primary);
+	border-color: var(--aisales-primary);
+	color: var(--aisales-text-inverse);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(var(--aisales-primary-rgb), 0.3);
+}
+
+.aisales-message--assistant .aisales-inline-option:active:not(:disabled) {
+	transform: translateY(0);
+	box-shadow: 0 1px 2px rgba(var(--aisales-primary-rgb), 0.2);
+}
+
+/* ==========================================================================
+   Responsive Adjustments for Inline Options
+   ========================================================================== */
+
+@media (max-width: 782px) {
+	.aisales-inline-options {
+		gap: var(--aisales-space-2);
+	}
+	
+	.aisales-inline-option {
+		padding: var(--aisales-space-2) var(--aisales-space-3);
+		font-size: var(--aisales-font-sm);
+	}
+}

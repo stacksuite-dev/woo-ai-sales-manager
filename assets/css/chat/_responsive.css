@@ -1,0 +1,116 @@
+/* ==========================================================================
+   Responsive Styles
+   ========================================================================== */
+
+@media screen and (max-width: 1200px) {
+	.aisales-chat-container {
+		grid-template-columns: 1fr;
+	}
+
+	.aisales-chat-panel,
+	.aisales-entity-panel {
+		position: static;
+		height: auto;
+		max-height: none;
+	}
+
+	.aisales-chat-panel {
+		min-height: 500px;
+		max-height: 600px;
+	}
+
+	.aisales-entity-panel {
+		max-height: 500px;
+	}
+}
+
+@media screen and (max-width: 782px) {
+	.aisales-chat-header {
+		flex-direction: column;
+		gap: var(--aisales-space-3);
+	}
+
+	.aisales-product-selector {
+		width: 100%;
+	}
+
+	.aisales-select {
+		max-width: none;
+	}
+
+	.aisales-chat-actions {
+		width: 100%;
+		justify-content: flex-end;
+	}
+
+	.aisales-quick-actions__buttons {
+		justify-content: center;
+	}
+
+	.aisales-suggestion__preview {
+		flex-direction: column;
+	}
+
+	.aisales-suggestion__arrow {
+		transform: rotate(90deg);
+		justify-content: center;
+	}
+
+	.aisales-balance-indicator {
+		margin-left: 0;
+		margin-top: var(--aisales-space-3);
+	}
+
+	.aisales-admin-wrap.aisales-chat-wrap > h1 {
+		flex-wrap: wrap;
+	}
+
+	.aisales-product-info__actions {
+		flex-direction: column;
+	}
+
+	/* Inline Options Responsive */
+	.aisales-inline-options {
+		gap: var(--aisales-space-2);
+	}
+	
+	.aisales-inline-option {
+		padding: var(--aisales-space-2) var(--aisales-space-3);
+		font-size: var(--aisales-font-sm);
+	}
+	
+	.aisales-generated-image__actions {
+		flex-direction: column;
+	}
+	
+	.aisales-generated-image__actions .aisales-inline-option {
+		width: 100%;
+		justify-content: center;
+	}
+}
+
+@media screen and (max-width: 480px) {
+	.aisales-chat-messages {
+		padding: var(--aisales-space-4);
+	}
+
+	.aisales-message {
+		max-width: 92%;
+	}
+
+	.aisales-quick-actions__buttons .aisales-btn span:not(.dashicons) {
+		display: none;
+	}
+
+	.aisales-quick-actions__buttons .aisales-btn .dashicons {
+		margin-right: 0;
+	}
+
+	.aisales-chat-welcome {
+		padding: var(--aisales-space-6);
+	}
+
+	.aisales-chat-welcome h3 {
+		font-size: var(--aisales-font-lg);
+	}
+}

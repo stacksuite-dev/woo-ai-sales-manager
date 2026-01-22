@@ -17,11 +17,11 @@ defined( 'ABSPATH' ) || exit;
 $widgets_page  = AISales_Widgets_Page::instance();
 $all_widgets   = $widgets_page->get_widgets();
 
-// Count only feature-type widgets for the active badge.
-$feature_widgets = array_filter( $all_widgets, function( $w ) { return 'feature' === $w['type']; } );
-$enabled_features = array_intersect( array_keys( $feature_widgets ), $settings['enabled_widgets'] );
-$enabled_count   = count( $enabled_features );
-$feature_count   = count( $feature_widgets );
+// Count only feature/injectable-type widgets for the active badge.
+$toggleable_widgets = array_filter( $all_widgets, function( $w ) { return in_array( $w['type'], array( 'feature', 'injectable' ), true ); } );
+$enabled_toggleable = array_intersect( array_keys( $toggleable_widgets ), $settings['enabled_widgets'] );
+$enabled_count   = count( $enabled_toggleable );
+$feature_count   = count( $toggleable_widgets );
 $total_count     = count( $all_widgets );
 ?>
 
@@ -70,12 +70,23 @@ $total_count     = count( $all_widgets );
 	<!-- Widgets Grid -->
 	<div class="aisales-widgets-content">
 		<div class="aisales-widgets-grid" id="widgets-grid">
-			<?php foreach ( $all_widgets as $widget_key => $widget ) : 
-				$is_enabled  = in_array( $widget_key, $settings['enabled_widgets'], true );
-				$is_feature  = 'feature' === $widget['type'];
-				$card_class  = 'aisales-widget-card';
-				$card_class .= $is_feature ? ' aisales-widget-card--feature' : ' aisales-widget-card--shortcode';
-			?>
+		<?php foreach ( $all_widgets as $widget_key => $widget ) : 
+			$is_enabled    = in_array( $widget_key, $settings['enabled_widgets'], true );
+			$is_toggleable = in_array( $widget['type'], array( 'feature', 'injectable' ), true );
+			$is_injectable = 'injectable' === $widget['type'];
+			$card_class    = 'aisales-widget-card';
+			$card_class   .= $is_toggleable ? ' aisales-widget-card--toggleable' : ' aisales-widget-card--shortcode';
+			if ( $is_injectable ) {
+				$card_class .= ' aisales-widget-card--injectable';
+			}
+			// Get current position for injectable widgets.
+			$current_position = '';
+			if ( $is_injectable && isset( $settings['widget_positions'][ $widget_key ] ) ) {
+				$current_position = $settings['widget_positions'][ $widget_key ];
+			} elseif ( $is_injectable && isset( $widget['default_pos'] ) ) {
+				$current_position = $widget['default_pos'];
+			}
+		?>
 			<div class="<?php echo esc_attr( $card_class ); ?>" data-widget="<?php echo esc_attr( $widget_key ); ?>" data-category="<?php echo esc_attr( $widget['category'] ); ?>" data-type="<?php echo esc_attr( $widget['type'] ); ?>">
 				<!-- Card Header -->
 				<div class="aisales-widget-card__header">
@@ -86,7 +97,7 @@ $total_count     = count( $all_widgets );
 						<h3 class="aisales-widget-card__name"><?php echo esc_html( $widget['name'] ); ?></h3>
 						<span class="aisales-widget-card__category"><?php echo esc_html( $categories[ $widget['category'] ]['name'] ); ?></span>
 					</div>
-					<?php if ( $is_feature ) : ?>
+					<?php if ( $is_toggleable ) : ?>
 					<label class="aisales-toggle-switch">
 						<input type="checkbox" 
 							   name="widget_enabled[<?php echo esc_attr( $widget_key ); ?>]" 
@@ -125,9 +136,9 @@ $total_count     = count( $all_widgets );
 
 				<!-- Card Actions -->
 				<div class="aisales-widget-card__actions">
-					<button type="button" class="aisales-btn aisales-btn--outline aisales-btn--sm aisales-widget-card__builder-btn" data-widget="<?php echo esc_attr( $widget_key ); ?>">
-						<span class="dashicons dashicons-admin-settings"></span>
-						<?php esc_html_e( 'Customize', 'ai-sales-manager-for-woocommerce' ); ?>
+					<button type="button" class="aisales-btn aisales-btn--outline aisales-btn--sm aisales-widget-card__settings-btn" data-widget="<?php echo esc_attr( $widget_key ); ?>">
+						<span class="dashicons dashicons-admin-generic"></span>
+						<?php esc_html_e( 'Settings', 'ai-sales-manager-for-woocommerce' ); ?>
 					</button>
 					<button type="button" class="aisales-btn aisales-btn--text aisales-btn--sm aisales-widget-card__docs-btn" data-widget="<?php echo esc_attr( $widget_key ); ?>">
 						<span class="dashicons dashicons-book"></span>
@@ -294,7 +305,7 @@ $total_count     = count( $all_widgets );
 </div>
 
 <!-- Shortcode Builder Modal -->
-<div class="aisales-modal-overlay" id="builder-modal-overlay" style="display: none;">
+<div class="aisales-modal-overlay" id="builder-modal-overlay">
 	<div class="aisales-modal aisales-builder-modal" id="builder-modal">
 		<div class="aisales-modal__header">
 			<h2 class="aisales-modal__title">
@@ -341,7 +352,7 @@ $total_count     = count( $all_widgets );
 </div>
 
 <!-- Documentation Modal -->
-<div class="aisales-modal-overlay" id="docs-modal-overlay" style="display: none;">
+<div class="aisales-modal-overlay" id="docs-modal-overlay">
 	<div class="aisales-modal aisales-docs-modal" id="docs-modal">
 		<div class="aisales-modal__header">
 			<h2 class="aisales-modal__title">
@@ -356,6 +367,76 @@ $total_count     = count( $all_widgets );
 			<div class="aisales-docs" id="docs-content">
 				<!-- Documentation content will be inserted here -->
 			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Widget Settings Modal - Power User Configuration -->
+<div class="aisales-modal-overlay" id="settings-modal-overlay">
+	<div class="aisales-modal aisales-settings-modal" id="settings-modal">
+		<div class="aisales-modal__header">
+			<h2 class="aisales-modal__title">
+				<span class="dashicons dashicons-admin-generic"></span>
+				<span id="settings-modal-title"><?php esc_html_e( 'Widget Settings', 'ai-sales-manager-for-woocommerce' ); ?></span>
+			</h2>
+			<button type="button" class="aisales-modal__close" id="settings-modal-close">
+				<span class="dashicons dashicons-no-alt"></span>
+			</button>
+		</div>
+		
+		<!-- Settings Tabs -->
+		<nav class="aisales-settings-tabs" id="settings-tabs">
+			<button type="button" class="aisales-settings-tab aisales-settings-tab--active" data-panel="appearance">
+				<span class="dashicons dashicons-admin-appearance aisales-settings-tab__icon"></span>
+				<?php esc_html_e( 'Appearance', 'ai-sales-manager-for-woocommerce' ); ?>
+			</button>
+			<button type="button" class="aisales-settings-tab" data-panel="display">
+				<span class="dashicons dashicons-visibility aisales-settings-tab__icon"></span>
+				<?php esc_html_e( 'Display', 'ai-sales-manager-for-woocommerce' ); ?>
+			</button>
+			<button type="button" class="aisales-settings-tab" data-panel="behavior">
+				<span class="dashicons dashicons-controls-play aisales-settings-tab__icon"></span>
+				<?php esc_html_e( 'Behavior', 'ai-sales-manager-for-woocommerce' ); ?>
+			</button>
+			<button type="button" class="aisales-settings-tab" data-panel="advanced">
+				<span class="dashicons dashicons-admin-tools aisales-settings-tab__icon"></span>
+				<?php esc_html_e( 'Advanced', 'ai-sales-manager-for-woocommerce' ); ?>
+			</button>
+		</nav>
+		
+		<div class="aisales-modal__body">
+			<!-- Appearance Panel -->
+			<div class="aisales-settings-panel aisales-settings-panel--active" data-panel="appearance" id="settings-panel-appearance">
+				<!-- Dynamic content inserted by JS -->
+			</div>
+			
+			<!-- Display Panel -->
+			<div class="aisales-settings-panel" data-panel="display" id="settings-panel-display">
+				<!-- Dynamic content inserted by JS -->
+			</div>
+			
+			<!-- Behavior Panel -->
+			<div class="aisales-settings-panel" data-panel="behavior" id="settings-panel-behavior">
+				<!-- Dynamic content inserted by JS -->
+			</div>
+			
+			<!-- Advanced Panel -->
+			<div class="aisales-settings-panel" data-panel="advanced" id="settings-panel-advanced">
+				<!-- Dynamic content inserted by JS -->
+			</div>
+		</div>
+		
+		<div class="aisales-modal__footer">
+			<div class="aisales-settings-footer__left">
+				<button type="button" class="aisales-settings-reset-btn" id="settings-reset">
+					<span class="dashicons dashicons-image-rotate"></span>
+					<?php esc_html_e( 'Reset to Defaults', 'ai-sales-manager-for-woocommerce' ); ?>
+				</button>
+			</div>
+			<button type="button" class="aisales-settings-save-btn" id="settings-save">
+				<span class="dashicons dashicons-saved"></span>
+				<?php esc_html_e( 'Save Settings', 'ai-sales-manager-for-woocommerce' ); ?>
+			</button>
 		</div>
 	</div>
 </div>

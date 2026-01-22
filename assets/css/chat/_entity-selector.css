@@ -1,0 +1,61 @@
+/**
+ * Entity Selector - Entity type tabs and switcher
+ *
+ * Tab bar for switching between product, category, and agent modes.
+ *
+ * @package AISales_Sales_Manager
+ */
+
+/* ==========================================================================
+   Entity Switcher
+   ========================================================================== */
+
+.aisales-entity-switcher {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-4);
+	flex: 1;
+}
+
+.aisales-entity-tabs {
+	display: flex;
+	background: var(--aisales-bg-muted);
+	border-radius: var(--aisales-radius-full);
+	padding: 3px;
+}
+
+.aisales-entity-tab {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	padding: var(--aisales-space-2) var(--aisales-space-4);
+	background: none;
+	border: none;
+	border-radius: var(--aisales-radius-full);
+	font-size: var(--aisales-font-sm);
+	font-weight: var(--aisales-font-weight-medium);
+	color: var(--aisales-text-secondary);
+	cursor: pointer;
+	transition: all var(--aisales-transition-fast);
+}
+
+.aisales-entity-tab .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+.aisales-entity-tab:hover:not(.aisales-entity-tab--active) {
+	color: var(--aisales-text-primary);
+}
+
+.aisales-entity-tab--active {
+	background: var(--aisales-bg-white);
+	color: var(--aisales-primary);
+	box-shadow: var(--aisales-shadow-sm);
+}
+
+.aisales-entity-selector {
+	flex: 1;
+	max-width: 350px;
+}

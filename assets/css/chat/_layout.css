@@ -1,0 +1,165 @@
+/* ==========================================================================
+   Chat Page Wrapper & Layout
+   Main structural styles for the chat interface
+   ========================================================================== */
+
+.aisales-admin-wrap.aisales-chat-wrap {
+	max-width: 1600px;
+}
+
+/* Hidden h1 anchor for WordPress notices - keeps notices at top of page */
+.aisales-admin-wrap.aisales-chat-wrap > h1.aisales-notices-anchor {
+	display: block;
+	height: 0;
+	margin: 0;
+	padding: 0;
+	border: none;
+	visibility: hidden;
+}
+
+/* Page title styling (replaces h1 inside header) */
+.aisales-chat-page-title {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-3);
+	font-size: 23px;
+	font-weight: 400;
+	line-height: 1.3;
+	color: var(--aisales-text-primary);
+}
+
+.aisales-chat-page-title .dashicons {
+	font-size: 28px;
+	width: 28px;
+	height: 28px;
+	color: var(--aisales-primary);
+}
+
+/* Balance Indicator - Chat-specific overrides */
+.aisales-balance-indicator {
+	margin-left: auto;
+}
+
+.aisales-balance-indicator #aisales-balance-display {
+	font-weight: var(--aisales-font-weight-bold);
+	color: var(--aisales-text-primary);
+	transition: color 0.3s ease;
+}
+
+/* Balance animation states */
+.aisales-balance-indicator.aisales-balance--decreasing #aisales-balance-display {
+	color: var(--aisales-danger, #dc3545);
+}
+
+.aisales-balance-indicator.aisales-balance--increasing #aisales-balance-display {
+	color: var(--aisales-success, #28a745);
+}
+
+/* Notices Container */
+.aisales-chat-wrap .aisales-notices-container {
+	margin-bottom: var(--aisales-space-4);
+}
+
+.aisales-chat-wrap .aisales-notices-container:empty {
+	display: none;
+}
+
+/* Fallback notice styles */
+.aisales-admin-wrap.aisales-chat-wrap > .notice,
+.aisales-admin-wrap.aisales-chat-wrap > .notice-warning,
+.aisales-admin-wrap.aisales-chat-wrap > .notice-error,
+.aisales-admin-wrap.aisales-chat-wrap > .notice-info,
+.aisales-admin-wrap.aisales-chat-wrap > .notice-success,
+.aisales-admin-wrap.aisales-chat-wrap > .updated,
+.aisales-admin-wrap.aisales-chat-wrap > .error {
+	margin: var(--aisales-space-3) 0;
+}
+
+/* ==========================================================================
+   Chat Container Layout
+   ========================================================================== */
+
+.aisales-chat-container {
+	display: grid;
+	grid-template-columns: 1fr 380px;
+	gap: var(--aisales-space-6);
+	align-items: start;
+}
+
+/* ==========================================================================
+   Chat Panel (Main Area)
+   ========================================================================== */
+
+.aisales-chat-panel {
+	position: sticky;
+	top: 32px; /* WordPress admin bar height */
+	display: flex;
+	flex-direction: column;
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--aisales-border-light);
+	border-radius: var(--aisales-radius-lg);
+	box-shadow: var(--aisales-shadow-sm);
+	overflow: hidden;
+	min-height: 0;
+	height: calc(100vh - 80px);
+}
+
+/* ----- Chat Header ----- */
+.aisales-chat-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: var(--aisales-space-4);
+	padding: var(--aisales-space-4) var(--aisales-space-5);
+	background: linear-gradient(180deg, var(--aisales-bg-white) 0%, var(--aisales-bg-subtle) 100%);
+	border-bottom: 1px solid var(--aisales-border-light);
+}
+
+.aisales-product-selector {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-3);
+	flex: 1;
+}
+
+.aisales-product-selector label {
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+	white-space: nowrap;
+	font-size: var(--aisales-font-sm);
+}
+
+.aisales-select {
+	flex: 1;
+	max-width: 350px;
+	padding: var(--aisales-space-3) var(--aisales-space-4);
+	border: 1px solid var(--aisales-border);
+	border-radius: var(--aisales-radius-md);
+	background: var(--aisales-bg-white);
+	font-size: var(--aisales-font-base);
+	color: var(--aisales-text-primary);
+	cursor: pointer;
+	transition: all var(--aisales-transition-fast);
+	box-shadow: var(--aisales-shadow-xs);
+}
+
+.aisales-select:hover {
+	border-color: var(--aisales-border);
+	box-shadow: var(--aisales-shadow-sm);
+}
+
+.aisales-select:focus {
+	outline: none;
+	border-color: var(--aisales-primary);
+	box-shadow: 0 0 0 3px var(--aisales-primary-light);
+}
+
+.aisales-chat-actions {
+	display: flex;
+	gap: var(--aisales-space-2);
+}
+
+/* Hide default WordPress h1 when using custom header */
+.aisales-chat-wrap > h1:first-of-type:not(.aisales-notices-anchor) {
+	display: none;
+}

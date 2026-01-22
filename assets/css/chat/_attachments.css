@@ -1,0 +1,240 @@
+/**
+ * Attachments - File attachment styles
+ *
+ * Styles for file attachments in the chat input and messages.
+ *
+ * @package AISales_Sales_Manager
+ */
+
+/* ==========================================================================
+   Attachment Styles
+   ========================================================================== */
+
+/* Attachment Button (Icon button) */
+.aisales-btn--icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	min-width: 40px;
+	padding: 0;
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--aisales-border);
+	border-radius: var(--aisales-radius-md);
+	color: var(--aisales-text-secondary);
+	cursor: pointer;
+	transition: all var(--aisales-transition-fast);
+	position: relative;
+}
+
+.aisales-btn--icon:hover {
+	border-color: var(--aisales-primary);
+	color: var(--aisales-primary);
+	background: var(--aisales-primary-light);
+}
+
+.aisales-btn--icon .dashicons {
+	font-size: 20px;
+	width: 20px;
+	height: 20px;
+}
+
+/* Attachment count badge */
+.aisales-attachment-count {
+	position: absolute;
+	top: -6px;
+	right: -6px;
+	min-width: 18px;
+	height: 18px;
+	padding: 0 5px;
+	background: var(--aisales-primary);
+	color: white;
+	font-size: 11px;
+	font-weight: var(--aisales-font-weight-bold);
+	line-height: 18px;
+	text-align: center;
+	border-radius: var(--aisales-radius-full);
+}
+
+/* Attachment Previews Container */
+.aisales-attachment-previews {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--aisales-space-2);
+	padding: var(--aisales-space-3);
+	margin-bottom: var(--aisales-space-2);
+	background: var(--aisales-bg-subtle);
+	border: 1px solid var(--aisales-border-light);
+	border-radius: var(--aisales-radius-md);
+}
+
+/* Individual Attachment Preview */
+.aisales-attachment-preview {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--aisales-space-1);
+	padding: var(--aisales-space-2);
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--aisales-border);
+	border-radius: var(--aisales-radius-md);
+	width: 80px;
+	transition: all var(--aisales-transition-fast);
+}
+
+.aisales-attachment-preview:hover {
+	border-color: var(--aisales-primary);
+	box-shadow: var(--aisales-shadow-sm);
+}
+
+.aisales-attachment-preview img {
+	width: 60px;
+	height: 60px;
+	object-fit: cover;
+	border-radius: var(--aisales-radius-sm);
+}
+
+.aisales-attachment-preview__icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 60px;
+	height: 60px;
+	background: var(--aisales-bg-muted);
+	border-radius: var(--aisales-radius-sm);
+}
+
+.aisales-attachment-preview__icon .dashicons {
+	font-size: 28px;
+	width: 28px;
+	height: 28px;
+	color: var(--aisales-text-secondary);
+}
+
+.aisales-attachment-preview__icon .dashicons-pdf {
+	color: #dc3545;
+}
+
+.aisales-attachment-preview__name {
+	font-size: 10px;
+	color: var(--aisales-text-secondary);
+	text-align: center;
+	word-break: break-word;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* Remove button */
+.aisales-attachment-remove {
+	position: absolute;
+	top: -8px;
+	right: -8px;
+	width: 20px;
+	height: 20px;
+	padding: 0;
+	background: var(--aisales-danger, #dc3545);
+	border: 2px solid var(--aisales-bg-white);
+	border-radius: var(--aisales-radius-full);
+	color: white;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	transition: opacity var(--aisales-transition-fast);
+}
+
+.aisales-attachment-preview:hover .aisales-attachment-remove {
+	opacity: 1;
+}
+
+.aisales-attachment-remove .dashicons {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+}
+
+/* Drag and Drop Overlay */
+.aisales-chat-input.aisales-drag-over {
+	position: relative;
+}
+
+.aisales-chat-input.aisales-drag-over::after {
+	content: 'Drop files here';
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(86, 52, 173, 0.1);
+	border: 2px dashed var(--aisales-primary);
+	border-radius: var(--aisales-radius-lg);
+	color: var(--aisales-primary);
+	font-size: var(--aisales-font-md);
+	font-weight: var(--aisales-font-weight-medium);
+	z-index: 10;
+	pointer-events: none;
+}
+
+/* Attachment hint */
+.aisales-attachment-hint {
+	font-size: var(--aisales-font-xs);
+	color: var(--aisales-text-muted);
+	margin-right: auto;
+}
+
+/* Message Attachments (in message bubbles) */
+.aisales-message__attachments {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--aisales-space-2);
+	margin-bottom: var(--aisales-space-2);
+	padding-bottom: var(--aisales-space-2);
+	border-bottom: 1px solid var(--aisales-border-light);
+}
+
+.aisales-message__attachment {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--aisales-space-1);
+	padding: var(--aisales-space-1) var(--aisales-space-2);
+	background: var(--aisales-bg-muted);
+	border-radius: var(--aisales-radius-sm);
+	font-size: var(--aisales-font-xs);
+	color: var(--aisales-text-secondary);
+}
+
+.aisales-message__attachment .dashicons {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+}
+
+.aisales-message__attachment .dashicons-format-image {
+	color: var(--aisales-primary);
+}
+
+.aisales-message__attachment .dashicons-pdf {
+	color: #dc3545;
+}
+
+/* Update chat input wrapper to accommodate attachment button */
+.aisales-chat-input__wrapper {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	background: var(--aisales-bg-white);
+	border: 2px solid var(--aisales-border);
+	border-radius: var(--aisales-radius-lg);
+	padding: var(--aisales-space-2);
+	transition: all var(--aisales-transition-fast);
+}
+
+.aisales-chat-input__wrapper:focus-within {
+	border-color: var(--aisales-primary);
+	box-shadow: 0 0 0 3px rgba(86, 52, 173, 0.1);
+}

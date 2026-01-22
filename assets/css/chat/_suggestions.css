@@ -1,0 +1,294 @@
+/* ==========================================================================
+   Suggestion Cards & Pending Changes
+   ========================================================================== */
+
+/* Suggestions Group Container */
+.aisales-suggestions-group {
+	margin-top: var(--aisales-space-4);
+	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+	border: 1px solid var(--aisales-border);
+	border-radius: var(--aisales-radius-lg);
+	overflow: hidden;
+	animation: groupSlideIn 0.3s ease-out;
+}
+
+@keyframes groupSlideIn {
+	from { opacity: 0; transform: translateY(10px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+.aisales-suggestions-group__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: var(--aisales-space-3) var(--aisales-space-4);
+	background: linear-gradient(135deg, var(--aisales-primary) 0%, #1a5490 100%);
+	color: white;
+}
+
+.aisales-suggestions-group__title {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	font-weight: var(--aisales-font-weight-semibold);
+	font-size: var(--aisales-font-sm);
+}
+
+.aisales-suggestions-group__title .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	opacity: 0.9;
+}
+
+.aisales-suggestions-group__count {
+	font-size: var(--aisales-font-xs);
+	background: rgba(255,255,255,0.2);
+	padding: 2px 8px;
+	border-radius: 10px;
+}
+
+.aisales-suggestions-group__current {
+	padding: var(--aisales-space-3) var(--aisales-space-4);
+	background: white;
+	border-bottom: 1px solid var(--aisales-border-light);
+}
+
+.aisales-suggestions-group__current-label {
+	font-size: 10px;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: var(--aisales-text-muted);
+	margin-bottom: 4px;
+}
+
+.aisales-suggestions-group__current-value {
+	font-size: var(--aisales-font-sm);
+	color: var(--aisales-text-secondary);
+	font-style: italic;
+}
+
+.aisales-suggestions-group__options {
+	padding: var(--aisales-space-3);
+	display: flex;
+	flex-direction: column;
+	gap: var(--aisales-space-2);
+}
+
+/* Individual Suggestion Option */
+.aisales-suggestion {
+	position: relative;
+	padding: var(--aisales-space-3) var(--aisales-space-4);
+	background: white;
+	border: 2px solid transparent;
+	border-radius: var(--aisales-radius-md);
+	cursor: pointer;
+	transition: all 0.2s ease;
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-3);
+}
+
+.aisales-suggestion:hover {
+	border-color: var(--aisales-primary);
+	background: linear-gradient(135deg, #f0f7ff 0%, #e8f4fd 100%);
+	transform: translateX(4px);
+}
+
+.aisales-suggestion--selected {
+	border-color: var(--aisales-success);
+	background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+	box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+.aisales-suggestion--applied {
+	border-color: var(--aisales-success);
+	background: var(--aisales-success-light);
+	pointer-events: none;
+}
+
+.aisales-suggestion--discarded {
+	border-color: var(--aisales-border);
+	background: var(--aisales-bg-subtle);
+	opacity: 0.5;
+	pointer-events: none;
+}
+
+/* Option Number Badge */
+.aisales-suggestion__number {
+	flex-shrink: 0;
+	width: 28px;
+	height: 28px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--aisales-bg-muted);
+	color: var(--aisales-text-muted);
+	border-radius: 50%;
+	font-size: 12px;
+	font-weight: var(--aisales-font-weight-semibold);
+	transition: all 0.2s ease;
+}
+
+.aisales-suggestion:hover .aisales-suggestion__number {
+	background: var(--aisales-primary);
+	color: white;
+}
+
+.aisales-suggestion--selected .aisales-suggestion__number {
+	background: var(--aisales-success);
+	color: white;
+}
+
+/* Suggestion Content */
+.aisales-suggestion__content {
+	flex: 1;
+	min-width: 0;
+}
+
+.aisales-suggestion__value {
+	color: var(--aisales-text-primary);
+	font-size: var(--aisales-font-sm);
+	word-break: break-word;
+	line-height: 1.5;
+}
+
+/* Quick Actions for Single Suggestion */
+.aisales-suggestion__actions {
+	flex-shrink: 0;
+	display: flex;
+	gap: var(--aisales-space-1);
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.2s ease;
+}
+
+.aisales-suggestion:hover .aisales-suggestion__actions,
+.aisales-suggestion--selected .aisales-suggestion__actions {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.aisales-suggestion__actions .aisales-btn {
+	padding: 6px 12px;
+	font-size: 12px;
+}
+
+/* Status Badge */
+.aisales-suggestion__status {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--aisales-space-1);
+	font-size: 12px;
+	font-weight: var(--aisales-font-weight-medium);
+	padding: 4px 10px;
+	border-radius: 12px;
+}
+
+.aisales-suggestion__status--applied {
+	color: var(--aisales-success);
+	background: var(--aisales-success-light);
+}
+
+.aisales-suggestion__status--discarded {
+	color: var(--aisales-text-muted);
+	background: var(--aisales-bg-muted);
+}
+
+/* Legacy support - hide old elements when in group */
+.aisales-suggestions-group .aisales-suggestion__header,
+.aisales-suggestions-group .aisales-suggestion__preview,
+.aisales-suggestions-group .aisales-suggestion__current,
+.aisales-suggestions-group .aisales-suggestion__new,
+.aisales-suggestions-group .aisales-suggestion__arrow,
+.aisales-suggestions-group .aisales-suggestion__label {
+	display: none;
+}
+
+/* Standalone suggestion (single suggestion, not in group) */
+.aisales-message__content > .aisales-suggestion {
+	margin-top: var(--aisales-space-4);
+	padding: var(--aisales-space-4);
+	border: 2px solid var(--aisales-primary);
+	border-radius: var(--aisales-radius-lg);
+	box-shadow: var(--aisales-shadow-sm);
+	cursor: default;
+	flex-direction: column;
+	align-items: stretch;
+	gap: var(--aisales-space-3);
+}
+
+.aisales-message__content > .aisales-suggestion:hover {
+	transform: none;
+	border-color: var(--aisales-primary);
+	background: white;
+}
+
+.aisales-message__content > .aisales-suggestion .aisales-suggestion__header,
+.aisales-message__content > .aisales-suggestion .aisales-suggestion__preview,
+.aisales-message__content > .aisales-suggestion .aisales-suggestion__actions {
+	display: flex;
+}
+
+.aisales-message__content > .aisales-suggestion .aisales-suggestion__number {
+	display: none;
+}
+
+.aisales-message__content > .aisales-suggestion .aisales-suggestion__actions {
+	opacity: 1;
+}
+
+/* Suggestion Header (for standalone) */
+.aisales-suggestion__header {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-2);
+	color: var(--aisales-primary);
+	font-weight: var(--aisales-font-weight-semibold);
+	font-size: var(--aisales-font-sm);
+}
+
+.aisales-suggestion__header .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+/* Suggestion Preview (for standalone) */
+.aisales-suggestion__preview {
+	display: flex;
+	align-items: stretch;
+	gap: var(--aisales-space-3);
+}
+
+.aisales-suggestion__current,
+.aisales-suggestion__new {
+	flex: 1;
+	padding: var(--aisales-space-3);
+	border-radius: var(--aisales-radius-md);
+	font-size: var(--aisales-font-sm);
+}
+
+.aisales-suggestion__current {
+	background: var(--aisales-bg-muted);
+	border: 1px solid var(--aisales-border);
+}
+
+.aisales-suggestion__new {
+	background: var(--aisales-success-light);
+	border: 1px solid var(--aisales-success);
+}
+
+.aisales-suggestion__label {
+	font-size: var(--aisales-font-xs);
+	color: var(--aisales-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin-bottom: var(--aisales-space-1);
+}
+
+.aisales-suggestion__arrow {
+	display: flex;
+	align-items: center;
+	color: var(--aisales-success);
+}

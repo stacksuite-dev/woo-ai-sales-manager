@@ -21,7 +21,7 @@ defined( 'ABSPATH' ) || exit;
 		<div class="aisales-batch-header__left">
 			<span class="aisales-batch-title">
 				<span class="dashicons dashicons-update"></span>
-				<?php esc_html_e( 'Bulk Enhancement', 'ai-sales-manager-for-woocommerce' ); ?>
+				<?php esc_html_e( 'Manage Catalog', 'ai-sales-manager-for-woocommerce' ); ?>
 			</span>
 			<span class="aisales-batch-subtitle">
 				<?php esc_html_e( 'AI-powered product optimization at scale', 'ai-sales-manager-for-woocommerce' ); ?>

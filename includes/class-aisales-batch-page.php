@@ -45,8 +45,8 @@ class AISales_Batch_Page {
 	public function add_submenu_page() {
 		add_submenu_page(
 			'ai-sales-manager',
-			__( 'Bulk Enhancement', 'ai-sales-manager-for-woocommerce' ),
-			__( 'Bulk Enhancement', 'ai-sales-manager-for-woocommerce' ),
+			__( 'Manage Catalog', 'ai-sales-manager-for-woocommerce' ),
+			__( 'Manage Catalog', 'ai-sales-manager-for-woocommerce' ),
 			'manage_woocommerce',
 			'ai-sales-bulk',
 			array( $this, 'render_page' )
@@ -320,7 +320,7 @@ class AISales_Batch_Page {
 		<div class="wrap aisales-admin-wrap">
 			<h1>
 				<span class="dashicons dashicons-update"></span>
-				<?php esc_html_e( 'Bulk Enhancement', 'ai-sales-manager-for-woocommerce' ); ?>
+				<?php esc_html_e( 'Manage Catalog', 'ai-sales-manager-for-woocommerce' ); ?>
 			</h1>
 
 			<div class="aisales-connect-wrap">
@@ -328,7 +328,7 @@ class AISales_Batch_Page {
 					<div class="aisales-empty-state">
 						<span class="dashicons dashicons-admin-network"></span>
 						<h3><?php esc_html_e( 'Connect Your Account', 'ai-sales-manager-for-woocommerce' ); ?></h3>
-						<p><?php esc_html_e( 'Connect your AI Sales Manager account to start using Bulk Enhancement.', 'ai-sales-manager-for-woocommerce' ); ?></p>
+						<p><?php esc_html_e( 'Connect your AI Sales Manager account to start using Manage Catalog.', 'ai-sales-manager-for-woocommerce' ); ?></p>
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=ai-sales-manager' ) ); ?>" class="aisales-btn aisales-btn--primary">
 							<?php esc_html_e( 'Go to Settings', 'ai-sales-manager-for-woocommerce' ); ?>
 						</a>

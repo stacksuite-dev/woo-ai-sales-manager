@@ -1,0 +1,58 @@
+/* ==========================================================================
+   Quick Actions
+   ========================================================================== */
+
+.aisales-quick-actions {
+	padding: var(--aisales-space-3) var(--aisales-space-5);
+	background: linear-gradient(180deg, var(--aisales-bg-subtle) 0%, var(--aisales-bg-white) 100%);
+	border-top: 1px solid var(--aisales-border-light);
+	flex-shrink: 0;
+}
+
+.aisales-quick-actions__label {
+	display: block;
+	font-size: var(--aisales-font-xs);
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin-bottom: var(--aisales-space-3);
+}
+
+.aisales-quick-actions__buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--aisales-space-2);
+}
+
+/* Quick Action Buttons - Pill Style */
+.aisales-quick-actions__buttons .aisales-btn {
+	padding: var(--aisales-space-2) var(--aisales-space-4);
+	font-size: var(--aisales-font-sm);
+	border-radius: var(--aisales-radius-full);
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--aisales-border);
+	color: var(--aisales-text-secondary);
+	box-shadow: var(--aisales-shadow-xs);
+	transition: all var(--aisales-transition-fast);
+}
+
+.aisales-quick-actions__buttons .aisales-btn:not(:disabled):hover {
+	background: var(--aisales-primary-light);
+	border-color: var(--aisales-primary);
+	color: var(--aisales-primary);
+	box-shadow: var(--aisales-shadow-sm);
+	transform: translateY(-1px);
+}
+
+.aisales-quick-actions__buttons .aisales-btn:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.aisales-quick-actions__buttons .aisales-btn .dashicons {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+	margin-right: var(--aisales-space-1);
+}

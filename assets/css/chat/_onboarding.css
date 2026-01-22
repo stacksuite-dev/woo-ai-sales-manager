@@ -1,0 +1,114 @@
+/**
+ * Onboarding Overlay - First-time user experience
+ *
+ * Modal overlay shown to guide new users through the chat interface.
+ *
+ * @package AISales_Sales_Manager
+ */
+
+/* ==========================================================================
+   Onboarding Overlay
+   ========================================================================== */
+
+.aisales-onboarding-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.6);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 100000;
+	backdrop-filter: blur(4px);
+	animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+.aisales-onboarding-card {
+	background: var(--aisales-bg-white);
+	border-radius: var(--aisales-radius-xl);
+	padding: var(--aisales-space-10);
+	max-width: 480px;
+	text-align: center;
+	box-shadow: var(--aisales-shadow-xl);
+	animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+	from {
+		opacity: 0;
+		transform: translateY(24px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.aisales-onboarding-icon {
+	width: 80px;
+	height: 80px;
+	margin: 0 auto var(--aisales-space-6);
+	background: linear-gradient(135deg, var(--aisales-primary-light) 0%, var(--aisales-success-light) 100%);
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 8px 24px rgba(34, 113, 177, 0.15);
+}
+
+.aisales-onboarding-icon .dashicons {
+	font-size: 36px;
+	width: 36px;
+	height: 36px;
+	color: var(--aisales-primary);
+}
+
+.aisales-onboarding-card h2 {
+	font-size: var(--aisales-font-xl);
+	font-weight: var(--aisales-font-weight-bold);
+	color: var(--aisales-text-primary);
+	margin: 0 0 var(--aisales-space-3) 0;
+}
+
+.aisales-onboarding-card > p {
+	font-size: var(--aisales-font-md);
+	color: var(--aisales-text-secondary);
+	line-height: var(--aisales-line-height-relaxed);
+	margin: 0 0 var(--aisales-space-6) 0;
+}
+
+.aisales-onboarding-actions {
+	display: flex;
+	flex-direction: column;
+	gap: var(--aisales-space-3);
+}
+
+.aisales-onboarding-actions .aisales-btn--lg {
+	padding: var(--aisales-space-4) var(--aisales-space-6);
+	font-size: var(--aisales-font-md);
+}
+
+.aisales-onboarding-hint {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--aisales-space-2);
+	margin-top: var(--aisales-space-5);
+	padding-top: var(--aisales-space-5);
+	border-top: 1px solid var(--aisales-border-light);
+	font-size: var(--aisales-font-xs);
+	color: var(--aisales-text-muted);
+}
+
+.aisales-onboarding-hint .dashicons {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+}

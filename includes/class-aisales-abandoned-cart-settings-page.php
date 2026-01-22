@@ -31,22 +31,7 @@ class AISales_Abandoned_Cart_Settings_Page {
 	 * Constructor.
 	 */
 	private function __construct() {
-		add_action( 'admin_menu', array( $this, 'add_submenu_page' ), 25 );
 		add_action( 'admin_init', array( $this, 'handle_form_submission' ) );
-	}
-
-	/**
-	 * Add submenu page.
-	 */
-	public function add_submenu_page() {
-		add_submenu_page(
-			'ai-sales-manager',
-			__( 'Abandoned Cart Settings', 'ai-sales-manager-for-woocommerce' ),
-			__( 'Abandoned Cart Settings', 'ai-sales-manager-for-woocommerce' ),
-			'manage_woocommerce',
-			'ai-sales-abandoned-cart-settings',
-			array( $this, 'render_page' )
-		);
 	}
 
 	/**
@@ -96,7 +81,7 @@ class AISales_Abandoned_Cart_Settings_Page {
 
 		update_option( AISales_Abandoned_Cart_Settings::OPTION_KEY, $settings );
 
-		wp_safe_redirect( admin_url( 'admin.php?page=ai-sales-abandoned-cart-settings&aisales_saved=1' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=ai-sales-abandoned-carts&aisales_saved=1' ) );
 		exit;
 	}
 
@@ -106,8 +91,8 @@ class AISales_Abandoned_Cart_Settings_Page {
 	public function render_page() {
 		$settings = AISales_Abandoned_Cart_Settings::get_settings();
 		?>
-		<div class="wrap">
-			<h1><?php esc_html_e( 'Abandoned Cart Settings', 'ai-sales-manager-for-woocommerce' ); ?></h1>
+		<section class="aisales-abandoned-carts-settings">
+			<h2><?php esc_html_e( 'Abandoned Cart Settings', 'ai-sales-manager-for-woocommerce' ); ?></h2>
 			<?php if ( isset( $_GET['aisales_saved'] ) ) : ?>
 				<div class="notice notice-success is-dismissible">
 					<p><?php esc_html_e( 'Settings saved.', 'ai-sales-manager-for-woocommerce' ); ?></p>
@@ -177,7 +162,7 @@ class AISales_Abandoned_Cart_Settings_Page {
 					</button>
 				</p>
 			</form>
-		</div>
+		</section>
 		<?php
 	}
 }

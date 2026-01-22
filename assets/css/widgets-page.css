@@ -6,6 +6,14 @@
  */
 
 /* ==========================================================================
+   Body State - Modal Open
+   ========================================================================== */
+
+body.aisales-modal-open {
+  overflow: hidden;
+}
+
+/* ==========================================================================
    Page Layout
    ========================================================================== */
 
@@ -250,7 +258,7 @@
 }
 
 /* Feature card indicator - shows "Auto" badge for auto-inject features */
-.aisales-widget-card--feature .aisales-widget-card__category::after {
+.aisales-widget-card--toggleable .aisales-widget-card__category::after {
   content: 'Auto';
   margin-left: 6px;
   padding: 2px 6px;
@@ -270,6 +278,78 @@
   font-size: 13px;
   line-height: 1.5;
   color: var(--aisales-text-secondary);
+}
+
+/* ==========================================================================
+   Position Dropdown (Injectable Widgets)
+   ========================================================================== */
+
+.aisales-widget-card__position {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  border-top: 1px solid var(--aisales-border-light);
+  transition: opacity 0.2s ease;
+}
+
+.aisales-widget-card__position[data-visible="false"] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.aisales-widget-card__position-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--aisales-text-secondary);
+  white-space: nowrap;
+}
+
+.aisales-widget-card__position-label .dashicons {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  color: var(--aisales-primary);
+}
+
+.aisales-widget-card__position-select {
+  flex: 1;
+  padding: 8px 32px 8px 12px;
+  border: 1px solid var(--aisales-border);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--aisales-text-primary);
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23646970' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.aisales-widget-card__position-select:hover:not(:disabled) {
+  border-color: var(--aisales-primary);
+}
+
+.aisales-widget-card__position-select:focus {
+  outline: none;
+  border-color: var(--aisales-primary);
+  box-shadow: 0 0 0 3px var(--aisales-primary-light);
+}
+
+.aisales-widget-card__position-select:disabled {
+  background-color: #f1f5f9;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238c8f94' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  color: var(--aisales-text-muted);
+  cursor: not-allowed;
 }
 
 /* ==========================================================================
@@ -602,6 +682,7 @@
 
 .aisales-widget-card__shortcode {
   padding: 16px 20px;
+  margin-top: 16px;
   border-top: 1px solid var(--aisales-border-light);
 }
 
@@ -982,9 +1063,20 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.aisales-modal-overlay--active {
+  opacity: 1;
+  visibility: visible;
 }
 
 .aisales-modal {
+  position: relative;
+  top: auto;
+  left: auto;
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
@@ -994,6 +1086,16 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.95);
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+}
+
+.aisales-modal--active {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
 }
 
 .aisales-modal__header {
@@ -1223,4 +1325,758 @@
 /* Hidden state for filtering */
 .aisales-widget-card.hidden {
   display: none;
+}
+
+/* ==========================================================================
+   Widget Settings Modal - Power User Configuration
+   Industrial precision aesthetic with functional depth
+   ========================================================================== */
+
+.aisales-settings-modal {
+  max-width: 720px;
+  background: #0f1419;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e7e9ea;
+}
+
+.aisales-settings-modal .aisales-modal__header {
+  background: linear-gradient(180deg, #1a1f26 0%, #0f1419 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 16px 20px;
+}
+
+.aisales-settings-modal .aisales-modal__title {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #e7e9ea;
+}
+
+.aisales-settings-modal .aisales-modal__title .dashicons {
+  color: #1d9bf0;
+}
+
+.aisales-settings-modal .aisales-modal__close {
+  color: #71767b;
+}
+
+.aisales-settings-modal .aisales-modal__close:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e7e9ea;
+}
+
+/* Settings Tabs Navigation */
+.aisales-settings-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 20px;
+  background: #16202a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.aisales-settings-tab {
+  position: relative;
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: #71767b;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.aisales-settings-tab:hover {
+  color: #e7e9ea;
+}
+
+.aisales-settings-tab--active {
+  color: #e7e9ea;
+}
+
+.aisales-settings-tab--active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #1d9bf0;
+  border-radius: 3px 3px 0 0;
+}
+
+.aisales-settings-tab__icon {
+  margin-right: 6px;
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  vertical-align: -2px;
+}
+
+/* Settings Content Area */
+.aisales-settings-modal .aisales-modal__body {
+  padding: 0;
+  background: #0f1419;
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.aisales-settings-panel {
+  display: none;
+  padding: 24px 20px;
+}
+
+.aisales-settings-panel--active {
+  display: block;
+}
+
+/* Settings Section */
+.aisales-settings-section {
+  margin-bottom: 28px;
+}
+
+.aisales-settings-section:last-child {
+  margin-bottom: 0;
+}
+
+.aisales-settings-section__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.aisales-settings-section__icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(29, 155, 240, 0.1);
+  border-radius: 6px;
+}
+
+.aisales-settings-section__icon .dashicons {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  color: #1d9bf0;
+}
+
+.aisales-settings-section__title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #71767b;
+  margin: 0;
+}
+
+/* Settings Row - Grid Layout */
+.aisales-settings-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.aisales-settings-row:last-child {
+  border-bottom: none;
+}
+
+.aisales-settings-row__info {
+  min-width: 0;
+}
+
+.aisales-settings-row__label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #e7e9ea;
+  margin-bottom: 2px;
+}
+
+.aisales-settings-row__help {
+  font-size: 12px;
+  color: #71767b;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.aisales-settings-row__control {
+  justify-self: end;
+}
+
+/* Dark Theme Input Controls */
+.aisales-settings-input {
+  padding: 10px 14px;
+  background: #202327;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  font-size: 14px;
+  color: #e7e9ea;
+  transition: all 0.15s ease;
+  width: 120px;
+}
+
+.aisales-settings-input:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.aisales-settings-input:focus {
+  outline: none;
+  border-color: #1d9bf0;
+  box-shadow: 0 0 0 3px rgba(29, 155, 240, 0.2);
+}
+
+.aisales-settings-input::placeholder {
+  color: #536471;
+}
+
+.aisales-settings-input--sm {
+  width: 80px;
+  padding: 8px 12px;
+}
+
+.aisales-settings-input--wide {
+  width: 100%;
+}
+
+/* Dark Theme Select */
+.aisales-settings-select {
+  padding: 10px 36px 10px 14px;
+  background-color: #202327;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2371767b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  font-size: 14px;
+  color: #e7e9ea;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.aisales-settings-select:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.aisales-settings-select:focus {
+  outline: none;
+  border-color: #1d9bf0;
+  box-shadow: 0 0 0 3px rgba(29, 155, 240, 0.2);
+}
+
+/* Dark Theme Toggle */
+.aisales-settings-toggle {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.aisales-settings-toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.aisales-settings-toggle__track {
+  position: absolute;
+  inset: 0;
+  background: #38444d;
+  border-radius: 12px;
+  transition: background 0.2s ease;
+}
+
+.aisales-settings-toggle input:checked + .aisales-settings-toggle__track {
+  background: #1d9bf0;
+}
+
+.aisales-settings-toggle__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: #e7e9ea;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.aisales-settings-toggle input:checked ~ .aisales-settings-toggle__thumb {
+  transform: translateX(20px);
+}
+
+/* Range Slider - Industrial Style */
+.aisales-settings-range {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.aisales-settings-range__input {
+  flex: 1;
+  height: 4px;
+  background: #38444d;
+  border-radius: 2px;
+  appearance: none;
+  cursor: pointer;
+}
+
+.aisales-settings-range__input::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #1d9bf0;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(29, 155, 240, 0.4);
+  transition: transform 0.15s ease;
+}
+
+.aisales-settings-range__input::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.aisales-settings-range__value {
+  min-width: 48px;
+  padding: 6px 10px;
+  background: #202327;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  color: #e7e9ea;
+  text-align: center;
+}
+
+/* Color Picker */
+.aisales-settings-color {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.aisales-settings-color__preview {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.aisales-settings-color__preview input[type="color"] {
+  position: absolute;
+  inset: -4px;
+  width: calc(100% + 8px);
+  height: calc(100% + 8px);
+  padding: 0;
+  border: none;
+  cursor: pointer;
+}
+
+.aisales-settings-color__hex {
+  padding: 8px 10px;
+  background: #202327;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  color: #e7e9ea;
+  width: 85px;
+  text-transform: uppercase;
+}
+
+.aisales-settings-color__hex::placeholder {
+  text-transform: none;
+  color: #536471;
+}
+
+.aisales-settings-color__hex:focus {
+  outline: none;
+  border-color: #1d9bf0;
+}
+
+.aisales-settings-color__clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  color: #71767b;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.aisales-settings-color__clear:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+/* Input with Unit Suffix */
+.aisales-settings-input-unit {
+  display: flex;
+  align-items: stretch;
+}
+
+.aisales-settings-input-unit .aisales-settings-input {
+  border-radius: 8px;
+  min-width: 70px;
+  text-align: right;
+}
+
+.aisales-settings-input-unit__suffix {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  background: #2f3336;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: #71767b;
+}
+
+/* Icon Style Selector */
+.aisales-settings-icons {
+  display: flex;
+  gap: 6px;
+}
+
+.aisales-settings-icon-option {
+  cursor: pointer;
+}
+
+.aisales-settings-icon-option input {
+  position: absolute;
+  opacity: 0;
+}
+
+.aisales-settings-icon-option__box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: #202327;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.aisales-settings-icon-option__box .dashicons {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: #71767b;
+}
+
+.aisales-settings-icon-option:hover .aisales-settings-icon-option__box {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.aisales-settings-icon-option input:checked + .aisales-settings-icon-option__box {
+  background: rgba(29, 155, 240, 0.15);
+  border-color: #1d9bf0;
+}
+
+.aisales-settings-icon-option input:checked + .aisales-settings-icon-option__box .dashicons {
+  color: #1d9bf0;
+}
+
+/* Textarea */
+.aisales-settings-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px 14px;
+  background: #202327;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #e7e9ea;
+  resize: vertical;
+  transition: all 0.15s ease;
+}
+
+.aisales-settings-textarea:focus {
+  outline: none;
+  border-color: #1d9bf0;
+  box-shadow: 0 0 0 3px rgba(29, 155, 240, 0.2);
+}
+
+/* Full Width Row (for textarea, text with placeholders) */
+.aisales-settings-row--full {
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.aisales-settings-row--full .aisales-settings-row__control {
+  justify-self: stretch;
+}
+
+/* Placeholder Variables */
+.aisales-settings-placeholder-hint {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: rgba(29, 155, 240, 0.08);
+  border-radius: 6px;
+  border-left: 3px solid #1d9bf0;
+}
+
+.aisales-settings-placeholder-hint__title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #1d9bf0;
+  margin-bottom: 6px;
+}
+
+.aisales-settings-placeholder-hint code {
+  display: inline-block;
+  padding: 2px 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  color: #e7e9ea;
+  margin: 2px 4px 2px 0;
+}
+
+/* Settings Modal Footer */
+.aisales-settings-modal .aisales-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: #16202a;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.aisales-settings-footer__left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.aisales-settings-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #71767b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.aisales-settings-reset-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #e7e9ea;
+}
+
+.aisales-settings-reset-btn .dashicons {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.aisales-settings-save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: #1d9bf0;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.aisales-settings-save-btn:hover {
+  background: #1a8cd8;
+}
+
+.aisales-settings-save-btn:disabled {
+  background: #38444d;
+  color: #71767b;
+  cursor: not-allowed;
+}
+
+.aisales-settings-save-btn .dashicons {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Live Preview in Settings */
+.aisales-settings-preview {
+  padding: 20px;
+  background: linear-gradient(135deg, #1a1f26 0%, #16202a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  margin-top: 20px;
+}
+
+.aisales-settings-preview__label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #536471;
+  margin-bottom: 16px;
+}
+
+.aisales-settings-preview__label .dashicons {
+  font-size: 12px;
+  width: 12px;
+  height: 12px;
+}
+
+.aisales-settings-preview__content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.aisales-preview-widget {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+.aisales-preview-widget .dashicons {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+/* Exclusions Tags Input */
+.aisales-settings-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px;
+  background: #202327;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  min-height: 44px;
+}
+
+.aisales-settings-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px 4px 10px;
+  background: #38444d;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #e7e9ea;
+}
+
+.aisales-settings-tag__remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #71767b;
+  transition: all 0.15s ease;
+}
+
+.aisales-settings-tag__remove:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #e7e9ea;
+}
+
+.aisales-settings-tags__input {
+  flex: 1;
+  min-width: 100px;
+  padding: 4px 8px;
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: #e7e9ea;
+}
+
+.aisales-settings-tags__input:focus {
+  outline: none;
+}
+
+.aisales-settings-tags__input::placeholder {
+  color: #536471;
+}
+
+/* Spin animation for save button */
+.aisales-settings-save-btn .dashicons.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Scrollbar styling for dark modal */
+.aisales-settings-modal .aisales-modal__body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.aisales-settings-modal .aisales-modal__body::-webkit-scrollbar-track {
+  background: #16202a;
+}
+
+.aisales-settings-modal .aisales-modal__body::-webkit-scrollbar-thumb {
+  background: #38444d;
+  border-radius: 4px;
+}
+
+.aisales-settings-modal .aisales-modal__body::-webkit-scrollbar-thumb:hover {
+  background: #536471;
 }

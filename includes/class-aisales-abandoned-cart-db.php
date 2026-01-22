@@ -58,4 +58,31 @@ class AISales_Abandoned_Cart_DB {
 
 		dbDelta( $sql );
 	}
+
+	/**
+	 * Ensure tables exist.
+	 */
+	public static function maybe_create_tables() {
+		if ( self::table_exists() ) {
+			return;
+		}
+
+		self::create_tables();
+	}
+
+	/**
+	 * Check if abandoned cart table exists.
+	 *
+	 * @return bool
+	 */
+	private static function table_exists() {
+		global $wpdb;
+		$table_name = self::get_table_name();
+
+		$found = $wpdb->get_var(
+			$wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name )
+		);
+
+		return $found === $table_name;
+	}
 }

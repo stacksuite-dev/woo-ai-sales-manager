@@ -1,0 +1,99 @@
+/**
+ * Button Variants - Chat-specific button styles
+ *
+ * Additional button variants used in the chat interface.
+ *
+ * @package AISales_Sales_Manager
+ */
+
+/* ==========================================================================
+   Button Variants for Chat
+   ========================================================================== */
+
+.aisales-btn--xs {
+	padding: var(--aisales-space-1) var(--aisales-space-3);
+	font-size: var(--aisales-font-xs);
+}
+
+.aisales-btn--xs .dashicons {
+	font-size: 12px;
+	width: 12px;
+	height: 12px;
+}
+
+.aisales-btn--success {
+	background: linear-gradient(135deg, var(--aisales-success) 0%, var(--aisales-success-hover) 100%);
+	color: white;
+	border: none;
+}
+
+.aisales-btn--success:hover {
+	background: linear-gradient(135deg, var(--aisales-success-hover) 0%, #006818 100%);
+}
+
+.aisales-btn--danger {
+	background: linear-gradient(135deg, var(--aisales-danger) 0%, var(--aisales-danger-hover) 100%);
+	color: white;
+	border: none;
+}
+
+.aisales-btn--danger:hover {
+	background: linear-gradient(135deg, var(--aisales-danger-hover) 0%, #9a2628 100%);
+}
+
+.aisales-btn--outline {
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--aisales-border);
+	color: var(--aisales-text-secondary);
+}
+
+.aisales-btn--outline:hover {
+	border-color: var(--aisales-primary);
+	color: var(--aisales-primary);
+	background: var(--aisales-primary-light);
+}
+
+.aisales-btn--loading {
+	pointer-events: none;
+	opacity: 0.7;
+}
+
+.aisales-btn--loading::after {
+	content: '';
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	border: 2px solid currentColor;
+	border-radius: 50%;
+	border-top-color: transparent;
+	animation: btnSpin 0.8s linear infinite;
+	margin-left: var(--aisales-space-2);
+}
+
+@keyframes btnSpin {
+	to { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   Additional Button Variants
+   ========================================================================== */
+
+.aisales-btn--lg {
+	padding: var(--aisales-space-4) var(--aisales-space-6);
+	font-size: var(--aisales-font-md);
+}
+
+.aisales-btn--sm {
+	padding: var(--aisales-space-2) var(--aisales-space-4);
+	font-size: var(--aisales-font-sm);
+}
+
+.aisales-btn--secondary {
+	background: var(--aisales-bg-white);
+	border: 1px solid var(--aisales-primary);
+	color: var(--aisales-primary);
+}
+
+.aisales-btn--secondary:hover {
+	background: var(--aisales-primary-light);
+}

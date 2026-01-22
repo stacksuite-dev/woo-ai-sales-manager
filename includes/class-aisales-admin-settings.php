@@ -142,20 +142,8 @@ class AISales_Admin_Settings {
 		// Check if connected
 		$is_connected = $api->is_connected();
 
-		// Get balance for header display
-		$balance = 0;
-		$balance_class = '';
-		if ( $is_connected ) {
-			$account = $api->get_account();
-			if ( ! is_wp_error( $account ) && isset( $account['balance_tokens'] ) ) {
-				$balance = $account['balance_tokens'];
-				if ( 500 > $balance ) {
-					$balance_class = 'aisales-page-header__balance--critical';
-				} elseif ( 2000 > $balance ) {
-					$balance_class = 'aisales-page-header__balance--low';
-				}
-			}
-		}
+		// Get balance for header display (from local option, updated by API calls)
+		$balance = get_option( 'aisales_balance', 0 );
 
 		// Get store context status
 		$store_context  = get_option( 'aisales_store_context', array() );
@@ -187,11 +175,7 @@ class AISales_Admin_Settings {
 							<span class="aisales-store-name"><?php echo esc_html( $store_name ); ?></span>
 							<span class="aisales-context-status aisales-context-status--<?php echo esc_attr( $context_status ); ?>"></span>
 						</button>
-						<span class="aisales-balance-indicator">
-							<span class="dashicons dashicons-database"></span>
-							<span class="aisales-balance-indicator__count" id="aisales-balance-count"><?php echo esc_html( number_format( $balance ) ); ?></span>
-							<?php esc_html_e( 'tokens', 'ai-sales-manager-for-woocommerce' ); ?>
-						</span>
+						<?php include AISALES_PLUGIN_DIR . 'templates/partials/balance-indicator.php'; ?>
 					</div>
 				</header>
 
@@ -359,13 +343,65 @@ class AISales_Admin_Settings {
 	private function render_dashboard_tab() {
 		$api     = AISales_API_Client::instance();
 		$account = $api->get_account();
-		$usage   = $api->get_usage( 5, 0 );
+		$usage   = $api->get_usage( 50, 0 ); // Get more logs for accurate stats
 
 		// Handle API errors gracefully
 		$has_error = is_wp_error( $account );
 		$balance   = ( ! $has_error && isset( $account['balance_tokens'] ) ) ? $account['balance_tokens'] : 0;
 		$email     = ( ! $has_error && isset( $account['email'] ) ) ? $account['email'] : '';
 		$usage     = is_wp_error( $usage ) ? array( 'logs' => array() ) : $usage;
+
+		// Calculate real usage stats from logs
+		$operation_counts = array(
+			'content'        => 0,
+			'taxonomy'       => 0,
+			'image_generate' => 0,
+			'image_improve'  => 0,
+			'chat'           => 0,
+			'email'          => 0,
+			'brand_analysis' => 0,
+		);
+
+		if ( ! empty( $usage['logs'] ) ) {
+			foreach ( $usage['logs'] as $log ) {
+				$op = isset( $log['operation'] ) ? $log['operation'] : '';
+				if ( isset( $operation_counts[ $op ] ) ) {
+					$operation_counts[ $op ]++;
+				}
+			}
+		}
+
+		// Combined counts for display
+		$image_count   = $operation_counts['image_generate'] + $operation_counts['image_improve'];
+		$content_count = $operation_counts['content'] + $operation_counts['brand_analysis'];
+		$chat_count    = $operation_counts['chat'];
+
+		// Get only 5 recent logs for dashboard display (the full 50 is used for stats above)
+		$recent_logs = array_slice( $usage['logs'], 0, 5 );
+
+		// Get abandoned cart stats
+		$cart_stats = array(
+			'abandoned' => 0,
+			'recovered' => 0,
+		);
+		if ( class_exists( 'AISales_Abandoned_Cart_DB' ) ) {
+			global $wpdb;
+			$table = AISales_Abandoned_Cart_DB::get_table_name();
+			// Check if table exists before querying.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$table_exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) );
+			if ( $table_exists ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$cart_stats['abandoned'] = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE status = 'abandoned'" );
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$cart_stats['recovered'] = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE status = 'recovered'" );
+			}
+		}
+
+		// Get enabled widgets count
+		$widgets_settings = get_option( 'aisales_widgets_settings', array() );
+		$enabled_widgets  = isset( $widgets_settings['enabled_widgets'] ) ? $widgets_settings['enabled_widgets'] : array();
+		$enabled_widgets_count = count( $enabled_widgets );
 
 		// Calculate balance percentage (assuming 10,000 is "full")
 		$balance_percentage = min( 100, ( $balance / 10000 ) * 100 );
@@ -426,18 +462,22 @@ class AISales_Admin_Settings {
 					<h2><?php esc_html_e( 'AI Activity', 'ai-sales-manager-for-woocommerce' ); ?></h2>
 				</div>
 
-				<div class="aisales-stats-grid">
+				<div class="aisales-stats-grid aisales-stats-grid--4col">
 					<div class="aisales-stat-card aisales-stat-card--content">
-						<span class="aisales-stat-card__value">12</span>
+						<span class="aisales-stat-card__value"><?php echo esc_html( $content_count ); ?></span>
 						<span class="aisales-stat-card__label"><?php esc_html_e( 'Content', 'ai-sales-manager-for-woocommerce' ); ?></span>
 					</div>
 					<div class="aisales-stat-card aisales-stat-card--taxonomy">
-						<span class="aisales-stat-card__value">45</span>
+						<span class="aisales-stat-card__value"><?php echo esc_html( $operation_counts['taxonomy'] ); ?></span>
 						<span class="aisales-stat-card__label"><?php esc_html_e( 'Tags', 'ai-sales-manager-for-woocommerce' ); ?></span>
 					</div>
 					<div class="aisales-stat-card aisales-stat-card--image">
-						<span class="aisales-stat-card__value">8</span>
+						<span class="aisales-stat-card__value"><?php echo esc_html( $image_count ); ?></span>
 						<span class="aisales-stat-card__label"><?php esc_html_e( 'Images', 'ai-sales-manager-for-woocommerce' ); ?></span>
+					</div>
+					<div class="aisales-stat-card aisales-stat-card--chat">
+						<span class="aisales-stat-card__value"><?php echo esc_html( $chat_count ); ?></span>
+						<span class="aisales-stat-card__label"><?php esc_html_e( 'Chats', 'ai-sales-manager-for-woocommerce' ); ?></span>
 					</div>
 				</div>
 
@@ -446,9 +486,111 @@ class AISales_Admin_Settings {
 					<?php echo esc_html( $email ); ?>
 				</p>
 			</div>
+		</div>
 
-			<!-- Recent Usage Card -->
-			<div class="aisales-card aisales-card--elevated aisales-dashboard__full">
+		<!-- Feature Quick-Access Cards -->
+		<div class="aisales-section aisales-mt-6">
+			<div class="aisales-section__header">
+				<h3 class="aisales-section__title">
+					<span class="dashicons dashicons-screenoptions"></span>
+					<?php esc_html_e( 'Features', 'ai-sales-manager-for-woocommerce' ); ?>
+				</h3>
+			</div>
+			<div class="aisales-feature-grid">
+				<!-- AI Agent Chat -->
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=ai-sales-chat' ) ); ?>" class="aisales-feature-card">
+					<div class="aisales-feature-card__icon aisales-feature-card__icon--chat">
+						<span class="dashicons dashicons-format-chat"></span>
+					</div>
+					<div class="aisales-feature-card__content">
+						<h4 class="aisales-feature-card__title"><?php esc_html_e( 'AI Agent', 'ai-sales-manager-for-woocommerce' ); ?></h4>
+						<p class="aisales-feature-card__desc"><?php esc_html_e( 'Chat with AI about your store', 'ai-sales-manager-for-woocommerce' ); ?></p>
+					</div>
+					<span class="dashicons dashicons-arrow-right-alt2 aisales-feature-card__arrow"></span>
+				</a>
+
+				<!-- Email Templates -->
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=ai-sales-email' ) ); ?>" class="aisales-feature-card">
+					<div class="aisales-feature-card__icon aisales-feature-card__icon--email">
+						<span class="dashicons dashicons-email-alt"></span>
+					</div>
+					<div class="aisales-feature-card__content">
+						<h4 class="aisales-feature-card__title"><?php esc_html_e( 'Email Templates', 'ai-sales-manager-for-woocommerce' ); ?></h4>
+						<p class="aisales-feature-card__desc"><?php esc_html_e( 'AI-generated email content', 'ai-sales-manager-for-woocommerce' ); ?></p>
+					</div>
+					<span class="dashicons dashicons-arrow-right-alt2 aisales-feature-card__arrow"></span>
+				</a>
+
+				<!-- Brand Settings -->
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=ai-sales-brand' ) ); ?>" class="aisales-feature-card">
+					<div class="aisales-feature-card__icon aisales-feature-card__icon--brand">
+						<span class="dashicons dashicons-art"></span>
+					</div>
+					<div class="aisales-feature-card__content">
+						<h4 class="aisales-feature-card__title"><?php esc_html_e( 'Brand Settings', 'ai-sales-manager-for-woocommerce' ); ?></h4>
+						<p class="aisales-feature-card__desc"><?php esc_html_e( 'Configure brand voice & style', 'ai-sales-manager-for-woocommerce' ); ?></p>
+					</div>
+					<span class="dashicons dashicons-arrow-right-alt2 aisales-feature-card__arrow"></span>
+				</a>
+
+				<!-- Widgets -->
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=ai-sales-widgets' ) ); ?>" class="aisales-feature-card">
+					<div class="aisales-feature-card__icon aisales-feature-card__icon--widgets">
+						<span class="dashicons dashicons-welcome-widgets-menus"></span>
+					</div>
+					<div class="aisales-feature-card__content">
+						<h4 class="aisales-feature-card__title"><?php esc_html_e( 'Widgets', 'ai-sales-manager-for-woocommerce' ); ?></h4>
+						<p class="aisales-feature-card__desc">
+							<?php
+							printf(
+								/* translators: %d: number of enabled widgets */
+								esc_html__( '%d widgets enabled', 'ai-sales-manager-for-woocommerce' ),
+								$enabled_widgets_count
+							);
+							?>
+						</p>
+					</div>
+					<span class="dashicons dashicons-arrow-right-alt2 aisales-feature-card__arrow"></span>
+				</a>
+
+				<!-- Abandoned Carts -->
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=ai-sales-abandoned-carts' ) ); ?>" class="aisales-feature-card">
+					<div class="aisales-feature-card__icon aisales-feature-card__icon--carts">
+						<span class="dashicons dashicons-cart"></span>
+					</div>
+					<div class="aisales-feature-card__content">
+						<h4 class="aisales-feature-card__title"><?php esc_html_e( 'Abandoned Carts', 'ai-sales-manager-for-woocommerce' ); ?></h4>
+						<p class="aisales-feature-card__desc">
+							<?php
+							printf(
+								/* translators: %1$d: abandoned carts, %2$d: recovered carts */
+								esc_html__( '%1$d abandoned, %2$d recovered', 'ai-sales-manager-for-woocommerce' ),
+								$cart_stats['abandoned'],
+								$cart_stats['recovered']
+							);
+							?>
+						</p>
+					</div>
+					<span class="dashicons dashicons-arrow-right-alt2 aisales-feature-card__arrow"></span>
+				</a>
+
+				<!-- Manage Catalog -->
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=ai-sales-bulk' ) ); ?>" class="aisales-feature-card">
+					<div class="aisales-feature-card__icon aisales-feature-card__icon--bulk">
+						<span class="dashicons dashicons-update"></span>
+					</div>
+					<div class="aisales-feature-card__content">
+						<h4 class="aisales-feature-card__title"><?php esc_html_e( 'Manage Catalog', 'ai-sales-manager-for-woocommerce' ); ?></h4>
+						<p class="aisales-feature-card__desc"><?php esc_html_e( 'Enhance multiple products at once', 'ai-sales-manager-for-woocommerce' ); ?></p>
+					</div>
+					<span class="dashicons dashicons-arrow-right-alt2 aisales-feature-card__arrow"></span>
+				</a>
+			</div>
+		</div>
+
+		<!-- Recent Usage Card -->
+		<div class="aisales-section aisales-mt-6">
+			<div class="aisales-card aisales-card--elevated">
 				<div class="aisales-card__header">
 					<div class="aisales-card__icon">
 						<span class="dashicons dashicons-clock"></span>
@@ -460,7 +602,7 @@ class AISales_Admin_Settings {
 					</a>
 				</div>
 
-				<?php if ( ! empty( $usage['logs'] ) ) : ?>
+				<?php if ( ! empty( $recent_logs ) ) : ?>
 					<table class="aisales-table-modern">
 						<thead>
 							<tr>
@@ -470,7 +612,7 @@ class AISales_Admin_Settings {
 							</tr>
 						</thead>
 						<tbody>
-							<?php foreach ( $usage['logs'] as $log ) : ?>
+							<?php foreach ( $recent_logs as $log ) : ?>
 								<tr>
 									<td><?php echo esc_html( $this->format_date( $log['created_at'] ) ); ?></td>
 									<td>
@@ -495,6 +637,45 @@ class AISales_Admin_Settings {
 			</div>
 		</div>
 
+		<!-- Coming Soon Features -->
+		<div class="aisales-section aisales-mt-6">
+			<div class="aisales-section__header">
+				<h3 class="aisales-section__title">
+					<span class="dashicons dashicons-calendar-alt"></span>
+					<?php esc_html_e( 'Coming Soon', 'ai-sales-manager-for-woocommerce' ); ?>
+				</h3>
+			</div>
+			<div class="aisales-feature-grid aisales-feature-grid--2col">
+				<!-- Market Research -->
+				<div class="aisales-feature-card aisales-feature-card--coming-soon">
+					<div class="aisales-feature-card__icon aisales-feature-card__icon--research">
+						<span class="dashicons dashicons-chart-area"></span>
+					</div>
+					<div class="aisales-feature-card__content">
+						<h4 class="aisales-feature-card__title">
+							<?php esc_html_e( 'Market Research', 'ai-sales-manager-for-woocommerce' ); ?>
+							<span class="aisales-badge aisales-badge--soon"><?php esc_html_e( 'Soon', 'ai-sales-manager-for-woocommerce' ); ?></span>
+						</h4>
+						<p class="aisales-feature-card__desc"><?php esc_html_e( 'AI-powered competitor analysis, pricing insights, and market trends', 'ai-sales-manager-for-woocommerce' ); ?></p>
+					</div>
+				</div>
+
+				<!-- Customer Credits -->
+				<div class="aisales-feature-card aisales-feature-card--coming-soon">
+					<div class="aisales-feature-card__icon aisales-feature-card__icon--credits">
+						<span class="dashicons dashicons-awards"></span>
+					</div>
+					<div class="aisales-feature-card__content">
+						<h4 class="aisales-feature-card__title">
+							<?php esc_html_e( 'Customer Credits', 'ai-sales-manager-for-woocommerce' ); ?>
+							<span class="aisales-badge aisales-badge--soon"><?php esc_html_e( 'Soon', 'ai-sales-manager-for-woocommerce' ); ?></span>
+						</h4>
+						<p class="aisales-feature-card__desc"><?php esc_html_e( 'Store credit system with AI-suggested rewards and loyalty programs', 'ai-sales-manager-for-woocommerce' ); ?></p>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<!-- How to Use Section - Enhanced -->
 		<div class="aisales-howto aisales-mt-6">
 			<div class="aisales-howto__header">
@@ -503,12 +684,32 @@ class AISales_Admin_Settings {
 				</div>
 				<h3 class="aisales-howto__title"><?php esc_html_e( 'Getting Started', 'ai-sales-manager-for-woocommerce' ); ?></h3>
 			</div>
-			<ol class="aisales-howto__steps">
-				<li class="aisales-howto__step"><?php esc_html_e( 'Go to Products → Edit any product', 'ai-sales-manager-for-woocommerce' ); ?></li>
-				<li class="aisales-howto__step"><?php esc_html_e( 'Find the "AI Tools" panel in the sidebar', 'ai-sales-manager-for-woocommerce' ); ?></li>
-				<li class="aisales-howto__step"><?php esc_html_e( 'Click any AI action to generate content', 'ai-sales-manager-for-woocommerce' ); ?></li>
-				<li class="aisales-howto__step"><?php esc_html_e( 'Review and apply the suggestions', 'ai-sales-manager-for-woocommerce' ); ?></li>
-			</ol>
+			<div class="aisales-howto__grid">
+				<div class="aisales-howto__column">
+					<h4 class="aisales-howto__subtitle"><?php esc_html_e( 'Product Enhancement', 'ai-sales-manager-for-woocommerce' ); ?></h4>
+					<ol class="aisales-howto__steps">
+						<li class="aisales-howto__step"><?php esc_html_e( 'Go to Products → Edit any product', 'ai-sales-manager-for-woocommerce' ); ?></li>
+						<li class="aisales-howto__step"><?php esc_html_e( 'Find the "AI Tools" panel in the sidebar', 'ai-sales-manager-for-woocommerce' ); ?></li>
+						<li class="aisales-howto__step"><?php esc_html_e( 'Generate descriptions, tags, or images', 'ai-sales-manager-for-woocommerce' ); ?></li>
+					</ol>
+				</div>
+				<div class="aisales-howto__column">
+					<h4 class="aisales-howto__subtitle"><?php esc_html_e( 'AI Agent Chat', 'ai-sales-manager-for-woocommerce' ); ?></h4>
+					<ol class="aisales-howto__steps">
+						<li class="aisales-howto__step"><?php esc_html_e( 'Open AI Agent from the menu', 'ai-sales-manager-for-woocommerce' ); ?></li>
+						<li class="aisales-howto__step"><?php esc_html_e( 'Ask questions about your store', 'ai-sales-manager-for-woocommerce' ); ?></li>
+						<li class="aisales-howto__step"><?php esc_html_e( 'Get insights and recommendations', 'ai-sales-manager-for-woocommerce' ); ?></li>
+					</ol>
+				</div>
+				<div class="aisales-howto__column">
+					<h4 class="aisales-howto__subtitle"><?php esc_html_e( 'Cart Recovery', 'ai-sales-manager-for-woocommerce' ); ?></h4>
+					<ol class="aisales-howto__steps">
+						<li class="aisales-howto__step"><?php esc_html_e( 'Configure abandoned cart settings', 'ai-sales-manager-for-woocommerce' ); ?></li>
+						<li class="aisales-howto__step"><?php esc_html_e( 'AI generates recovery emails', 'ai-sales-manager-for-woocommerce' ); ?></li>
+						<li class="aisales-howto__step"><?php esc_html_e( 'Monitor recovery stats', 'ai-sales-manager-for-woocommerce' ); ?></li>
+					</ol>
+				</div>
+			</div>
 		</div>
 		<?php
 	}

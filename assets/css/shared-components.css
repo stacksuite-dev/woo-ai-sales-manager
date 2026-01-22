@@ -9,9 +9,10 @@
  */
 
 /* ==========================================================================
-   Store Context Button
+   Header Buttons (Shared Base)
    ========================================================================== */
 
+.aisales-header-btn,
 .aisales-store-context-btn {
 	display: inline-flex;
 	align-items: center;
@@ -28,18 +29,21 @@
 	box-shadow: var(--aisales-shadow-xs);
 }
 
+.aisales-header-btn:hover,
 .aisales-store-context-btn:hover {
 	border-color: var(--aisales-primary);
 	color: var(--aisales-primary);
 	box-shadow: var(--aisales-shadow-sm);
 }
 
+.aisales-header-btn:focus,
 .aisales-store-context-btn:focus {
 	outline: none;
 	border-color: var(--aisales-primary);
 	box-shadow: 0 0 0 2px var(--aisales-primary-light);
 }
 
+.aisales-header-btn .dashicons,
 .aisales-store-context-btn .dashicons {
 	font-size: 16px;
 	width: 16px;
@@ -75,6 +79,14 @@
 .aisales-context-status--missing {
 	background: var(--aisales-border);
 	box-shadow: 0 0 0 2px var(--aisales-bg-muted);
+}
+
+/* Header Button Text Elements */
+.aisales-header-btn__text {
+	max-width: 100px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 /* ==========================================================================
@@ -397,10 +409,13 @@ body.aisales-context-panel-active {
    ========================================================================== */
 
 @media (max-width: 782px) {
-	.aisales-store-context-btn .aisales-store-name {
+	.aisales-store-context-btn .aisales-store-name,
+	.aisales-header-btn__text {
 		display: none;
 	}
 
+	.aisales-header-btn,
+	.aisales-store-context-btn,
 	.aisales-balance-indicator {
 		padding: var(--aisales-space-2) var(--aisales-space-3);
 	}
@@ -795,4 +810,120 @@ body.aisales-context-panel-active {
 	.aisales-usage-estimate__label {
 		text-align: left;
 	}
+}
+
+/* ==========================================================================
+   Reusable UI Components
+   ========================================================================== */
+
+/* Status Badges */
+.aisales-status-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--aisales-space-1);
+	padding: var(--aisales-space-1) var(--aisales-space-2);
+	font-size: var(--aisales-font-xs);
+	font-weight: var(--aisales-font-weight-medium);
+	border-radius: var(--aisales-radius-full);
+}
+
+.aisales-status-badge .dashicons {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+}
+
+.aisales-status-badge--active,
+.aisales-status-badge--success {
+	background: var(--aisales-success-light);
+	color: var(--aisales-success);
+}
+
+.aisales-status-badge--draft,
+.aisales-status-badge--warning {
+	background: var(--aisales-warning-light);
+	color: #996b00;
+}
+
+.aisales-status-badge--none {
+	background: var(--aisales-bg-muted);
+	color: var(--aisales-text-muted);
+}
+
+/* Toggle Switch */
+.aisales-toggle-switch {
+	position: relative;
+	display: inline-block;
+	width: 44px;
+	height: 24px;
+	margin-left: auto;
+}
+
+.aisales-toggle-switch input {
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+.aisales-toggle-switch__slider {
+	position: absolute;
+	cursor: pointer;
+	inset: 0;
+	background: var(--aisales-border);
+	border-radius: var(--aisales-radius-full);
+	transition: background 0.3s ease;
+}
+
+.aisales-toggle-switch__slider::before {
+	position: absolute;
+	content: "";
+	height: 18px;
+	width: 18px;
+	left: 3px;
+	bottom: 3px;
+	background: var(--aisales-bg-white);
+	border-radius: 50%;
+	transition: transform 0.3s ease;
+	box-shadow: var(--aisales-shadow-sm);
+}
+
+.aisales-toggle-switch input:checked + .aisales-toggle-switch__slider {
+	background: var(--aisales-success);
+}
+
+.aisales-toggle-switch input:checked + .aisales-toggle-switch__slider::before {
+	transform: translateX(20px);
+}
+
+.aisales-toggle-switch input:focus + .aisales-toggle-switch__slider {
+	box-shadow: 0 0 0 2px var(--aisales-primary-light);
+}
+
+/* Spinner */
+.aisales-spinner {
+	width: 24px;
+	height: 24px;
+	border: 2px solid var(--aisales-border-light);
+	border-top-color: var(--aisales-primary);
+	border-radius: 50%;
+	animation: aisales-spin 0.8s linear infinite;
+}
+
+.aisales-spinner--lg {
+	width: 40px;
+	height: 40px;
+	border-width: 3px;
+}
+
+@keyframes aisales-spin {
+	to { transform: rotate(360deg); }
+}
+
+/* Danger Button Modifier */
+.aisales-btn--danger {
+	color: var(--aisales-danger, #dc3545);
+}
+
+.aisales-btn--danger:hover {
+	background: rgba(220, 53, 69, 0.1);
 }
