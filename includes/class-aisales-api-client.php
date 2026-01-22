@@ -7,6 +7,9 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// Load mock data provider for development/testing.
+require_once __DIR__ . '/class-aisales-api-mock.php';
+
 /**
  * API Client class
  */
@@ -155,7 +158,7 @@ class AISales_API_Client {
 	 */
 	public function connect( $email, $domain ) {
 		if ( $this->use_mock ) {
-			return $this->mock_connect( $email, $domain );
+			return AISales_API_Mock::connect( $email, $domain );
 		}
 
 		return $this->request( '/auth/connect', 'POST', array(
@@ -171,7 +174,7 @@ class AISales_API_Client {
 	 */
 	public function get_account() {
 		if ( $this->use_mock ) {
-			return $this->mock_get_account();
+			return AISales_API_Mock::get_account();
 		}
 
 		return $this->request( '/account' );
@@ -186,7 +189,7 @@ class AISales_API_Client {
 	 */
 	public function get_usage( $limit = 10, $offset = 0 ) {
 		if ( $this->use_mock ) {
-			return $this->mock_get_usage( $limit, $offset );
+			return AISales_API_Mock::get_usage( $limit, $offset );
 		}
 
 		return $this->request( "/account/usage?limit={$limit}&offset={$offset}" );
@@ -201,7 +204,7 @@ class AISales_API_Client {
 	 */
 	public function get_transactions( $limit = 10, $offset = 0 ) {
 		if ( $this->use_mock ) {
-			return $this->mock_get_transactions( $limit, $offset );
+			return AISales_API_Mock::get_transactions( $limit, $offset );
 		}
 
 		return $this->request( "/account/transactions?limit={$limit}&offset={$offset}" );
@@ -215,7 +218,7 @@ class AISales_API_Client {
 	 */
 	public function create_checkout( $plan = '10k' ) {
 		if ( $this->use_mock ) {
-			return $this->mock_create_checkout( $plan );
+			return AISales_API_Mock::create_checkout( $plan );
 		}
 
 		$admin_url = admin_url( 'admin.php?page=ai-sales-manager' );
@@ -235,7 +238,7 @@ class AISales_API_Client {
 	 */
 	public function generate_content( $product_data ) {
 		if ( $this->use_mock ) {
-			return $this->mock_generate_content( $product_data );
+			return AISales_API_Mock::generate_content( $product_data );
 		}
 
 		return $this->request( '/ai/content', 'POST', $product_data );
@@ -249,7 +252,7 @@ class AISales_API_Client {
 	 */
 	public function suggest_taxonomy( $product_data ) {
 		if ( $this->use_mock ) {
-			return $this->mock_suggest_taxonomy( $product_data );
+			return AISales_API_Mock::suggest_taxonomy( $product_data );
 		}
 
 		return $this->request( '/ai/taxonomy', 'POST', $product_data );
@@ -263,7 +266,7 @@ class AISales_API_Client {
 	 */
 	public function generate_image( $product_data ) {
 		if ( $this->use_mock ) {
-			return $this->mock_generate_image( $product_data );
+			return AISales_API_Mock::generate_image( $product_data );
 		}
 
 		return $this->request( '/ai/image/generate', 'POST', $product_data );
@@ -277,7 +280,7 @@ class AISales_API_Client {
 	 */
 	public function improve_image( $image_data ) {
 		if ( $this->use_mock ) {
-			return $this->mock_improve_image( $image_data );
+			return AISales_API_Mock::improve_image( $image_data );
 		}
 
 		return $this->request( '/ai/image/improve', 'POST', $image_data );
@@ -291,7 +294,7 @@ class AISales_API_Client {
 	 */
 	public function generate_category_content( $category_data ) {
 		if ( $this->use_mock ) {
-			return $this->mock_generate_category_content( $category_data );
+			return AISales_API_Mock::generate_category_content( $category_data );
 		}
 
 		return $this->request( '/ai/category/content', 'POST', $category_data );
@@ -305,7 +308,7 @@ class AISales_API_Client {
 	 */
 	public function suggest_subcategories( $category_data ) {
 		if ( $this->use_mock ) {
-			return $this->mock_suggest_subcategories( $category_data );
+			return AISales_API_Mock::suggest_subcategories( $category_data );
 		}
 
 		return $this->request( '/ai/category/subcategories', 'POST', $category_data );
@@ -329,10 +332,118 @@ class AISales_API_Client {
 	 */
 	public function analyze_brand( $context ) {
 		if ( $this->use_mock ) {
-			return $this->mock_analyze_brand( $context );
+			return AISales_API_Mock::analyze_brand( $context );
 		}
 
 		return $this->request( '/ai/brand/analyze', 'POST', $context );
+	}
+
+	// =========================================================================
+	// SUPPORT METHODS
+	// =========================================================================
+
+	/**
+	 * Create support draft and run AI analysis
+	 *
+	 * @param array $data Draft payload.
+	 * @return array|WP_Error
+	 */
+	public function create_support_draft( $data ) {
+		if ( $this->use_mock ) {
+			return AISales_API_Mock::create_support_draft( $data );
+		}
+
+		return $this->request( '/support/draft', 'POST', $data );
+	}
+
+	/**
+	 * Clarify a support draft
+	 *
+	 * @param string $draft_id Draft ID.
+	 * @param array  $answers  Clarification answers.
+	 * @return array|WP_Error
+	 */
+	public function clarify_support_draft( $draft_id, $answers ) {
+		if ( $this->use_mock ) {
+			return AISales_API_Mock::clarify_support_draft( $draft_id, $answers );
+		}
+
+		return $this->request( '/support/draft/' . $draft_id . '/clarify', 'POST', array(
+			'answers' => $answers,
+		) );
+	}
+
+	/**
+	 * Submit support ticket
+	 *
+	 * @param string $draft_id Draft ID.
+	 * @return array|WP_Error
+	 */
+	public function submit_support_ticket( $draft_id ) {
+		if ( $this->use_mock ) {
+			return AISales_API_Mock::submit_support_ticket( $draft_id );
+		}
+
+		return $this->request( '/support/submit/' . $draft_id, 'POST' );
+	}
+
+	/**
+	 * Get support tickets
+	 *
+	 * @param array $filters Filters for list.
+	 * @return array|WP_Error
+	 */
+	public function get_support_tickets( $filters = array() ) {
+		if ( $this->use_mock ) {
+			return AISales_API_Mock::get_support_tickets();
+		}
+
+		$query = empty( $filters ) ? '' : '?' . http_build_query( $filters );
+		return $this->request( '/support/tickets' . $query );
+	}
+
+	/**
+	 * Get support ticket details
+	 *
+	 * @param string $ticket_id Ticket ID.
+	 * @return array|WP_Error
+	 */
+	public function get_support_ticket( $ticket_id ) {
+		if ( $this->use_mock ) {
+			return AISales_API_Mock::get_support_ticket( $ticket_id );
+		}
+
+		return $this->request( '/support/tickets/' . $ticket_id );
+	}
+
+	/**
+	 * Reply to a support ticket
+	 *
+	 * @param string $ticket_id Ticket ID.
+	 * @param string $message   Reply message.
+	 * @return array|WP_Error
+	 */
+	public function reply_support_ticket( $ticket_id, $message ) {
+		if ( $this->use_mock ) {
+			return AISales_API_Mock::reply_support_ticket( $ticket_id, $message );
+		}
+
+		return $this->request( '/support/tickets/' . $ticket_id . '/reply', 'POST', array(
+			'message' => $message,
+		) );
+	}
+
+	/**
+	 * Get support stats
+	 *
+	 * @return array|WP_Error
+	 */
+	public function get_support_stats() {
+		if ( $this->use_mock ) {
+			return AISales_API_Mock::get_support_stats();
+		}
+
+		return $this->request( '/support/stats' );
 	}
 
 	// =========================================================================
@@ -346,7 +457,7 @@ class AISales_API_Client {
 	 */
 	public function get_auto_topup_settings() {
 		if ( $this->use_mock ) {
-			return $this->mock_get_auto_topup_settings();
+			return AISales_API_Mock::get_auto_topup_settings();
 		}
 
 		return $this->request( '/billing/auto-topup' );
@@ -360,7 +471,7 @@ class AISales_API_Client {
 	 */
 	public function update_auto_topup_settings( $settings ) {
 		if ( $this->use_mock ) {
-			return $this->mock_update_auto_topup_settings( $settings );
+			return AISales_API_Mock::update_auto_topup_settings( $settings );
 		}
 
 		return $this->request( '/billing/auto-topup', 'PUT', $settings );
@@ -373,7 +484,7 @@ class AISales_API_Client {
 	 */
 	public function get_payment_method() {
 		if ( $this->use_mock ) {
-			return $this->mock_get_payment_method();
+			return AISales_API_Mock::get_payment_method();
 		}
 
 		return $this->request( '/billing/payment-method' );
@@ -388,7 +499,7 @@ class AISales_API_Client {
 	 */
 	public function setup_payment_method( $success_url, $cancel_url ) {
 		if ( $this->use_mock ) {
-			return $this->mock_setup_payment_method( $success_url );
+			return AISales_API_Mock::setup_payment_method( $success_url );
 		}
 
 		return $this->request( '/billing/setup-payment-method', 'POST', array(
@@ -420,7 +531,7 @@ class AISales_API_Client {
 	 */
 	public function remove_payment_method() {
 		if ( $this->use_mock ) {
-			return $this->mock_remove_payment_method();
+			return AISales_API_Mock::remove_payment_method();
 		}
 
 		return $this->request( '/billing/payment-method', 'DELETE' );
@@ -435,7 +546,7 @@ class AISales_API_Client {
 	 */
 	public function get_purchases( $limit = 20, $offset = 0 ) {
 		if ( $this->use_mock ) {
-			return $this->mock_get_purchases( $limit, $offset );
+			return AISales_API_Mock::get_purchases( $limit, $offset );
 		}
 
 		return $this->request( "/billing/purchases?limit={$limit}&offset={$offset}" );
@@ -448,7 +559,7 @@ class AISales_API_Client {
 	 */
 	public function get_plans() {
 		if ( $this->use_mock ) {
-			return $this->mock_get_plans();
+			return AISales_API_Mock::get_plans();
 		}
 
 		return $this->request( '/billing/plans' );
@@ -465,7 +576,7 @@ class AISales_API_Client {
 	 */
 	public function create_recovery_token( $email, $domain ) {
 		if ( $this->use_mock ) {
-			return $this->mock_create_recovery_token( $email, $domain );
+			return AISales_API_Mock::create_recovery_token( $email, $domain );
 		}
 
 		return $this->request_without_auth( '/auth/create-recovery-token', 'POST', array(
@@ -482,7 +593,7 @@ class AISales_API_Client {
 	 */
 	public function validate_recovery_token( $token ) {
 		if ( $this->use_mock ) {
-			return $this->mock_validate_recovery_token( $token );
+			return AISales_API_Mock::validate_recovery_token( $token );
 		}
 
 		return $this->request_without_auth( '/auth/validate-recovery-token', 'POST', array(
@@ -534,751 +645,5 @@ class AISales_API_Client {
 		}
 
 		return isset( $data['data'] ) ? $data['data'] : $data;
-	}
-
-	// =========================================================================
-	// MOCK DATA METHODS (for development/testing)
-	// =========================================================================
-
-	/**
-	 * Mock connect response (domain-based auth)
-	 * New accounts receive 10,000 welcome bonus tokens
-	 *
-	 * @param string $email  User email.
-	 * @param string $domain Site domain.
-	 * @return array
-	 */
-	private function mock_connect( $email, $domain ) {
-		$api_key       = get_option( 'aisales_api_key' );
-		$is_new        = false;
-		$welcome_bonus = null;
-
-		if ( ! $api_key ) {
-			$api_key       = 'wai_mock_' . wp_generate_password( 32, false );
-			$is_new        = true;
-			$welcome_bonus = 10000;
-			update_option( 'aisales_balance', 10000 ); // Welcome bonus: 10,000 tokens
-		}
-
-		update_option( 'aisales_api_key', $api_key );
-		update_option( 'aisales_user_email', $email );
-		update_option( 'aisales_domain', $domain );
-
-		$balance = get_option( 'aisales_balance', 10000 );
-
-		$response = array(
-			'message'        => $is_new ? 'Account created successfully' : 'Connected successfully',
-			'user_id'        => 1,
-			'email'          => $email,
-			'domain'         => $domain,
-			'api_key'        => $api_key,
-			'balance_tokens' => $balance,
-			'is_new'         => $is_new,
-		);
-
-		if ( $welcome_bonus ) {
-			$response['welcome_bonus'] = $welcome_bonus;
-		}
-
-		return $response;
-	}
-
-	/**
-	 * Mock get account response
-	 *
-	 * @return array
-	 */
-	private function mock_get_account() {
-		return array(
-			'user_id'        => 1,
-			'email'          => get_option( 'aisales_user_email', 'demo@example.com' ),
-			'balance_tokens' => get_option( 'aisales_balance', 7432 ),
-		);
-	}
-
-	/**
-	 * Mock get usage response
-	 *
-	 * @param int $limit  Limit.
-	 * @param int $offset Offset.
-	 * @return array
-	 */
-	private function mock_get_usage( $limit, $offset ) {
-		$mock_logs = array(
-			array(
-				'id'            => 1,
-				'operation'     => 'content',
-				'input_tokens'  => 150,
-				'output_tokens' => 95,
-				'total_tokens'  => 245,
-				'product_id'    => '123',
-				'created_at'    => gmdate( 'Y-m-d H:i:s', strtotime( '-1 hour' ) ),
-			),
-			array(
-				'id'            => 2,
-				'operation'     => 'image_generate',
-				'input_tokens'  => 200,
-				'output_tokens' => 1003,
-				'total_tokens'  => 1203,
-				'product_id'    => '456',
-				'created_at'    => gmdate( 'Y-m-d H:i:s', strtotime( '-2 hours' ) ),
-			),
-			array(
-				'id'            => 3,
-				'operation'     => 'taxonomy',
-				'input_tokens'  => 50,
-				'output_tokens' => 39,
-				'total_tokens'  => 89,
-				'product_id'    => '789',
-				'created_at'    => gmdate( 'Y-m-d H:i:s', strtotime( '-1 day' ) ),
-			),
-			array(
-				'id'            => 4,
-				'operation'     => 'content',
-				'input_tokens'  => 180,
-				'output_tokens' => 120,
-				'total_tokens'  => 300,
-				'product_id'    => '101',
-				'created_at'    => gmdate( 'Y-m-d H:i:s', strtotime( '-2 days' ) ),
-			),
-			array(
-				'id'            => 5,
-				'operation'     => 'image_improve',
-				'input_tokens'  => 500,
-				'output_tokens' => 450,
-				'total_tokens'  => 950,
-				'product_id'    => '102',
-				'created_at'    => gmdate( 'Y-m-d H:i:s', strtotime( '-3 days' ) ),
-			),
-		);
-
-		return array(
-			'logs'       => array_slice( $mock_logs, $offset, $limit ),
-			'pagination' => array(
-				'total'    => count( $mock_logs ),
-				'limit'    => $limit,
-				'offset'   => $offset,
-				'has_more' => ( $offset + $limit ) < count( $mock_logs ),
-			),
-		);
-	}
-
-	/**
-	 * Mock get transactions response
-	 *
-	 * @param int $limit  Limit.
-	 * @param int $offset Offset.
-	 * @return array
-	 */
-	private function mock_get_transactions( $limit, $offset ) {
-		$mock_transactions = array(
-			array(
-				'id'            => 1,
-				'type'          => 'topup',
-				'amount_tokens' => 10000,
-				'amount_usd'    => 900,
-				'balance_after' => 10000,
-				'description'   => 'Token top-up',
-				'created_at'    => gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) ),
-			),
-			array(
-				'id'            => 2,
-				'type'          => 'usage',
-				'amount_tokens' => -245,
-				'amount_usd'    => null,
-				'balance_after' => 9755,
-				'description'   => 'Content generation',
-				'created_at'    => gmdate( 'Y-m-d H:i:s', strtotime( '-1 hour' ) ),
-			),
-			array(
-				'id'            => 3,
-				'type'          => 'usage',
-				'amount_tokens' => -1203,
-				'amount_usd'    => null,
-				'balance_after' => 8552,
-				'description'   => 'Image generation',
-				'created_at'    => gmdate( 'Y-m-d H:i:s', strtotime( '-2 hours' ) ),
-			),
-		);
-
-		return array(
-			'transactions' => array_slice( $mock_transactions, $offset, $limit ),
-			'pagination'   => array(
-				'total'    => count( $mock_transactions ),
-				'limit'    => $limit,
-				'offset'   => $offset,
-				'has_more' => ( $offset + $limit ) < count( $mock_transactions ),
-			),
-		);
-	}
-
-	/**
-	 * Mock create checkout response
-	 *
-	 * @param string $plan Plan identifier.
-	 * @return array
-	 */
-	private function mock_create_checkout( $plan = '10k' ) {
-		// Map plan IDs to token amounts
-		$plan_tokens = array(
-			'starter_plan'  => 5000,
-			'standard_plan' => 10000,
-			'pro_plan'      => 25000,
-			'business_plan' => 50000,
-			'5k'            => 5000,
-			'10k'           => 10000,
-			'25k'           => 25000,
-			'50k'           => 50000,
-		);
-
-		$tokens = isset( $plan_tokens[ $plan ] ) ? $plan_tokens[ $plan ] : 10000;
-
-		// In mock mode, just add tokens directly
-		$current_balance = get_option( 'aisales_balance', 0 );
-		update_option( 'aisales_balance', $current_balance + $tokens );
-
-		return array(
-			'checkout_url' => admin_url( 'admin.php?page=ai-sales-manager&topup=success' ),
-			'session_id'   => 'mock_session_' . time(),
-		);
-	}
-
-	/**
-	 * Mock generate content response
-	 *
-	 * @param array $product_data Product data.
-	 * @return array
-	 */
-	private function mock_generate_content( $product_data ) {
-		$title = isset( $product_data['product_title'] ) ? $product_data['product_title'] : 'Product';
-
-		// Deduct mock tokens
-		$this->deduct_mock_tokens( 245 );
-
-		return array(
-			'result'      => array(
-				'title'            => $title . ' - Premium Quality',
-				'description'      => "Discover the exceptional quality of our {$title}. Crafted with meticulous attention to detail, this product combines style with functionality. Perfect for those who appreciate the finer things in life.\n\nKey Features:\n• Premium materials for lasting durability\n• Modern design that complements any setting\n• Carefully crafted for optimal performance\n• Backed by our quality guarantee",
-				'short_description' => "Premium {$title} crafted with exceptional quality and modern design. Perfect for discerning customers.",
-				'meta_description' => "Shop our premium {$title}. High-quality materials, modern design, and exceptional value. Free shipping available.",
-			),
-			'tokens_used' => array(
-				'input'  => 150,
-				'output' => 95,
-				'total'  => 245,
-			),
-		);
-	}
-
-	/**
-	 * Mock suggest taxonomy response
-	 *
-	 * @param array $product_data Product data.
-	 * @return array
-	 */
-	private function mock_suggest_taxonomy( $product_data ) {
-		// Deduct mock tokens
-		$this->deduct_mock_tokens( 89 );
-
-		return array(
-			'suggested_categories' => array(
-				'Clothing',
-				'Men\'s Fashion',
-				'Casual Wear',
-			),
-			'suggested_tags'       => array(
-				'premium',
-				'comfortable',
-				'stylish',
-				'everyday',
-				'bestseller',
-			),
-			'suggested_attributes' => array(
-				array(
-					'name'   => 'Material',
-					'values' => array( 'Cotton', 'Polyester Blend' ),
-				),
-				array(
-					'name'   => 'Fit',
-					'values' => array( 'Regular', 'Slim', 'Relaxed' ),
-				),
-			),
-			'tokens_used'          => array(
-				'input'  => 50,
-				'output' => 39,
-				'total'  => 89,
-			),
-		);
-	}
-
-	/**
-	 * Mock generate image response
-	 *
-	 * @param array $product_data Product data.
-	 * @return array
-	 */
-	private function mock_generate_image( $product_data ) {
-		// Deduct mock tokens
-		$this->deduct_mock_tokens( 1203 );
-
-		// Return a placeholder image URL
-		return array(
-			'image_url'   => 'https://via.placeholder.com/800x800/3498db/ffffff?text=AI+Generated+Image',
-			'tokens_used' => array(
-				'input'  => 200,
-				'output' => 1003,
-				'total'  => 1203,
-			),
-		);
-	}
-
-	/**
-	 * Mock improve image response
-	 *
-	 * @param array $image_data Image data.
-	 * @return array
-	 */
-	private function mock_improve_image( $image_data ) {
-		// Deduct mock tokens
-		$this->deduct_mock_tokens( 950 );
-
-		return array(
-			'image_url'   => 'https://via.placeholder.com/800x800/2ecc71/ffffff?text=Improved+Image',
-			'tokens_used' => array(
-				'input'  => 500,
-				'output' => 450,
-				'total'  => 950,
-			),
-		);
-	}
-
-	/**
-	 * Deduct mock tokens from balance
-	 *
-	 * @param int $tokens Number of tokens to deduct.
-	 */
-	private function deduct_mock_tokens( $tokens ) {
-		$balance = get_option( 'aisales_balance', 7432 );
-		$new_balance = max( 0, $balance - $tokens );
-		update_option( 'aisales_balance', $new_balance );
-	}
-
-	// =========================================================================
-	// MOCK BILLING & AUTO TOP-UP METHODS
-	// =========================================================================
-
-	/**
-	 * Mock get auto top-up settings response
-	 *
-	 * @return array
-	 */
-	private function mock_get_auto_topup_settings() {
-		return array(
-			'enabled'      => get_option( 'aisales_auto_topup_enabled', false ),
-			'threshold'    => get_option( 'aisales_auto_topup_threshold', 1000 ),
-			'product_slug' => get_option( 'aisales_auto_topup_product', 'standard_plan' ),
-		);
-	}
-
-	/**
-	 * Mock update auto top-up settings response
-	 *
-	 * @param array $settings Settings to update.
-	 * @return array
-	 */
-	private function mock_update_auto_topup_settings( $settings ) {
-		if ( isset( $settings['enabled'] ) ) {
-			update_option( 'aisales_auto_topup_enabled', $settings['enabled'] );
-		}
-		if ( isset( $settings['threshold'] ) ) {
-			update_option( 'aisales_auto_topup_threshold', $settings['threshold'] );
-		}
-		if ( isset( $settings['product_slug'] ) ) {
-			update_option( 'aisales_auto_topup_product', $settings['product_slug'] );
-		}
-
-		return $this->mock_get_auto_topup_settings();
-	}
-
-	/**
-	 * Mock get payment method response
-	 *
-	 * @return array
-	 */
-	private function mock_get_payment_method() {
-		$has_method = get_option( 'aisales_mock_payment_method', false );
-
-		if ( ! $has_method ) {
-			return array( 'payment_method' => null );
-		}
-
-		return array(
-			'payment_method' => array(
-				'id'        => 'pm_mock_1234567890',
-				'brand'     => 'visa',
-				'last4'     => '4242',
-				'exp_month' => 12,
-				'exp_year'  => 2027,
-			),
-		);
-	}
-
-	/**
-	 * Mock setup payment method response
-	 *
-	 * @param string $success_url Success URL.
-	 * @return array
-	 */
-	private function mock_setup_payment_method( $success_url ) {
-		// In mock mode, just save a mock payment method
-		update_option( 'aisales_mock_payment_method', true );
-
-		return array(
-			'setup_url'  => add_query_arg( 'payment_setup', 'success', $success_url ),
-			'session_id' => 'mock_setup_session_' . time(),
-		);
-	}
-
-	/**
-	 * Mock remove payment method response
-	 *
-	 * @return array
-	 */
-	private function mock_remove_payment_method() {
-		delete_option( 'aisales_mock_payment_method' );
-		update_option( 'aisales_auto_topup_enabled', false );
-
-		return array( 'removed' => true );
-	}
-
-	/**
-	 * Mock get plans response
-	 *
-	 * @return array
-	 */
-	private function mock_get_plans() {
-		return array(
-			'plans' => array(
-				array(
-					'id'        => 'starter_plan',
-					'name'      => 'Starter',
-					'tokens'    => 5000,
-					'price_usd' => 5.00,
-				),
-				array(
-					'id'        => 'standard_plan',
-					'name'      => 'Standard',
-					'tokens'    => 10000,
-					'price_usd' => 9.00,
-				),
-				array(
-					'id'        => 'pro_plan',
-					'name'      => 'Pro',
-					'tokens'    => 25000,
-					'price_usd' => 20.00,
-				),
-				array(
-					'id'        => 'business_plan',
-					'name'      => 'Business',
-					'tokens'    => 50000,
-					'price_usd' => 35.00,
-				),
-			),
-		);
-	}
-
-	/**
-	 * Mock get purchases response
-	 *
-	 * @param int $limit  Limit.
-	 * @param int $offset Offset.
-	 * @return array
-	 */
-	private function mock_get_purchases( $limit, $offset ) {
-		$mock_purchases = array(
-			array(
-				'id'            => 1,
-				'type'          => 'topup',
-				'amount_tokens' => 10000,
-				'amount_usd'    => 900,
-				'balance_after' => 10000,
-				'description'   => 'Token top-up: 10,000 tokens',
-				'created_at'    => gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) ),
-			),
-			array(
-				'id'            => 2,
-				'type'          => 'auto_topup',
-				'amount_tokens' => 10000,
-				'amount_usd'    => 900,
-				'balance_after' => 12500,
-				'description'   => 'Auto top-up: 10,000 tokens',
-				'created_at'    => gmdate( 'Y-m-d H:i:s', strtotime( '-3 days' ) ),
-			),
-			array(
-				'id'            => 3,
-				'type'          => 'topup',
-				'amount_tokens' => 10000,
-				'amount_usd'    => 900,
-				'balance_after' => 17432,
-				'description'   => 'Token top-up: 10,000 tokens',
-				'created_at'    => gmdate( 'Y-m-d H:i:s', strtotime( '-1 day' ) ),
-			),
-		);
-
-		// Sort by date descending
-		usort( $mock_purchases, function( $a, $b ) {
-			return strtotime( $b['created_at'] ) - strtotime( $a['created_at'] );
-		});
-
-		return array(
-			'purchases' => array_slice( $mock_purchases, $offset, $limit ),
-			'total'     => count( $mock_purchases ),
-			'limit'     => $limit,
-			'offset'    => $offset,
-		);
-	}
-
-	/**
-	 * Mock generate category content response
-	 *
-	 * @param array $category_data Category data.
-	 * @return array
-	 */
-	private function mock_generate_category_content( $category_data ) {
-		$name = isset( $category_data['name'] ) ? $category_data['name'] : 'Category';
-
-		$this->deduct_mock_tokens( 200 );
-
-		return array(
-			'result'      => array(
-				'description' => "Discover our exceptional {$name} collection. Carefully curated to bring you the finest products in this category.",
-			),
-			'tokens_used' => array(
-				'input'  => 100,
-				'output' => 100,
-				'total'  => 200,
-			),
-		);
-	}
-
-	/**
-	 * Mock suggest subcategories response
-	 *
-	 * @param array $category_data Category data.
-	 * @return array
-	 */
-	private function mock_suggest_subcategories( $category_data ) {
-		$this->deduct_mock_tokens( 150 );
-
-		return array(
-			'subcategories' => array(
-				'Featured Items',
-				'New Arrivals',
-				'Best Sellers',
-				'Sale Items',
-			),
-			'tokens_used'   => array(
-				'input'  => 75,
-				'output' => 75,
-				'total'  => 150,
-			),
-		);
-	}
-
-	/**
-	 * Mock create recovery token response
-	 *
-	 * @param string $email  User email.
-	 * @param string $domain Site domain.
-	 * @return array
-	 */
-	private function mock_create_recovery_token( $email, $domain ) {
-		// Normalize domain (strip www. prefix)
-		$normalized_domain = preg_replace( '/^www\./i', '', strtolower( trim( $domain ) ) );
-		
-		// Check if we have a stored domain that matches
-		$stored_domain = get_option( 'aisales_domain', '' );
-		$stored_email  = get_option( 'aisales_user_email', '' );
-		
-		// Normalize stored domain too
-		$stored_normalized = preg_replace( '/^www\./i', '', strtolower( trim( $stored_domain ) ) );
-		
-		// Verify domain matches
-		if ( $stored_normalized !== $normalized_domain ) {
-			return array(
-				'success'     => true,
-				'has_account' => false,
-				'message'     => 'If an account exists with this email and domain, a recovery token has been created',
-			);
-		}
-		
-		// Verify email matches
-		if ( strtolower( trim( $stored_email ) ) !== strtolower( trim( $email ) ) ) {
-			return array(
-				'success'     => true,
-				'has_account' => false,
-				'message'     => 'If an account exists with this email and domain, a recovery token has been created',
-			);
-		}
-
-		// Generate a mock token
-		$token = 'mock_recovery_' . wp_generate_password( 32, false );
-
-		// Store the token temporarily for validation
-		set_transient( 'aisales_mock_recovery_token', array(
-			'token'  => $token,
-			'email'  => $email,
-			'domain' => $normalized_domain,
-		), HOUR_IN_SECONDS );
-
-		return array(
-			'success'     => true,
-			'has_account' => true,
-			'token'       => $token,
-			'email'       => $email,
-			'expires_at'  => gmdate( 'Y-m-d H:i:s', time() + HOUR_IN_SECONDS ),
-		);
-	}
-
-	/**
-	 * Mock validate recovery token response
-	 *
-	 * @param string $token Recovery token.
-	 * @return array|WP_Error
-	 */
-	private function mock_validate_recovery_token( $token ) {
-		// Get the stored mock token
-		$stored = get_transient( 'aisales_mock_recovery_token' );
-
-		if ( ! $stored || $stored['token'] !== $token ) {
-			return new WP_Error(
-				'invalid_token',
-				__( 'Invalid or expired recovery token.', 'ai-sales-manager-for-woocommerce' )
-			);
-		}
-
-		// Generate a new mock API key
-		$new_api_key = 'wai_mock_' . wp_generate_password( 32, false );
-
-		// Clean up the used token
-		delete_transient( 'aisales_mock_recovery_token' );
-
-		return array(
-			'api_key' => $new_api_key,
-			'email'   => $stored['email'],
-			'message' => __( 'API key recovered successfully.', 'ai-sales-manager-for-woocommerce' ),
-		);
-	}
-
-	/**
-	 * Mock analyze brand response
-	 *
-	 * @param array $context Store analysis context.
-	 * @return array
-	 */
-	private function mock_analyze_brand( $context ) {
-		$this->deduct_mock_tokens( 500 );
-
-		// Use provided context to generate suggestions
-		$store_name = isset( $context['store_name'] ) ? $context['store_name'] : get_bloginfo( 'name' );
-		$products   = isset( $context['products'] ) ? $context['products'] : array();
-
-		// Try to infer industry from products
-		$industry = 'general';
-		if ( ! empty( $products ) ) {
-			// Simple keyword matching for demo
-			$product_text = strtolower( implode( ' ', wp_list_pluck( $products, 'name' ) ) );
-			if ( strpos( $product_text, 'shirt' ) !== false || strpos( $product_text, 'dress' ) !== false || strpos( $product_text, 'clothing' ) !== false ) {
-				$industry = 'fashion';
-			} elseif ( strpos( $product_text, 'phone' ) !== false || strpos( $product_text, 'laptop' ) !== false || strpos( $product_text, 'computer' ) !== false ) {
-				$industry = 'electronics';
-			} elseif ( strpos( $product_text, 'cream' ) !== false || strpos( $product_text, 'beauty' ) !== false || strpos( $product_text, 'skin' ) !== false ) {
-				$industry = 'beauty';
-			} elseif ( strpos( $product_text, 'food' ) !== false || strpos( $product_text, 'organic' ) !== false || strpos( $product_text, 'coffee' ) !== false ) {
-				$industry = 'food';
-			} elseif ( strpos( $product_text, 'furniture' ) !== false || strpos( $product_text, 'decor' ) !== false || strpos( $product_text, 'home' ) !== false ) {
-				$industry = 'home';
-			}
-		}
-
-		// Generate target audience based on industry
-		$audiences = array(
-			'fashion'     => 'Style-conscious individuals aged 25-45 who value quality and contemporary fashion trends.',
-			'electronics' => 'Tech-savvy consumers aged 20-50 looking for reliable electronics and innovative gadgets.',
-			'beauty'      => 'Health and beauty enthusiasts aged 25-55 who prioritize self-care and premium skincare products.',
-			'food'        => 'Health-conscious foodies aged 25-60 who appreciate quality ingredients and artisanal products.',
-			'home'        => 'Homeowners and design enthusiasts aged 30-55 looking to create comfortable, stylish living spaces.',
-			'general'     => 'Quality-focused shoppers aged 25-55 who value reliable products and excellent customer service.',
-		);
-
-		// Use theme colors if available
-		$primary_color = isset( $context['theme_colors']['primary'] ) ? $context['theme_colors']['primary'] : '#7f54b3';
-		$text_color    = isset( $context['theme_colors']['text'] ) ? $context['theme_colors']['text'] : '#3c3c3c';
-		$bg_color      = isset( $context['theme_colors']['background'] ) ? $context['theme_colors']['background'] : '#f7f7f7';
-
-		// Generate taglines based on industry
-		$taglines = array(
-			'fashion'     => 'Elevate Your Style, Define Your Look',
-			'electronics' => 'Innovation at Your Fingertips',
-			'beauty'      => 'Discover Your Natural Radiance',
-			'food'        => 'Fresh Quality, Delivered to You',
-			'home'        => 'Where Comfort Meets Style',
-			'general'     => 'Quality Products, Exceptional Service',
-		);
-
-		// Generate differentiators based on industry
-		$differentiators = array(
-			'fashion'     => 'Curated collections with a focus on sustainable, ethically-sourced materials and timeless design.',
-			'electronics' => 'Expert product selection with hands-on testing and dedicated post-purchase support.',
-			'beauty'      => 'Clean beauty formulations backed by science, with personalized skincare recommendations.',
-			'food'        => 'Direct relationships with local producers ensuring freshness and supporting small businesses.',
-			'home'        => 'Designer-curated pieces at accessible prices with free interior design consultations.',
-			'general'     => 'Personalized shopping experience with expert product recommendations and hassle-free returns.',
-		);
-
-		// Generate pain points based on industry
-		$pain_points = array(
-			'fashion'     => 'Finding quality pieces that fit well, staying stylish on a budget, wardrobe clutter',
-			'electronics' => 'Tech overwhelm, fear of buying outdated products, complicated setup processes',
-			'beauty'      => 'Ingredient confusion, finding products for specific skin concerns, product overload',
-			'food'        => 'Finding fresh quality ingredients, dietary restrictions, meal planning stress',
-			'home'        => 'Creating cohesive design, quality vs price tradeoffs, assembly and delivery hassles',
-			'general'     => 'Product quality uncertainty, difficult returns, impersonal shopping experiences',
-		);
-
-		// Price positions based on industry
-		$price_positions = array(
-			'fashion'     => 'mid_range',
-			'electronics' => 'value',
-			'beauty'      => 'premium',
-			'food'        => 'value',
-			'home'        => 'mid_range',
-			'general'     => 'value',
-		);
-
-		return array(
-			'suggestions' => array(
-				'store_name'      => $store_name,
-				'tagline'         => $taglines[ $industry ],
-				'business_niche'  => $industry,
-				'target_audience' => $audiences[ $industry ],
-				'price_position'  => $price_positions[ $industry ],
-				'differentiator'  => $differentiators[ $industry ],
-				'pain_points'     => $pain_points[ $industry ],
-				'brand_tone'      => 'friendly',
-				'words_to_avoid'  => 'cheap, discount, budget, basic',
-				'promotion_style' => 'moderate',
-				'primary_color'   => $primary_color,
-				'text_color'      => $text_color,
-				'bg_color'        => $bg_color,
-				'font_family'     => 'system',
-				'brand_values'    => array( 'Quality', 'Trust', 'Service', 'Innovation' ),
-			),
-			'tokens_used' => array(
-				'input'  => 300,
-				'output' => 200,
-				'total'  => 500,
-			),
-		);
 	}
 }
