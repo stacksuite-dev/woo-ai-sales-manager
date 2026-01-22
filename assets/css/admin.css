@@ -76,6 +76,7 @@
   --aisales-bg-subtle: #f6f7f7;
   --aisales-bg-muted: #f0f0f1;
   --aisales-bg-dark: #1d2327;
+  --aisales-surface: #ffffff;
 
   /* ===== Operation Type Colors ===== */
   --aisales-op-content: #00450c;
@@ -506,6 +507,31 @@
   background: var(--aisales-success-hover);
 }
 
+/* Pill Button (header action style) */
+.aisales-btn--pill {
+  padding: var(--aisales-space-2) var(--aisales-space-4);
+  border-radius: var(--aisales-radius-full, 9999px);
+  font-size: var(--aisales-font-sm);
+  background: var(--aisales-bg-white);
+  color: var(--aisales-text-secondary);
+  border: 1px solid var(--aisales-border);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.aisales-btn--pill:hover {
+  border-color: var(--aisales-primary);
+  color: var(--aisales-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.aisales-btn--pill:active {
+  transform: scale(0.98);
+}
+
+.aisales-btn--pill .dashicons {
+  color: var(--aisales-primary);
+}
+
 /* Button Sizes */
 .aisales-btn--sm {
   padding: var(--aisales-space-1) var(--aisales-space-3);
@@ -547,7 +573,82 @@
   pointer-events: none;
 }
 
-/* Button full width */
+/* =========================================
+   Abandoned Cart - Create Order Button
+   ========================================= */
+
+.aisales-abandoned-cart-create-order {
+  position: relative;
+  background: linear-gradient(135deg, var(--aisales-primary) 0%, var(--aisales-primary-hover) 100%);
+  border: none;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #fff;
+  border-radius: var(--aisales-radius-md);
+  box-shadow: 0 2px 4px rgba(var(--aisales-primary-rgb), 0.25), 
+              inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: all var(--aisales-transition-normal);
+  overflow: hidden;
+}
+
+.aisales-abandoned-cart-create-order::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.aisales-abandoned-cart-create-order:hover {
+  background: linear-gradient(135deg, var(--aisales-primary-hover) 0%, var(--aisales-primary-active) 100%);
+  box-shadow: 0 4px 8px rgba(var(--aisales-primary-rgb), 0.35),
+              inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.aisales-abandoned-cart-create-order:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(var(--aisales-primary-rgb), 0.3),
+              inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.aisales-abandoned-cart-create-order .dashicons {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  opacity: 0.9;
+}
+
+.aisales-abandoned-cart-create-order .aisales-btn__label {
+  position: relative;
+}
+
+/* Loading state for Create Order button */
+.aisales-abandoned-cart-create-order.aisales-btn--loading {
+  background: linear-gradient(135deg, var(--aisales-primary) 0%, var(--aisales-primary-hover) 100%);
+  pointer-events: none;
+}
+
+.aisales-abandoned-cart-create-order.aisales-btn--loading .aisales-btn__label,
+.aisales-abandoned-cart-create-order.aisales-btn--loading .dashicons {
+  opacity: 0;
+}
+
+.aisales-abandoned-cart-create-order.aisales-btn--loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: aisales-spin 0.6s linear infinite;
+}
 .aisales-btn--full {
   width: 100%;
 }
@@ -3583,10 +3684,12 @@
 .aisales-stat-card--content { border-top: 3px solid var(--aisales-op-content-border); }
 .aisales-stat-card--taxonomy { border-top: 3px solid var(--aisales-op-taxonomy-border); }
 .aisales-stat-card--image { border-top: 3px solid var(--aisales-op-image-border); }
+.aisales-stat-card--chat { border-top: 3px solid #8b5cf6; }
 
 .aisales-stat-card--content .aisales-stat-card__value { color: var(--aisales-op-content); }
 .aisales-stat-card--taxonomy .aisales-stat-card__value { color: var(--aisales-op-taxonomy); }
 .aisales-stat-card--image .aisales-stat-card__value { color: var(--aisales-op-image); }
+.aisales-stat-card--chat .aisales-stat-card__value { color: #8b5cf6; }
 
 /* ----- Enhanced Table ----- */
 .aisales-table-modern {
@@ -3936,6 +4039,258 @@
 /* Card Icon Red Variant */
 .aisales-card__icon--red {
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.15) 100%);
+}
+
+/* Abandoned Carts Page */
+.aisales-abandoned-carts-page__stats {
+  margin: var(--aisales-space-5) 0;
+}
+
+.aisales-abandoned-carts-page__table {
+  margin-top: var(--aisales-space-4);
+}
+
+.aisales-abandoned-carts-page__table .wp-list-table {
+  border: 1px solid var(--aisales-border-lighter);
+  border-radius: var(--aisales-radius-lg);
+  overflow: hidden;
+}
+
+.aisales-abandoned-carts-page__table .aisales-table-modern tbody tr {
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.aisales-abandoned-carts-page__table .aisales-table-modern tbody tr:hover {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.04), rgba(16, 185, 129, 0.04));
+  box-shadow: inset 0 1px 0 rgba(59, 130, 246, 0.08);
+}
+
+.aisales-cart-email {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.aisales-cart-meta {
+  font-size: var(--aisales-font-xs);
+  color: var(--aisales-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.aisales-cart-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.aisales-cart-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--aisales-space-3);
+}
+
+.aisales-cart-summary__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.aisales-cart-summary__count {
+  font-weight: var(--aisales-font-weight-semibold);
+  font-size: var(--aisales-font-sm);
+  color: var(--aisales-text-primary);
+}
+
+.aisales-cart-summary__preview {
+  font-size: var(--aisales-font-xs);
+  color: var(--aisales-text-secondary);
+}
+
+.aisales-cart-details-row td {
+  background: var(--aisales-bg-subtle);
+}
+
+.aisales-cart-details {
+  padding: var(--aisales-space-4);
+  border-radius: var(--aisales-radius-md);
+  background: var(--aisales-bg-white);
+  border: 1px solid var(--aisales-border-lighter);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.aisales-cart-details__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--aisales-space-3);
+}
+
+.aisales-cart-details__title {
+  font-size: var(--aisales-font-sm);
+  font-weight: var(--aisales-font-weight-semibold);
+  color: var(--aisales-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.aisales-cart-details__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.aisales-cart-details__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: var(--aisales-radius-sm);
+  background: var(--aisales-bg-subtle);
+}
+
+.aisales-cart-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.aisales-cart-item__name {
+  font-weight: var(--aisales-font-weight-medium);
+  color: var(--aisales-text-primary);
+}
+
+.aisales-cart-item__meta {
+  font-size: var(--aisales-font-xs);
+  color: var(--aisales-text-secondary);
+  white-space: nowrap;
+}
+
+.aisales-cart-total {
+  font-weight: var(--aisales-font-weight-semibold);
+  color: var(--aisales-text-primary);
+}
+
+.aisales-cart-timestamp {
+  font-size: var(--aisales-font-xs);
+  color: var(--aisales-text-muted);
+}
+
+.aisales-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: var(--aisales-font-xs);
+  font-weight: var(--aisales-font-weight-semibold);
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.aisales-status-badge--warning {
+  color: #92400e;
+  background: rgba(251, 191, 36, 0.18);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+}
+
+.aisales-status-badge--success {
+  color: #065f46;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.aisales-status-badge--muted {
+  color: var(--aisales-text-muted);
+  background: var(--aisales-bg-subtle);
+  border: 1px solid var(--aisales-border-lighter);
+}
+
+.aisales-status-badge--info {
+  color: #1e3a8a;
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.aisales-status-badge--neutral {
+  color: var(--aisales-text-secondary);
+  background: var(--aisales-bg-subtle);
+  border: 1px solid var(--aisales-border-lighter);
+}
+
+.aisales-cart-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.aisales-cart-actions__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: var(--aisales-font-xs);
+  font-weight: var(--aisales-font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #0f172a;
+  background: rgba(148, 163, 184, 0.15);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+.aisales-cart-actions__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.aisales-payment-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: var(--aisales-radius-md);
+  background: var(--aisales-bg-subtle);
+  border: 1px dashed rgba(59, 130, 246, 0.35);
+}
+
+.aisales-payment-link__url {
+  font-size: var(--aisales-font-xs);
+  color: var(--aisales-primary);
+  text-decoration: none;
+  font-weight: var(--aisales-font-weight-medium);
+}
+
+.aisales-payment-link__url:hover {
+  text-decoration: underline;
+}
+
+.aisales-btn__label {
+  display: inline-flex;
+  align-items: center;
+}
+
+.aisales-abandoned-carts-page__settings {
+  margin-top: var(--aisales-space-6);
+}
+
+.aisales-abandoned-carts-settings {
+  background: var(--aisales-bg-white);
+  border: 1px solid var(--aisales-border-light);
+  border-radius: var(--aisales-radius-lg);
+  padding: var(--aisales-space-5);
+}
+
+.aisales-abandoned-carts-settings h2 {
+  margin-top: 0;
 }
 
 .aisales-card__icon--red .dashicons {
@@ -5202,5 +5557,675 @@ td.aisales-table__col--date {
   .aisales-payment-card__actions .aisales-btn {
     flex: 1;
     justify-content: center;
+  }
+}
+
+/* =========================================
+   Abandoned Cart Settings Modal
+   ========================================= */
+
+/* Modal extends base modal styles */
+.aisales-abandoned-cart-settings-modal {
+  max-width: 500px;
+}
+
+.aisales-abandoned-cart-settings-modal .aisales-modal__body {
+  padding: var(--aisales-space-5) var(--aisales-space-6);
+}
+
+/* Checkbox label styling */
+.aisales-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--aisales-space-2);
+  font-size: var(--aisales-font-sm);
+  color: var(--aisales-text-primary);
+  cursor: pointer;
+}
+
+.aisales-checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
+}
+
+/* Email timing grid */
+.aisales-email-timing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--aisales-space-3);
+}
+
+.aisales-email-timing-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--aisales-space-2);
+}
+
+.aisales-email-timing-item label {
+  font-size: var(--aisales-font-xs);
+  font-weight: var(--aisales-font-weight-medium);
+  color: var(--aisales-text-secondary);
+}
+
+.aisales-email-timing-item .aisales-form-input {
+  height: 40px;
+  padding: 0 var(--aisales-space-3);
+}
+
+/* Modal form input adjustments */
+.aisales-abandoned-cart-settings-modal .aisales-form-input {
+  height: 44px;
+}
+
+.aisales-abandoned-cart-settings-modal select.aisales-form-input {
+  padding: 0 var(--aisales-space-4);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 40px;
+}
+
+/* Responsive modal */
+@media (max-width: 600px) {
+  .aisales-abandoned-cart-settings-modal {
+    width: 95%;
+    max-width: none;
+  }
+
+  .aisales-email-timing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aisales-abandoned-cart-settings-modal .aisales-modal__footer {
+    flex-direction: column-reverse;
+    gap: var(--aisales-space-3);
+  }
+
+  .aisales-abandoned-cart-settings-modal .aisales-modal__footer .aisales-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* =========================================
+   Abandoned Carts Page Header
+   ========================================= */
+
+.aisales-abandoned-carts-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--aisales-space-5);
+}
+
+.aisales-abandoned-carts-page__title {
+  margin: 0;
+  font-size: 23px;
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--aisales-text-primary);
+}
+
+@media (max-width: 600px) {
+  .aisales-abandoned-carts-page__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--aisales-space-3);
+  }
+}
+
+/* =========================================
+   Dashboard Feature Cards
+   ========================================= */
+
+/* Section container */
+.aisales-section {
+  margin-top: var(--aisales-space-6);
+}
+
+.aisales-section__header {
+  margin-bottom: var(--aisales-space-4);
+}
+
+.aisales-section__title {
+  display: flex;
+  align-items: center;
+  gap: var(--aisales-space-2);
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--aisales-text-primary);
+}
+
+.aisales-section__title .dashicons {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: var(--aisales-primary);
+}
+
+/* Feature grid */
+.aisales-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--aisales-space-4);
+}
+
+.aisales-feature-grid--2col {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+/* Feature card */
+.aisales-feature-card {
+  display: flex;
+  align-items: center;
+  gap: var(--aisales-space-4);
+  padding: var(--aisales-space-4);
+  background: var(--aisales-bg-white);
+  border: 1px solid var(--aisales-border-light);
+  border-radius: var(--aisales-radius-lg);
+  text-decoration: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.aisales-feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, transparent);
+  transition: background 0.25s ease;
+}
+
+.aisales-feature-card:hover {
+  border-color: var(--aisales-border);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.08), 0 4px 8px -2px rgba(0, 0, 0, 0.04);
+  transform: translateY(-2px);
+}
+
+.aisales-feature-card:focus {
+  outline: 2px solid var(--aisales-primary);
+  outline-offset: 2px;
+}
+
+/* Feature card icon */
+.aisales-feature-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  position: relative;
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.12);
+}
+
+.aisales-feature-card__icon .dashicons {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+  color: #ffffff;
+  position: relative;
+  z-index: 1;
+}
+
+/* Icon color variants - refined with subtle inner glow and better gradients */
+
+/* AI Agent Chat - Deep indigo to violet */
+.aisales-feature-card__icon--chat {
+  background: linear-gradient(145deg, #6366f1 0%, #7c3aed 100%);
+  box-shadow: 0 4px 14px -2px rgba(99, 102, 241, 0.4);
+}
+
+.aisales-feature-card:hover .aisales-feature-card__icon--chat {
+  box-shadow: 0 6px 20px -2px rgba(99, 102, 241, 0.5);
+}
+
+.aisales-feature-card:has(.aisales-feature-card__icon--chat):hover::before {
+  background: linear-gradient(90deg, #6366f1, #7c3aed);
+}
+
+/* Email Templates - Rose pink */
+.aisales-feature-card__icon--email {
+  background: linear-gradient(145deg, #e11d48 0%, #f43f5e 100%);
+  box-shadow: 0 4px 14px -2px rgba(225, 29, 72, 0.4);
+}
+
+.aisales-feature-card:hover .aisales-feature-card__icon--email {
+  box-shadow: 0 6px 20px -2px rgba(225, 29, 72, 0.5);
+}
+
+.aisales-feature-card:has(.aisales-feature-card__icon--email):hover::before {
+  background: linear-gradient(90deg, #e11d48, #f43f5e);
+}
+
+/* Brand Settings - Warm amber/orange */
+.aisales-feature-card__icon--brand {
+  background: linear-gradient(145deg, #d97706 0%, #f59e0b 100%);
+  box-shadow: 0 4px 14px -2px rgba(217, 119, 6, 0.4);
+}
+
+.aisales-feature-card:hover .aisales-feature-card__icon--brand {
+  box-shadow: 0 6px 20px -2px rgba(217, 119, 6, 0.5);
+}
+
+.aisales-feature-card:has(.aisales-feature-card__icon--brand):hover::before {
+  background: linear-gradient(90deg, #d97706, #f59e0b);
+}
+
+/* Widgets - Fresh emerald */
+.aisales-feature-card__icon--widgets {
+  background: linear-gradient(145deg, #059669 0%, #10b981 100%);
+  box-shadow: 0 4px 14px -2px rgba(5, 150, 105, 0.4);
+}
+
+.aisales-feature-card:hover .aisales-feature-card__icon--widgets {
+  box-shadow: 0 6px 20px -2px rgba(5, 150, 105, 0.5);
+}
+
+.aisales-feature-card:has(.aisales-feature-card__icon--widgets):hover::before {
+  background: linear-gradient(90deg, #059669, #10b981);
+}
+
+/* Abandoned Carts - Deep coral/red */
+.aisales-feature-card__icon--carts {
+  background: linear-gradient(145deg, #dc2626 0%, #ef4444 100%);
+  box-shadow: 0 4px 14px -2px rgba(220, 38, 38, 0.4);
+}
+
+.aisales-feature-card:hover .aisales-feature-card__icon--carts {
+  box-shadow: 0 6px 20px -2px rgba(220, 38, 38, 0.5);
+}
+
+.aisales-feature-card:has(.aisales-feature-card__icon--carts):hover::before {
+  background: linear-gradient(90deg, #dc2626, #ef4444);
+}
+
+/* Manage Catalog - Ocean blue */
+.aisales-feature-card__icon--bulk {
+  background: linear-gradient(145deg, #0284c7 0%, #0ea5e9 100%);
+  box-shadow: 0 4px 14px -2px rgba(2, 132, 199, 0.4);
+}
+
+.aisales-feature-card:hover .aisales-feature-card__icon--bulk {
+  box-shadow: 0 6px 20px -2px rgba(2, 132, 199, 0.5);
+}
+
+.aisales-feature-card:has(.aisales-feature-card__icon--bulk):hover::before {
+  background: linear-gradient(90deg, #0284c7, #0ea5e9);
+}
+
+/* Market Research - Rich purple */
+.aisales-feature-card__icon--research {
+  background: linear-gradient(145deg, #7c3aed 0%, #a78bfa 100%);
+  box-shadow: 0 4px 14px -2px rgba(124, 58, 237, 0.35);
+}
+
+/* Customer Credits - Teal */
+.aisales-feature-card__icon--credits {
+  background: linear-gradient(145deg, #0d9488 0%, #14b8a6 100%);
+  box-shadow: 0 4px 14px -2px rgba(13, 148, 136, 0.35);
+}
+
+/* Feature card content */
+.aisales-feature-card__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.aisales-feature-card__title {
+  display: flex;
+  align-items: center;
+  gap: var(--aisales-space-2);
+  margin: 0 0 var(--aisales-space-1) 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--aisales-text-primary);
+}
+
+.aisales-feature-card__desc {
+  margin: 0;
+  font-size: 13px;
+  color: var(--aisales-text-muted);
+  line-height: 1.4;
+}
+
+/* Arrow icon */
+.aisales-feature-card__arrow {
+  flex-shrink: 0;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: var(--aisales-text-muted);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.aisales-feature-card:hover .aisales-feature-card__arrow {
+  transform: translateX(4px);
+  color: var(--aisales-primary);
+}
+
+/* Coming soon card variant */
+.aisales-feature-card--coming-soon {
+  cursor: default;
+  background: linear-gradient(135deg, var(--aisales-bg-white) 0%, #f8fafc 100%);
+}
+
+.aisales-feature-card--coming-soon::before {
+  display: none;
+}
+
+.aisales-feature-card--coming-soon:hover {
+  transform: none;
+  border-color: var(--aisales-border-light);
+  box-shadow: none;
+}
+
+.aisales-feature-card--coming-soon .aisales-feature-card__icon {
+  opacity: 0.65;
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.08);
+}
+
+/* Coming soon badge */
+.aisales-badge--soon {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border-radius: var(--aisales-radius-full);
+}
+
+/* =========================================
+   Getting Started Grid Layout
+   ========================================= */
+
+.aisales-howto__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--aisales-space-6);
+}
+
+.aisales-howto__column {
+  padding: var(--aisales-space-4);
+  background: var(--aisales-surface);
+  border-radius: var(--aisales-radius-md);
+}
+
+.aisales-howto__subtitle {
+  margin: 0 0 var(--aisales-space-3) 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--aisales-text-primary);
+}
+
+.aisales-howto__column .aisales-howto__steps {
+  margin: 0;
+  padding-left: var(--aisales-space-5);
+}
+
+.aisales-howto__column .aisales-howto__step {
+  margin-bottom: var(--aisales-space-2);
+  font-size: 13px;
+  color: var(--aisales-text-secondary);
+}
+
+.aisales-howto__column .aisales-howto__step:last-child {
+  margin-bottom: 0;
+}
+
+/* =========================================
+   Dashboard Responsive
+   ========================================= */
+
+@media (max-width: 1200px) {
+  .aisales-feature-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .aisales-howto__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 782px) {
+  .aisales-feature-grid,
+  .aisales-feature-grid--2col,
+  .aisales-howto__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aisales-feature-card {
+    padding: var(--aisales-space-3);
+  }
+
+  .aisales-feature-card__icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .aisales-feature-card__icon .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* =========================================
+   Hide Third-Party Notices on Plugin Pages
+   ========================================= */
+
+/* Hide other plugin notices on AI Sales Manager pages */
+.toplevel_page_ai-sales-manager .notice:not(.aisales-alert),
+.ai-sales-manager_page_ai-sales-chat .notice:not(.aisales-alert),
+.ai-sales-manager_page_ai-sales-bulk .notice:not(.aisales-alert),
+.ai-sales-manager_page_ai-sales-email .notice:not(.aisales-alert),
+.ai-sales-manager_page_ai-sales-brand .notice:not(.aisales-alert),
+.ai-sales-manager_page_ai-sales-widgets .notice:not(.aisales-alert),
+.ai-sales-manager_page_ai-sales-abandoned-carts .notice:not(.aisales-alert),
+.ai-sales-manager_page_ai-sales-support .notice:not(.aisales-alert) {
+  display: none !important;
+}
+
+/* Also hide the update-nag and other common admin notices */
+.toplevel_page_ai-sales-manager .update-nag,
+.toplevel_page_ai-sales-manager #tptn-admin-notice,
+.toplevel_page_ai-sales-manager .wpforms-review-notice,
+.toplevel_page_ai-sales-manager [class*="wpseo-"],
+.ai-sales-manager_page_ai-sales-chat .update-nag,
+.ai-sales-manager_page_ai-sales-bulk .update-nag,
+.ai-sales-manager_page_ai-sales-email .update-nag,
+.ai-sales-manager_page_ai-sales-brand .update-nag,
+.ai-sales-manager_page_ai-sales-widgets .update-nag,
+.ai-sales-manager_page_ai-sales-abandoned-carts .update-nag,
+.ai-sales-manager_page_ai-sales-support .update-nag {
+  display: none !important;
+}
+
+/* =========================================
+   Action Group (Icon-only button group)
+   ========================================= */
+
+.aisales-action-group {
+  display: inline-flex;
+  align-items: stretch;
+  border-radius: var(--aisales-radius-md);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  font-size: 0; /* Eliminate whitespace between inline elements */
+  vertical-align: middle;
+}
+
+.aisales-action-group__btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  margin: 0;
+  background: var(--aisales-surface);
+  border: 1px solid var(--aisales-border);
+  color: var(--aisales-text-secondary);
+  cursor: pointer;
+  transition: all var(--aisales-transition-fast);
+  text-decoration: none;
+  font-size: var(--aisales-font-sm); /* Reset font-size */
+  line-height: 1;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.aisales-action-group__btn:first-child {
+  border-radius: var(--aisales-radius-md) 0 0 var(--aisales-radius-md);
+}
+
+.aisales-action-group__btn:last-child {
+  border-radius: 0 var(--aisales-radius-md) var(--aisales-radius-md) 0;
+}
+
+.aisales-action-group__btn:only-child {
+  border-radius: var(--aisales-radius-md);
+}
+
+.aisales-action-group__btn:not(:first-child) {
+  margin-left: -1px;
+}
+
+.aisales-action-group__btn:hover,
+.aisales-action-group__btn:focus {
+  background: var(--aisales-primary-light);
+  border-color: var(--aisales-primary);
+  color: var(--aisales-primary);
+  z-index: 2;
+}
+
+.aisales-action-group__btn:active {
+  background: rgba(var(--aisales-primary-rgb), 0.15);
+  transform: scale(0.96);
+}
+
+.aisales-action-group__btn .dashicons {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  line-height: 1;
+}
+
+/* Success state for copy button feedback */
+.aisales-action-group__btn.aisales-btn--success {
+  background: var(--aisales-success-light);
+  border-color: var(--aisales-success);
+  color: var(--aisales-success);
+}
+
+/* Action Group Tooltips */
+.aisales-action-group__btn[data-tooltip]::before,
+.aisales-action-group__btn[data-tooltip]::after {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--aisales-transition-fast), visibility var(--aisales-transition-fast);
+  pointer-events: none;
+  z-index: 100;
+}
+
+.aisales-action-group__btn[data-tooltip]::before {
+  content: attr(data-tooltip);
+  bottom: calc(100% + 6px);
+  padding: 6px 10px;
+  background: var(--aisales-text-primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+  border-radius: var(--aisales-radius-sm);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.aisales-action-group__btn[data-tooltip]::after {
+  content: '';
+  bottom: calc(100% + 2px);
+  border: 4px solid transparent;
+  border-top-color: var(--aisales-text-primary);
+}
+
+.aisales-action-group__btn[data-tooltip]:hover::before,
+.aisales-action-group__btn[data-tooltip]:hover::after,
+.aisales-action-group__btn[data-tooltip]:focus::before,
+.aisales-action-group__btn[data-tooltip]:focus::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Tooltip success state */
+.aisales-action-group__btn[data-tooltip].aisales-tooltip--success::before {
+  background: var(--aisales-success);
+}
+
+.aisales-action-group__btn[data-tooltip].aisales-tooltip--success::after {
+  border-top-color: var(--aisales-success);
+}
+
+/* =========================================
+   Button Loading State (CSS Spinner)
+   ========================================= */
+
+.aisales-btn--loading {
+  position: relative;
+  pointer-events: none;
+  color: transparent !important;
+}
+
+.aisales-btn--loading .aisales-btn__label,
+.aisales-btn--loading .dashicons {
+  visibility: hidden;
+}
+
+.aisales-btn--loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: aisales-spin 0.6s linear infinite;
+  opacity: 1;
+}
+
+.aisales-btn--loading.aisales-btn--primary::after {
+  border-color: rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+}
+
+.aisales-btn--loading.aisales-btn--secondary::after,
+.aisales-btn--loading.aisales-btn--ghost::after {
+  border-color: rgba(34, 113, 177, 0.3);
+  border-top-color: var(--aisales-primary);
+}
+
+@keyframes aisales-spin {
+  to {
+    transform: rotate(360deg);
   }
 }

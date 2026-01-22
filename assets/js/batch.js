@@ -1125,17 +1125,7 @@
 						<span class="aisales-results-table__status aisales-results-table__status--pending">Pending</span>
 					</td>
 					<td>
-						<div class="aisales-results-table__actions">
-							<button type="button" class="aisales-btn aisales-btn--secondary aisales-btn--sm aisales-view-details" data-product-id="${result.product_id}" title="View Changes">
-								<span class="dashicons dashicons-visibility"></span>
-							</button>
-							<a href="${escapeHtml(viewUrl)}" target="_blank" rel="noopener noreferrer" class="aisales-btn aisales-btn--secondary aisales-btn--sm" title="View Product Page">
-								<span class="dashicons dashicons-external"></span>
-							</a>
-							<a href="${escapeHtml(editUrl)}" target="_blank" rel="noopener noreferrer" class="aisales-btn aisales-btn--secondary aisales-btn--sm" title="Edit Product">
-								<span class="dashicons dashicons-edit"></span>
-							</a>
-						</div>
+						<div class="aisales-action-group"><button type="button" class="aisales-action-group__btn aisales-view-details" data-product-id="${result.product_id}" data-tooltip="View changes"><span class="dashicons dashicons-visibility"></span></button><a href="${escapeHtml(viewUrl)}" target="_blank" rel="noopener noreferrer" class="aisales-action-group__btn" data-tooltip="View product"><span class="dashicons dashicons-external"></span></a><a href="${escapeHtml(editUrl)}" target="_blank" rel="noopener noreferrer" class="aisales-action-group__btn" data-tooltip="Edit product"><span class="dashicons dashicons-edit"></span></a></div>
 					</td>
 				</tr>
 			`);

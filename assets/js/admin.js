@@ -18,6 +18,7 @@
             this.bindStoreContextEvents();
             this.bindBalanceModalEvents();
             this.bindBillingEvents();
+            this.bindAbandonedCartActions();
             this.handlePageToasts();
             this.handlePaymentSetupReturn();
             this.initBalanceIndicator();
@@ -1002,6 +1003,184 @@
         },
 
         /**
+         * Bind abandoned cart actions
+         */
+        bindAbandonedCartActions: function() {
+            var self = this;
+            var $page = $('.aisales-abandoned-carts-page');
+
+            if (!$page.length) {
+                return;
+            }
+
+            $page.on('click', '.aisales-abandoned-cart-create-order', function() {
+                var $btn = $(this);
+                var cartId = $btn.data('cart-id');
+
+                if (!cartId) {
+                    return;
+                }
+
+                $btn.addClass('aisales-btn--loading').prop('disabled', true);
+                $btn.find('.aisales-btn__label').text('Creating...');
+
+                $.ajax({
+                    url: aisalesAdmin.ajaxUrl,
+                    method: 'POST',
+                    data: {
+                        action: 'aisales_create_abandoned_cart_order',
+                        nonce: aisalesAdmin.nonce,
+                        cart_id: cartId
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            self.updateAbandonedCartRow(cartId, response.data);
+                            self.showRichToast({
+                                type: 'success',
+                                icon: 'dashicons-yes-alt',
+                                title: 'Order Ready',
+                                message: response.data.success || 'Share the payment link with the customer.',
+                                duration: 4000
+                            });
+                        } else {
+                            self.showRichToast({
+                                type: 'error',
+                                icon: 'dashicons-warning',
+                                title: 'Order Failed',
+                                message: response.data.message || aisalesAdmin.strings.error,
+                                duration: 4000
+                            });
+                        }
+                    },
+                    error: function() {
+                        self.showRichToast({
+                            type: 'error',
+                            icon: 'dashicons-warning',
+                            title: 'Connection Error',
+                            message: aisalesAdmin.strings.error,
+                            duration: 4000
+                        });
+                    },
+                    complete: function() {
+                        $btn.removeClass('aisales-btn--loading').prop('disabled', false);
+                        $btn.find('.aisales-btn__label').text('Create order');
+                    }
+                });
+            });
+
+            $page.on('click', '.aisales-abandoned-cart-copy-link', function() {
+                var $btn = $(this);
+                var paymentUrl = $btn.data('payment-url');
+
+                if (!paymentUrl) {
+                    return;
+                }
+
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(paymentUrl).then(function() {
+                        self.showCopyFeedback($btn, 'Link copied');
+                    }).catch(function() {
+                        self.fallbackCopy(paymentUrl, $btn, $btn.find('.dashicons'));
+                    });
+                } else {
+                    self.fallbackCopy(paymentUrl, $btn, $btn.find('.dashicons'));
+                }
+            });
+
+            $page.on('click', '.aisales-cart-toggle', function() {
+                var $btn = $(this);
+                var cartId = $btn.data('cart-id');
+                var $detailsRow = $('.aisales-cart-details-row[data-cart-id="' + cartId + '"]');
+                var $summaryButton = $('.aisales-cart-summary .aisales-cart-toggle[data-cart-id="' + cartId + '"]');
+
+                if (!$detailsRow.length) {
+                    return;
+                }
+
+                var isVisible = $detailsRow.is(':visible');
+                $detailsRow.toggle(!isVisible);
+
+                if ($summaryButton.length) {
+                    $summaryButton.find('.aisales-btn__label').text(isVisible ? 'View items' : 'Hide items');
+                    $summaryButton.find('.dashicons').toggleClass('dashicons-visibility', isVisible).toggleClass('dashicons-hidden', !isVisible);
+                }
+            });
+        },
+
+        /**
+         * Update row UI after order creation
+         */
+        updateAbandonedCartRow: function(cartId, data) {
+            var $row = $('.aisales-abandoned-cart-row[data-cart-id="' + cartId + '"]');
+            if (!$row.length) {
+                return;
+            }
+
+            $row.find('[data-column="status"]').html('<span class="aisales-status-badge aisales-status-badge--info">Order Created</span>');
+
+            var actionsHtml = '<div class="aisales-action-group" data-order-id="' + this.escapeHtml(String(data.order_id)) + '">' +
+                '<button type="button" class="aisales-action-group__btn aisales-abandoned-cart-copy-link" data-payment-url="' + this.escapeHtml(data.payment_url) + '" data-tooltip="Copy link">' +
+                    '<span class="dashicons dashicons-admin-links"></span>' +
+                '</button>' +
+                '<a class="aisales-action-group__btn" href="' + this.escapeHtml(data.payment_url) + '" target="_blank" rel="noopener noreferrer" data-tooltip="Open payment">' +
+                    '<span class="dashicons dashicons-external"></span>' +
+                '</a>' +
+                '<a class="aisales-action-group__btn" href="' + this.escapeHtml(data.edit_url) + '" data-tooltip="View order">' +
+                    '<span class="dashicons dashicons-visibility"></span>' +
+                '</a>' +
+            '</div>';
+
+            $row.find('[data-column="actions"]').html(actionsHtml);
+        },
+
+        /**
+         * Show small feedback on copy
+         */
+        showCopyFeedback: function($btn, message) {
+            var $label = $btn.find('.aisales-btn__label');
+            var labelText = $label.length ? $label.text() : $btn.text();
+            var originalText = labelText;
+            var $icon = $btn.find('.dashicons');
+            var originalIcon = $icon.length ? $icon.attr('class') : '';
+            var originalTooltip = $btn.attr('data-tooltip') || '';
+            var isActionGroupBtn = $btn.hasClass('aisales-action-group__btn');
+
+            $btn.addClass('aisales-btn--success');
+
+            // Update tooltip for action group buttons
+            if (isActionGroupBtn && originalTooltip) {
+                $btn.attr('data-tooltip', message).addClass('aisales-tooltip--success');
+            }
+
+            if ($label.length) {
+                $label.text(message);
+            } else if (!isActionGroupBtn) {
+                $btn.text(message);
+            }
+
+            if ($icon.length) {
+                $icon.attr('class', 'dashicons dashicons-yes');
+            }
+
+            setTimeout(function() {
+                $btn.removeClass('aisales-btn--success');
+                if (isActionGroupBtn && originalTooltip) {
+                    $btn.attr('data-tooltip', originalTooltip).removeClass('aisales-tooltip--success');
+                }
+                if ($label.length) {
+                    $label.text(originalText);
+                } else if (!isActionGroupBtn) {
+                    $btn.text(originalText);
+                }
+                if ($icon.length) {
+                    $icon.attr('class', originalIcon);
+                }
+            }, 1800);
+
+            this.showToast(message);
+        },
+
+        /**
          * Initiate quick top-up checkout with specific plan
          */
         initiateQuickTopup: function($btn, planId) {
@@ -1416,11 +1595,7 @@
             $indicator.attr('tabindex', '0');
             $indicator.attr('title', aisalesAdmin.strings.clickToTopUp || 'Click to add tokens');
 
-            // Check if balance is low (below 1000)
-            var balance = this.getBalanceValue();
-            if (balance < 1000) {
-                $indicator.addClass('aisales-balance-indicator--low');
-            }
+            $indicator.removeClass('aisales-balance-indicator--low');
         },
 
         /**
@@ -1595,12 +1770,11 @@
                 $indicator.removeClass('aisales-balance--increasing');
             }, 500);
 
-            // Update low balance state
-            if (newBalance >= 1000) {
-                $indicator.removeClass('aisales-balance-indicator--low');
-            }
+            $indicator.removeClass('aisales-balance-indicator--low');
         }
     };
+
+    window.AISales = AISales;
 
     // Initialize on document ready
     $(document).ready(function() {

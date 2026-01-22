@@ -1065,23 +1065,7 @@
   color: var(--aisales-danger);
 }
 
-.aisales-results-table__actions {
-  display: flex;
-  gap: var(--aisales-space-1);
-  align-items: center;
-}
-
-.aisales-results-table__actions .aisales-btn--sm {
-  padding: 4px 8px;
-  min-width: auto;
-}
-
-.aisales-results-table__actions .aisales-btn--sm .dashicons {
-  font-size: 16px;
-  width: 16px;
-  height: 16px;
-  line-height: 16px;
-}
+/* Results table uses shared .aisales-action-group styles from admin.css */
 
 /* ==========================================================================
    ACTION BAR
