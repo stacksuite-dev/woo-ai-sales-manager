@@ -18,7 +18,6 @@ body.aisales-modal-open {
 .aisales-email-page {
 	max-width: 1400px;
 	margin: 0 auto;
-	padding: 0 var(--aisales-space-4);
 }
 
 .aisales-email-page .aisales-notices-anchor {
@@ -66,6 +65,79 @@ body.aisales-modal-open {
 	display: flex;
 	align-items: center;
 	gap: var(--aisales-space-3);
+}
+
+/* ==========================================================================
+   Tab Navigation (Settings integration)
+   ========================================================================== */
+
+.aisales-email-page__tabs {
+	display: flex;
+	gap: 4px;
+	margin-bottom: 24px;
+	padding: 4px;
+	background: #f1f5f9;
+	border-radius: 10px;
+	border: 1px solid var(--aisales-border-light, #dcdcde);
+}
+
+.aisales-email-tab {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 16px;
+	background: transparent;
+	border: none;
+	border-radius: 8px;
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--aisales-text-secondary, #646970);
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.aisales-email-tab:hover {
+	background: rgba(255, 255, 255, 0.8);
+	color: var(--aisales-text-primary, #1d2327);
+}
+
+.aisales-email-tab--active {
+	background: #fff;
+	color: var(--aisales-primary, #2271b1);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.aisales-email-tab .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+.aisales-email-tab__count {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 20px;
+	height: 20px;
+	padding: 0 6px;
+	background: var(--aisales-bg-muted, #f0f0f1);
+	border-radius: 10px;
+	font-size: 11px;
+	font-weight: 600;
+}
+
+.aisales-email-tab--active .aisales-email-tab__count {
+	background: var(--aisales-primary-light, #e8f4fd);
+	color: var(--aisales-primary, #2271b1);
+}
+
+/* Tab Panels */
+.aisales-email-tab-panel {
+	display: none;
+}
+
+.aisales-email-tab-panel--active {
+	display: block;
 }
 
 /* ==========================================================================

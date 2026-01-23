@@ -951,8 +951,29 @@
 		$('.aisales-email-stat--none .aisales-email-stat__count').text(notCreated);
 	}
 
+	/**
+	 * Handle tab switching between Templates and Settings
+	 */
+	function handleTabSwitch() {
+		$('.aisales-email-tab').on('click', function () {
+			var $tab = $(this);
+			var tabId = $tab.data('tab');
+
+			// Update tab states
+			$('.aisales-email-tab').removeClass('aisales-email-tab--active');
+			$tab.addClass('aisales-email-tab--active');
+
+			// Update panel visibility
+			$('.aisales-email-tab-panel').removeClass('aisales-email-tab-panel--active').hide();
+			$('.aisales-email-tab-panel[data-tab-panel="' + tabId + '"]').addClass('aisales-email-tab-panel--active').show();
+		});
+	}
+
 	// Initialize when document is ready
-	$(document).ready(init);
+	$(document).ready(function () {
+		init();
+		handleTabSwitch();
+	});
 
 	// CSS for spinning animation
 	$('<style>')

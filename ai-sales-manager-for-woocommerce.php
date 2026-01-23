@@ -128,6 +128,7 @@ final class AISales_Sales_Manager {
 			require_once AISALES_PLUGIN_DIR . 'includes/class-aisales-brand-page.php';
 			require_once AISALES_PLUGIN_DIR . 'includes/widgets/class-aisales-widgets-page.php';
 			require_once AISALES_PLUGIN_DIR . 'includes/class-aisales-batch-page.php';
+			require_once AISALES_PLUGIN_DIR . 'includes/class-aisales-seo-checker-page.php';
 		}
 
 		// Frontend shortcodes (load on both admin and frontend for preview support)
@@ -167,6 +168,7 @@ final class AISales_Sales_Manager {
 			AISales_Brand_Page::instance();
 			AISales_Widgets_Page::instance();
 			AISales_Batch_Page::instance();
+			AISales_SEO_Checker_Page::instance();
 		}
 
 		add_action( 'admin_menu', array( $this, 'reorder_submenu_items' ), 999 );
@@ -274,7 +276,7 @@ final class AISales_Sales_Manager {
 	 */
 	private function should_load_admin_assets( $hook ) {
 		// Plugin pages.
-		if ( in_array( $hook, array( 'toplevel_page_ai-sales-manager', 'ai-sales-manager_page_ai-sales-agent', 'ai-sales-manager_page_ai-sales-emails', 'ai-sales-manager_page_ai-sales-support', 'ai-sales-manager_page_ai-sales-brand', 'ai-sales-manager_page_ai-sales-widgets', 'ai-sales-manager_page_ai-sales-abandoned-carts', 'ai-sales-manager_page_ai-sales-abandoned-cart-settings', 'ai-sales-manager_page_ai-sales-bulk', 'ai-sales-manager_page_ai-sales-email-delivery' ), true ) ) {
+		if ( in_array( $hook, array( 'toplevel_page_ai-sales-manager', 'ai-sales-manager_page_ai-sales-agent', 'ai-sales-manager_page_ai-sales-emails', 'ai-sales-manager_page_ai-sales-support', 'ai-sales-manager_page_ai-sales-brand', 'ai-sales-manager_page_ai-sales-widgets', 'ai-sales-manager_page_ai-sales-abandoned-carts', 'ai-sales-manager_page_ai-sales-abandoned-cart-settings', 'ai-sales-manager_page_ai-sales-bulk', 'ai-sales-manager_page_ai-sales-seo-checker' ), true ) ) {
 			return true;
 		}
 

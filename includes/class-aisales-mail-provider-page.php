@@ -41,16 +41,13 @@ class AISales_Mail_Provider_Page {
 
 	/**
 	 * Add submenu page under AI Sales Manager.
+	 *
+	 * Note: Menu item removed - Email Settings now accessed via Email Templates page.
+	 * Keeping method for backward compatibility in case of direct URL access.
 	 */
 	public function add_submenu_page() {
-		add_submenu_page(
-			'ai-sales-manager',
-			__( 'Email Settings', 'ai-sales-manager-for-woocommerce' ),
-			__( 'Email Settings', 'ai-sales-manager-for-woocommerce' ),
-			'manage_woocommerce',
-			'ai-sales-email-delivery',
-			array( $this, 'render_page' )
-		);
+		// Menu registration removed - settings integrated into Email Templates page.
+		// The functionality is now available via the Settings tab in Email Templates.
 	}
 
 	/**

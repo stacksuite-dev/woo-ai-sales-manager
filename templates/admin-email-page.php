@@ -51,6 +51,21 @@ defined( 'ABSPATH' ) || exit;
 			</div>
 		</div>
 	<?php else : ?>
+		<!-- Tab Navigation (widgets-style) -->
+		<nav class="aisales-email-page__tabs">
+			<button type="button" class="aisales-email-tab aisales-email-tab--active" data-tab="templates">
+				<span class="dashicons dashicons-email-alt"></span>
+				<span class="aisales-email-tab__text"><?php esc_html_e( 'Templates', 'ai-sales-manager-for-woocommerce' ); ?></span>
+				<span class="aisales-email-tab__count"><?php echo esc_html( $stats['total'] ); ?></span>
+			</button>
+			<button type="button" class="aisales-email-tab" data-tab="settings">
+				<span class="dashicons dashicons-admin-generic"></span>
+				<span class="aisales-email-tab__text"><?php esc_html_e( 'Settings', 'ai-sales-manager-for-woocommerce' ); ?></span>
+			</button>
+		</nav>
+
+		<!-- Tab Panel: Templates -->
+		<div class="aisales-email-tab-panel aisales-email-tab-panel--active" data-tab-panel="templates">
 		<!-- Main Content Container -->
 		<div class="aisales-email-page__content">
 			<!-- List View (Default) -->
@@ -396,6 +411,15 @@ defined( 'ABSPATH' ) || exit;
 				</div>
 			<?php endforeach; ?>
 		</div>
+		</div><!-- /.aisales-email-tab-panel[templates] -->
+
+		<!-- Tab Panel: Settings -->
+		<div class="aisales-email-tab-panel" data-tab-panel="settings" style="display: none;">
+			<?php
+			$mail_settings = AISales_Mail_Provider::instance()->get_settings();
+			include AISALES_PLUGIN_DIR . 'templates/partials/email-settings-panel.php';
+			?>
+		</div><!-- /.aisales-email-tab-panel[settings] -->
 	<?php endif; ?>
 </div>
 
