@@ -40,18 +40,24 @@ class AISales_Email_Manager {
 			'description' => 'Sent when a new order is received and payment is confirmed',
 			'wc_email_id' => 'customer_processing_order',
 			'is_mvp'      => true,
+			'category'    => 'transactional',
+			'icon'        => 'dashicons-yes-alt',
 		),
 		'order_shipped'           => array(
 			'label'       => 'Order Shipped',
 			'description' => 'Sent when an order is marked as shipped with tracking info',
 			'wc_email_id' => 'customer_note',
 			'is_mvp'      => true,
+			'category'    => 'transactional',
+			'icon'        => 'dashicons-airplane',
 		),
 		'order_completed'         => array(
 			'label'       => 'Order Completed',
 			'description' => 'Sent when an order is marked as complete',
 			'wc_email_id' => 'customer_completed_order',
 			'is_mvp'      => true,
+			'category'    => 'transactional',
+			'icon'        => 'dashicons-saved',
 		),
 		// Phase 2: Customer Account Emails.
 		'customer_new_account'    => array(
@@ -59,30 +65,42 @@ class AISales_Email_Manager {
 			'description' => 'Welcome email sent when a customer creates an account',
 			'wc_email_id' => 'customer_new_account',
 			'is_mvp'      => false,
+			'category'    => 'customer',
+			'icon'        => 'dashicons-admin-users',
+			'is_user'     => true,
 		),
 		'customer_reset_password' => array(
 			'label'       => 'Password Reset',
 			'description' => 'Sent when a customer requests to reset their password',
 			'wc_email_id' => 'customer_reset_password',
 			'is_mvp'      => false,
+			'category'    => 'customer',
+			'icon'        => 'dashicons-lock',
+			'is_user'     => true,
 		),
 		'customer_invoice'        => array(
 			'label'       => 'Customer Invoice',
 			'description' => 'Sent to customers with order details and payment link',
 			'wc_email_id' => 'customer_invoice',
 			'is_mvp'      => false,
+			'category'    => 'customer',
+			'icon'        => 'dashicons-media-text',
 		),
 		'customer_note'           => array(
 			'label'       => 'Customer Note',
 			'description' => 'Sent when the store adds a note to the customer order',
 			'wc_email_id' => 'customer_note',
 			'is_mvp'      => false,
+			'category'    => 'customer',
+			'icon'        => 'dashicons-testimonial',
 		),
 		'customer_refunded_order' => array(
 			'label'       => 'Order Refunded',
 			'description' => 'Sent when an order is fully or partially refunded',
 			'wc_email_id' => 'customer_refunded_order',
 			'is_mvp'      => false,
+			'category'    => 'customer',
+			'icon'        => 'dashicons-money-alt',
 		),
 		// Phase 3: Admin Notification Emails.
 		'new_order_admin'         => array(
@@ -91,6 +109,8 @@ class AISales_Email_Manager {
 			'wc_email_id' => 'new_order',
 			'is_mvp'      => false,
 			'is_admin'    => true,
+			'category'    => 'admin',
+			'icon'        => 'dashicons-cart',
 		),
 		'cancelled_order_admin'   => array(
 			'label'       => 'Cancelled Order (Admin)',
@@ -98,6 +118,8 @@ class AISales_Email_Manager {
 			'wc_email_id' => 'cancelled_order',
 			'is_mvp'      => false,
 			'is_admin'    => true,
+			'category'    => 'admin',
+			'icon'        => 'dashicons-dismiss',
 		),
 		'failed_order_admin'      => array(
 			'label'       => 'Failed Order (Admin)',
@@ -105,6 +127,8 @@ class AISales_Email_Manager {
 			'wc_email_id' => 'failed_order',
 			'is_mvp'      => false,
 			'is_admin'    => true,
+			'category'    => 'admin',
+			'icon'        => 'dashicons-warning',
 		),
 		// Phase 4: Order Status Emails (Customer).
 		'order_on_hold'           => array(
@@ -112,18 +136,24 @@ class AISales_Email_Manager {
 			'description' => 'Sent when an order is placed on hold awaiting payment',
 			'wc_email_id' => 'customer_on_hold_order',
 			'is_mvp'      => false,
+			'category'    => 'transactional',
+			'icon'        => 'dashicons-clock',
 		),
 		'order_cancelled'         => array(
 			'label'       => 'Order Cancelled',
 			'description' => 'Sent when a customer order is cancelled',
 			'wc_email_id' => 'customer_cancelled_order',
 			'is_mvp'      => false,
+			'category'    => 'transactional',
+			'icon'        => 'dashicons-no',
 		),
 		'order_failed'            => array(
 			'label'       => 'Payment Failed',
 			'description' => 'Sent when a customer payment fails',
 			'wc_email_id' => 'customer_failed_order',
 			'is_mvp'      => false,
+			'category'    => 'transactional',
+			'icon'        => 'dashicons-warning',
 		),
 		// Phase 5: Abandoned Cart Recovery Emails.
 		'abandoned_cart_1'        => array(
@@ -132,6 +162,8 @@ class AISales_Email_Manager {
 			'wc_email_id' => 'aisales_abandoned_cart_1',
 			'is_mvp'      => false,
 			'is_recovery' => true,
+			'category'    => 'recovery',
+			'icon'        => 'dashicons-email',
 		),
 		'abandoned_cart_2'        => array(
 			'label'       => 'Cart Reminder (2nd)',
@@ -139,6 +171,8 @@ class AISales_Email_Manager {
 			'wc_email_id' => 'aisales_abandoned_cart_2',
 			'is_mvp'      => false,
 			'is_recovery' => true,
+			'category'    => 'recovery',
+			'icon'        => 'dashicons-email-alt',
 		),
 		'abandoned_cart_3'        => array(
 			'label'       => 'Cart Reminder (Final)',
@@ -146,6 +180,8 @@ class AISales_Email_Manager {
 			'wc_email_id' => 'aisales_abandoned_cart_3',
 			'is_mvp'      => false,
 			'is_recovery' => true,
+			'category'    => 'recovery',
+			'icon'        => 'dashicons-email-alt2',
 		),
 	);
 
@@ -244,55 +280,66 @@ class AISales_Email_Manager {
 	}
 
 	/**
+	 * WooCommerce email ID to template type mapping.
+	 * Built from template_types on demand.
+	 *
+	 * @var array|null
+	 */
+	private $wc_email_map = null;
+
+	/**
+	 * Get WooCommerce email ID to template type mapping.
+	 *
+	 * @return array Map of wc_email_id => template_type.
+	 */
+	private function get_wc_email_map() {
+		if ( null === $this->wc_email_map ) {
+			$this->wc_email_map = array();
+			foreach ( $this->template_types as $type => $meta ) {
+				// Skip abandoned cart templates (handled by separate system).
+				if ( ! empty( $meta['is_recovery'] ) ) {
+					continue;
+				}
+				$this->wc_email_map[ $meta['wc_email_id'] ] = $type;
+			}
+		}
+		return $this->wc_email_map;
+	}
+
+	/**
 	 * Initialize WooCommerce email hooks
 	 */
 	public function init_email_hooks() {
-		// Only hook if WooCommerce is active and we have templates enabled.
+		// Only hook if WooCommerce is active.
 		if ( ! class_exists( 'WooCommerce' ) ) {
 			return;
 		}
 
-		// Phase 1: Transactional emails - Subject filters.
-		add_filter( 'woocommerce_email_subject_customer_processing_order', array( $this, 'filter_processing_subject' ), 10, 2 );
-		add_filter( 'woocommerce_email_subject_customer_completed_order', array( $this, 'filter_completed_subject' ), 10, 2 );
+		// Register subject and heading filters for all template types dynamically.
+		foreach ( $this->template_types as $type => $meta ) {
+			// Skip abandoned cart templates (handled by separate email system).
+			if ( ! empty( $meta['is_recovery'] ) ) {
+				continue;
+			}
 
-		// Phase 1: Transactional emails - Heading filters.
-		add_filter( 'woocommerce_email_heading_customer_processing_order', array( $this, 'filter_processing_heading' ), 10, 2 );
-		add_filter( 'woocommerce_email_heading_customer_completed_order', array( $this, 'filter_completed_heading' ), 10, 2 );
+			$wc_email_id = $meta['wc_email_id'];
 
-		// Phase 2: Customer account emails - Subject filters.
-		add_filter( 'woocommerce_email_subject_customer_new_account', array( $this, 'filter_new_account_subject' ), 10, 2 );
-		add_filter( 'woocommerce_email_subject_customer_reset_password', array( $this, 'filter_reset_password_subject' ), 10, 2 );
-		add_filter( 'woocommerce_email_subject_customer_invoice', array( $this, 'filter_invoice_subject' ), 10, 2 );
-		add_filter( 'woocommerce_email_subject_customer_note', array( $this, 'filter_customer_note_subject' ), 10, 2 );
-		add_filter( 'woocommerce_email_subject_customer_refunded_order', array( $this, 'filter_refunded_order_subject' ), 10, 2 );
+			// Add subject filter.
+			add_filter(
+				'woocommerce_email_subject_' . $wc_email_id,
+				array( $this, 'filter_email_subject' ),
+				10,
+				2
+			);
 
-		// Phase 2: Customer account emails - Heading filters.
-		add_filter( 'woocommerce_email_heading_customer_new_account', array( $this, 'filter_new_account_heading' ), 10, 2 );
-		add_filter( 'woocommerce_email_heading_customer_reset_password', array( $this, 'filter_reset_password_heading' ), 10, 2 );
-		add_filter( 'woocommerce_email_heading_customer_invoice', array( $this, 'filter_invoice_heading' ), 10, 2 );
-		add_filter( 'woocommerce_email_heading_customer_note', array( $this, 'filter_customer_note_heading' ), 10, 2 );
-		add_filter( 'woocommerce_email_heading_customer_refunded_order', array( $this, 'filter_refunded_order_heading' ), 10, 2 );
-
-		// Phase 3: Admin notification emails - Subject filters.
-		add_filter( 'woocommerce_email_subject_new_order', array( $this, 'filter_new_order_admin_subject' ), 10, 2 );
-		add_filter( 'woocommerce_email_subject_cancelled_order', array( $this, 'filter_cancelled_order_admin_subject' ), 10, 2 );
-		add_filter( 'woocommerce_email_subject_failed_order', array( $this, 'filter_failed_order_admin_subject' ), 10, 2 );
-
-		// Phase 3: Admin notification emails - Heading filters.
-		add_filter( 'woocommerce_email_heading_new_order', array( $this, 'filter_new_order_admin_heading' ), 10, 2 );
-		add_filter( 'woocommerce_email_heading_cancelled_order', array( $this, 'filter_cancelled_order_admin_heading' ), 10, 2 );
-		add_filter( 'woocommerce_email_heading_failed_order', array( $this, 'filter_failed_order_admin_heading' ), 10, 2 );
-
-		// Phase 4: Order status emails - Subject filters.
-		add_filter( 'woocommerce_email_subject_customer_on_hold_order', array( $this, 'filter_on_hold_subject' ), 10, 2 );
-		add_filter( 'woocommerce_email_subject_customer_cancelled_order', array( $this, 'filter_cancelled_subject' ), 10, 2 );
-		add_filter( 'woocommerce_email_subject_customer_failed_order', array( $this, 'filter_failed_subject' ), 10, 2 );
-
-		// Phase 4: Order status emails - Heading filters.
-		add_filter( 'woocommerce_email_heading_customer_on_hold_order', array( $this, 'filter_on_hold_heading' ), 10, 2 );
-		add_filter( 'woocommerce_email_heading_customer_cancelled_order', array( $this, 'filter_cancelled_heading' ), 10, 2 );
-		add_filter( 'woocommerce_email_heading_customer_failed_order', array( $this, 'filter_failed_heading' ), 10, 2 );
+			// Add heading filter.
+			add_filter(
+				'woocommerce_email_heading_' . $wc_email_id,
+				array( $this, 'filter_email_heading' ),
+				10,
+				2
+			);
+		}
 
 		// Content hooks - inject custom content before order table.
 		add_action( 'woocommerce_email_before_order_table', array( $this, 'inject_custom_content' ), 10, 4 );
@@ -556,445 +603,94 @@ class AISales_Email_Manager {
 	}
 
 	/**
-	 * Filter processing order email subject
+	 * Generic email subject filter.
 	 *
-	 * @param string   $subject Default subject.
-	 * @param WC_Order $order   Order object.
+	 * Determines template type from current filter and applies custom subject.
+	 *
+	 * @param string              $subject Default subject.
+	 * @param WC_Order|WP_User    $object  Order or User object.
 	 * @return string Filtered subject.
 	 */
-	public function filter_processing_subject( $subject, $order ) {
-		$template = $this->get_active_template( 'order_processing' );
-		
-		if ( $template && ! empty( $template['subject'] ) ) {
-			return $this->replace_placeholders( $template['subject'], $order );
+	public function filter_email_subject( $subject, $object ) {
+		$template_type = $this->get_template_type_from_filter();
+
+		if ( ! $template_type ) {
+			return $subject;
+		}
+
+		$template = $this->get_active_template( $template_type );
+
+		if ( ! $template || empty( $template['subject'] ) ) {
+			return $subject;
+		}
+
+		// Use user placeholders for user-based emails.
+		$meta = $this->template_types[ $template_type ] ?? array();
+		if ( ! empty( $meta['is_user'] ) && $object instanceof WP_User ) {
+			return $this->replace_user_placeholders( $template['subject'], $object );
+		}
+
+		// Use order placeholders for order-based emails.
+		if ( $object instanceof WC_Order ) {
+			return $this->replace_placeholders( $template['subject'], $object );
 		}
 
 		return $subject;
 	}
 
 	/**
-	 * Filter completed order email subject
+	 * Generic email heading filter.
 	 *
-	 * @param string   $subject Default subject.
-	 * @param WC_Order $order   Order object.
-	 * @return string Filtered subject.
-	 */
-	public function filter_completed_subject( $subject, $order ) {
-		$template = $this->get_active_template( 'order_completed' );
-		
-		if ( $template && ! empty( $template['subject'] ) ) {
-			return $this->replace_placeholders( $template['subject'], $order );
-		}
-
-		return $subject;
-	}
-
-	/**
-	 * Filter processing order email heading
+	 * Determines template type from current filter and applies custom heading.
 	 *
-	 * @param string   $heading Default heading.
-	 * @param WC_Order $order   Order object.
+	 * @param string              $heading Default heading.
+	 * @param WC_Order|WP_User    $object  Order or User object.
 	 * @return string Filtered heading.
 	 */
-	public function filter_processing_heading( $heading, $order ) {
-		$template = $this->get_active_template( 'order_processing' );
-		
-		if ( $template && ! empty( $template['heading'] ) ) {
-			return $this->replace_placeholders( $template['heading'], $order );
+	public function filter_email_heading( $heading, $object ) {
+		$template_type = $this->get_template_type_from_filter();
+
+		if ( ! $template_type ) {
+			return $heading;
+		}
+
+		$template = $this->get_active_template( $template_type );
+
+		if ( ! $template || empty( $template['heading'] ) ) {
+			return $heading;
+		}
+
+		// Use user placeholders for user-based emails.
+		$meta = $this->template_types[ $template_type ] ?? array();
+		if ( ! empty( $meta['is_user'] ) && $object instanceof WP_User ) {
+			return $this->replace_user_placeholders( $template['heading'], $object );
+		}
+
+		// Use order placeholders for order-based emails.
+		if ( $object instanceof WC_Order ) {
+			return $this->replace_placeholders( $template['heading'], $object );
 		}
 
 		return $heading;
 	}
 
 	/**
-	 * Filter completed order email heading
+	 * Determine template type from current filter hook.
 	 *
-	 * @param string   $heading Default heading.
-	 * @param WC_Order $order   Order object.
-	 * @return string Filtered heading.
+	 * @return string|null Template type or null if not found.
 	 */
-	public function filter_completed_heading( $heading, $order ) {
-		$template = $this->get_active_template( 'order_completed' );
+	private function get_template_type_from_filter() {
+		$current_filter = current_filter();
 
-		if ( $template && ! empty( $template['heading'] ) ) {
-			return $this->replace_placeholders( $template['heading'], $order );
+		// Extract WC email ID from filter name.
+		// Filter format: woocommerce_email_subject_{wc_email_id} or woocommerce_email_heading_{wc_email_id}
+		if ( preg_match( '/^woocommerce_email_(?:subject|heading)_(.+)$/', $current_filter, $matches ) ) {
+			$wc_email_id = $matches[1];
+			$map = $this->get_wc_email_map();
+			return $map[ $wc_email_id ] ?? null;
 		}
 
-		return $heading;
-	}
-
-	/**
-	 * Filter new account email subject
-	 *
-	 * @param string  $subject Default subject.
-	 * @param WP_User $user    User object.
-	 * @return string Filtered subject.
-	 */
-	public function filter_new_account_subject( $subject, $user ) {
-		$template = $this->get_active_template( 'customer_new_account' );
-
-		if ( $template && ! empty( $template['subject'] ) ) {
-			return $this->replace_user_placeholders( $template['subject'], $user );
-		}
-
-		return $subject;
-	}
-
-	/**
-	 * Filter new account email heading
-	 *
-	 * @param string  $heading Default heading.
-	 * @param WP_User $user    User object.
-	 * @return string Filtered heading.
-	 */
-	public function filter_new_account_heading( $heading, $user ) {
-		$template = $this->get_active_template( 'customer_new_account' );
-
-		if ( $template && ! empty( $template['heading'] ) ) {
-			return $this->replace_user_placeholders( $template['heading'], $user );
-		}
-
-		return $heading;
-	}
-
-	/**
-	 * Filter reset password email subject
-	 *
-	 * @param string  $subject Default subject.
-	 * @param WP_User $user    User object.
-	 * @return string Filtered subject.
-	 */
-	public function filter_reset_password_subject( $subject, $user ) {
-		$template = $this->get_active_template( 'customer_reset_password' );
-
-		if ( $template && ! empty( $template['subject'] ) ) {
-			return $this->replace_user_placeholders( $template['subject'], $user );
-		}
-
-		return $subject;
-	}
-
-	/**
-	 * Filter reset password email heading
-	 *
-	 * @param string  $heading Default heading.
-	 * @param WP_User $user    User object.
-	 * @return string Filtered heading.
-	 */
-	public function filter_reset_password_heading( $heading, $user ) {
-		$template = $this->get_active_template( 'customer_reset_password' );
-
-		if ( $template && ! empty( $template['heading'] ) ) {
-			return $this->replace_user_placeholders( $template['heading'], $user );
-		}
-
-		return $heading;
-	}
-
-	/**
-	 * Filter invoice email subject
-	 *
-	 * @param string   $subject Default subject.
-	 * @param WC_Order $order   Order object.
-	 * @return string Filtered subject.
-	 */
-	public function filter_invoice_subject( $subject, $order ) {
-		$template = $this->get_active_template( 'customer_invoice' );
-
-		if ( $template && ! empty( $template['subject'] ) ) {
-			return $this->replace_placeholders( $template['subject'], $order );
-		}
-
-		return $subject;
-	}
-
-	/**
-	 * Filter invoice email heading
-	 *
-	 * @param string   $heading Default heading.
-	 * @param WC_Order $order   Order object.
-	 * @return string Filtered heading.
-	 */
-	public function filter_invoice_heading( $heading, $order ) {
-		$template = $this->get_active_template( 'customer_invoice' );
-
-		if ( $template && ! empty( $template['heading'] ) ) {
-			return $this->replace_placeholders( $template['heading'], $order );
-		}
-
-		return $heading;
-	}
-
-	/**
-	 * Filter customer note email subject
-	 *
-	 * @param string   $subject Default subject.
-	 * @param WC_Order $order   Order object.
-	 * @return string Filtered subject.
-	 */
-	public function filter_customer_note_subject( $subject, $order ) {
-		$template = $this->get_active_template( 'customer_note' );
-
-		if ( $template && ! empty( $template['subject'] ) ) {
-			return $this->replace_placeholders( $template['subject'], $order );
-		}
-
-		return $subject;
-	}
-
-	/**
-	 * Filter customer note email heading
-	 *
-	 * @param string   $heading Default heading.
-	 * @param WC_Order $order   Order object.
-	 * @return string Filtered heading.
-	 */
-	public function filter_customer_note_heading( $heading, $order ) {
-		$template = $this->get_active_template( 'customer_note' );
-
-		if ( $template && ! empty( $template['heading'] ) ) {
-			return $this->replace_placeholders( $template['heading'], $order );
-		}
-
-		return $heading;
-	}
-
-	/**
-	 * Filter refunded order email subject
-	 *
-	 * @param string   $subject Default subject.
-	 * @param WC_Order $order   Order object.
-	 * @return string Filtered subject.
-	 */
-	public function filter_refunded_order_subject( $subject, $order ) {
-		$template = $this->get_active_template( 'customer_refunded_order' );
-
-		if ( $template && ! empty( $template['subject'] ) ) {
-			return $this->replace_placeholders( $template['subject'], $order );
-		}
-
-		return $subject;
-	}
-
-	/**
-	 * Filter refunded order email heading
-	 *
-	 * @param string   $heading Default heading.
-	 * @param WC_Order $order   Order object.
-	 * @return string Filtered heading.
-	 */
-	public function filter_refunded_order_heading( $heading, $order ) {
-		$template = $this->get_active_template( 'customer_refunded_order' );
-
-		if ( $template && ! empty( $template['heading'] ) ) {
-			return $this->replace_placeholders( $template['heading'], $order );
-		}
-
-		return $heading;
-	}
-
-	/**
-	 * Filter new order admin email subject
-	 *
-	 * @param string   $subject Default subject.
-	 * @param WC_Order $order   Order object.
-	 * @return string Filtered subject.
-	 */
-	public function filter_new_order_admin_subject( $subject, $order ) {
-		$template = $this->get_active_template( 'new_order_admin' );
-
-		if ( $template && ! empty( $template['subject'] ) ) {
-			return $this->replace_placeholders( $template['subject'], $order );
-		}
-
-		return $subject;
-	}
-
-	/**
-	 * Filter new order admin email heading
-	 *
-	 * @param string   $heading Default heading.
-	 * @param WC_Order $order   Order object.
-	 * @return string Filtered heading.
-	 */
-	public function filter_new_order_admin_heading( $heading, $order ) {
-		$template = $this->get_active_template( 'new_order_admin' );
-
-		if ( $template && ! empty( $template['heading'] ) ) {
-			return $this->replace_placeholders( $template['heading'], $order );
-		}
-
-		return $heading;
-	}
-
-	/**
-	 * Filter cancelled order admin email subject
-	 *
-	 * @param string   $subject Default subject.
-	 * @param WC_Order $order   Order object.
-	 * @return string Filtered subject.
-	 */
-	public function filter_cancelled_order_admin_subject( $subject, $order ) {
-		$template = $this->get_active_template( 'cancelled_order_admin' );
-
-		if ( $template && ! empty( $template['subject'] ) ) {
-			return $this->replace_placeholders( $template['subject'], $order );
-		}
-
-		return $subject;
-	}
-
-	/**
-	 * Filter cancelled order admin email heading
-	 *
-	 * @param string   $heading Default heading.
-	 * @param WC_Order $order   Order object.
-	 * @return string Filtered heading.
-	 */
-	public function filter_cancelled_order_admin_heading( $heading, $order ) {
-		$template = $this->get_active_template( 'cancelled_order_admin' );
-
-		if ( $template && ! empty( $template['heading'] ) ) {
-			return $this->replace_placeholders( $template['heading'], $order );
-		}
-
-		return $heading;
-	}
-
-	/**
-	 * Filter failed order admin email subject
-	 *
-	 * @param string   $subject Default subject.
-	 * @param WC_Order $order   Order object.
-	 * @return string Filtered subject.
-	 */
-	public function filter_failed_order_admin_subject( $subject, $order ) {
-		$template = $this->get_active_template( 'failed_order_admin' );
-
-		if ( $template && ! empty( $template['subject'] ) ) {
-			return $this->replace_placeholders( $template['subject'], $order );
-		}
-
-		return $subject;
-	}
-
-	/**
-	 * Filter failed order admin email heading
-	 *
-	 * @param string   $heading Default heading.
-	 * @param WC_Order $order   Order object.
-	 * @return string Filtered heading.
-	 */
-	public function filter_failed_order_admin_heading( $heading, $order ) {
-		$template = $this->get_active_template( 'failed_order_admin' );
-
-		if ( $template && ! empty( $template['heading'] ) ) {
-			return $this->replace_placeholders( $template['heading'], $order );
-		}
-
-		return $heading;
-	}
-
-	/**
-	 * Filter on hold order email subject
-	 *
-	 * @param string   $subject Default subject.
-	 * @param WC_Order $order   Order object.
-	 * @return string Filtered subject.
-	 */
-	public function filter_on_hold_subject( $subject, $order ) {
-		$template = $this->get_active_template( 'order_on_hold' );
-
-		if ( $template && ! empty( $template['subject'] ) ) {
-			return $this->replace_placeholders( $template['subject'], $order );
-		}
-
-		return $subject;
-	}
-
-	/**
-	 * Filter on hold order email heading
-	 *
-	 * @param string   $heading Default heading.
-	 * @param WC_Order $order   Order object.
-	 * @return string Filtered heading.
-	 */
-	public function filter_on_hold_heading( $heading, $order ) {
-		$template = $this->get_active_template( 'order_on_hold' );
-
-		if ( $template && ! empty( $template['heading'] ) ) {
-			return $this->replace_placeholders( $template['heading'], $order );
-		}
-
-		return $heading;
-	}
-
-	/**
-	 * Filter cancelled order email subject (customer)
-	 *
-	 * @param string   $subject Default subject.
-	 * @param WC_Order $order   Order object.
-	 * @return string Filtered subject.
-	 */
-	public function filter_cancelled_subject( $subject, $order ) {
-		$template = $this->get_active_template( 'order_cancelled' );
-
-		if ( $template && ! empty( $template['subject'] ) ) {
-			return $this->replace_placeholders( $template['subject'], $order );
-		}
-
-		return $subject;
-	}
-
-	/**
-	 * Filter cancelled order email heading (customer)
-	 *
-	 * @param string   $heading Default heading.
-	 * @param WC_Order $order   Order object.
-	 * @return string Filtered heading.
-	 */
-	public function filter_cancelled_heading( $heading, $order ) {
-		$template = $this->get_active_template( 'order_cancelled' );
-
-		if ( $template && ! empty( $template['heading'] ) ) {
-			return $this->replace_placeholders( $template['heading'], $order );
-		}
-
-		return $heading;
-	}
-
-	/**
-	 * Filter failed order email subject (customer)
-	 *
-	 * @param string   $subject Default subject.
-	 * @param WC_Order $order   Order object.
-	 * @return string Filtered subject.
-	 */
-	public function filter_failed_subject( $subject, $order ) {
-		$template = $this->get_active_template( 'order_failed' );
-
-		if ( $template && ! empty( $template['subject'] ) ) {
-			return $this->replace_placeholders( $template['subject'], $order );
-		}
-
-		return $subject;
-	}
-
-	/**
-	 * Filter failed order email heading (customer)
-	 *
-	 * @param string   $heading Default heading.
-	 * @param WC_Order $order   Order object.
-	 * @return string Filtered heading.
-	 */
-	public function filter_failed_heading( $heading, $order ) {
-		$template = $this->get_active_template( 'order_failed' );
-
-		if ( $template && ! empty( $template['heading'] ) ) {
-			return $this->replace_placeholders( $template['heading'], $order );
-		}
-
-		return $heading;
+		return null;
 	}
 
 	/**

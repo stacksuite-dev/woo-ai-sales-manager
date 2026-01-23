@@ -372,6 +372,8 @@ class AISales_Email_Page {
 	/**
 	 * Group templates by category
 	 *
+	 * Uses centralized category metadata from AISales_Email_Manager.
+	 *
 	 * @param array $templates All templates.
 	 * @return array Grouped templates.
 	 */
@@ -399,34 +401,14 @@ class AISales_Email_Page {
 			),
 		);
 
-		// Category mapping.
-		$category_map = array(
-			// Phase 1: Transactional.
-			'order_processing'        => 'transactional',
-			'order_shipped'           => 'transactional',
-			'order_completed'         => 'transactional',
-			// Phase 2: Customer Account.
-			'customer_new_account'    => 'customer',
-			'customer_reset_password' => 'customer',
-			'customer_invoice'        => 'customer',
-			'customer_note'           => 'customer',
-			'customer_refunded_order' => 'customer',
-			// Phase 3: Admin Notifications.
-			'new_order_admin'         => 'admin',
-			'cancelled_order_admin'   => 'admin',
-			'failed_order_admin'      => 'admin',
-			// Phase 4: Order Status (Customer).
-			'order_on_hold'           => 'transactional',
-			'order_cancelled'         => 'transactional',
-			'order_failed'            => 'transactional',
-			// Phase 5: Abandoned Cart Recovery.
-			'abandoned_cart_1'        => 'recovery',
-			'abandoned_cart_2'        => 'recovery',
-			'abandoned_cart_3'        => 'recovery',
-		);
+		// Get template types metadata from email manager (single source of truth).
+		$template_types = AISales_Email_Manager::instance()->get_template_types();
 
 		foreach ( $templates as $type => $template ) {
-			$category = isset( $category_map[ $type ] ) ? $category_map[ $type ] : 'transactional';
+			// Get category from centralized metadata.
+			$category = isset( $template_types[ $type ]['category'] )
+				? $template_types[ $type ]['category']
+				: 'transactional';
 			$groups[ $category ]['templates'][ $type ] = $template;
 		}
 
@@ -473,35 +455,18 @@ class AISales_Email_Page {
 	/**
 	 * Get template icon based on type
 	 *
+	 * Uses centralized icon metadata from AISales_Email_Manager.
+	 *
 	 * @param string $type Template type.
 	 * @return string Dashicon class.
 	 */
 	public static function get_template_icon( $type ) {
-		$icons = array(
-			// Phase 1: Transactional.
-			'order_processing'        => 'dashicons-yes-alt',
-			'order_shipped'           => 'dashicons-airplane',
-			'order_completed'         => 'dashicons-awards',
-			// Phase 2: Customer Account.
-			'customer_new_account'    => 'dashicons-admin-users',
-			'customer_reset_password' => 'dashicons-lock',
-			'customer_invoice'        => 'dashicons-media-text',
-			'customer_note'           => 'dashicons-format-aside',
-			'customer_refunded_order' => 'dashicons-money-alt',
-			// Phase 3: Admin Notifications.
-			'new_order_admin'         => 'dashicons-store',
-			'cancelled_order_admin'   => 'dashicons-dismiss',
-			'failed_order_admin'      => 'dashicons-warning',
-			// Phase 4: Order Status (Customer).
-			'order_on_hold'           => 'dashicons-clock',
-			'order_cancelled'         => 'dashicons-no-alt',
-			'order_failed'            => 'dashicons-thumbs-down',
-			// Phase 5: Abandoned Cart Recovery.
-			'abandoned_cart_1'        => 'dashicons-cart',
-			'abandoned_cart_2'        => 'dashicons-megaphone',
-			'abandoned_cart_3'        => 'dashicons-flag',
-		);
+		$template_types = AISales_Email_Manager::instance()->get_template_types();
 
-		return isset( $icons[ $type ] ) ? $icons[ $type ] : 'dashicons-email-alt';
+		if ( isset( $template_types[ $type ]['icon'] ) ) {
+			return $template_types[ $type ]['icon'];
+		}
+
+		return 'dashicons-email-alt';
 	}
 }
