@@ -881,26 +881,8 @@ $aisales_show_onboarding = empty( $aisales_has_visited ) && 'missing' === $aisal
 	</div>
 </script>
 
-<?php if ( ! empty( $product_data ) ) : ?>
-<script type="text/javascript">
-	// Pre-select product from metabox redirect
-	window.aisalesPreselectedProduct = <?php echo wp_json_encode( $product_data ); ?>;
-	window.aisalesPreselectedEntityType = 'product';
-</script>
-<?php endif; ?>
-
-<?php if ( ! empty( $category_data ) ) : ?>
-<script type="text/javascript">
-	// Pre-select category from URL parameter
-	window.aisalesPreselectedCategory = <?php echo wp_json_encode( $category_data ); ?>;
-	window.aisalesPreselectedEntityType = 'category';
-</script>
-<?php endif; ?>
-
-<script type="text/javascript">
-	// Store context status for JS
-	window.aisalesStoreContext = {
-		status: '<?php echo esc_js( $aisales_context_status ); ?>',
-		isConfigured: <?php echo $aisales_context_status === 'configured' ? 'true' : 'false'; ?>
-	};
-</script>
+<?php
+// Note: Preselected entity data (product_data, category_data) and store context
+// are now passed via wp_add_inline_script() in AISales_Chat_Page::add_preselected_entity_scripts()
+// This ensures compliance with WordPress plugin guidelines for proper script enqueuing.
+?>

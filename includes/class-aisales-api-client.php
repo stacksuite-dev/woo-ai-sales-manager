@@ -338,6 +338,26 @@ class AISales_API_Client {
 		return $this->request( '/ai/brand/analyze', 'POST', $context );
 	}
 
+	/**
+	 * Generate SEO-optimized content (titles, meta descriptions, content, keywords)
+	 *
+	 * @param array $data SEO generation data including:
+	 *   - fix_type: 'title', 'meta_description', 'content', or 'keyword'
+	 *   - item: Item context (type, id, title, description, etc.)
+	 *   - issue: Current SEO issue details
+	 *   - store_context: Optional brand/store context
+	 *   - requirements: Optional length and quality requirements
+	 *   - language: Optional language (default 'English')
+	 * @return array|WP_Error
+	 */
+	public function generate_seo_content( $data ) {
+		if ( $this->use_mock ) {
+			return AISales_API_Mock::generate_seo_content( $data );
+		}
+
+		return $this->request( '/ai/seo/generate', 'POST', $data );
+	}
+
 	// =========================================================================
 	// SUPPORT METHODS
 	// =========================================================================

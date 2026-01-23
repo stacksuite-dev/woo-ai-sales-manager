@@ -3,7 +3,7 @@
  * Plugin Name: AI Sales Manager for WooCommerce
  * Plugin URI: https://github.com/stacksuite-dev/woo-ai-sales-manager
  * Description: AI-powered product catalog management for WooCommerce. Generate content, suggest tags/categories, and create/improve product images using Google Gemini.
- * Version: 1.2.0
+ * Version: 1.4.0
  * Author: StackSuite
  * Author URI: https://stacksuite.dev
  * License: GPL v2 or later
@@ -13,6 +13,7 @@
  * Requires at least: 6.0
  * Tested up to: 6.9
  * Requires PHP: 8.0
+ * Requires Plugins: woocommerce
  * WC requires at least: 8.0
  * WC tested up to: 9.0
  *
@@ -25,7 +26,7 @@ register_activation_hook( __FILE__, 'aisales_activate' );
 register_deactivation_hook( __FILE__, 'aisales_deactivate' );
 
 // Plugin constants
-define( 'AISALES_VERSION', '1.2.0' );
+define( 'AISALES_VERSION', '1.4.0' );
 define( 'AISALES_PLUGIN_FILE', __FILE__ );
 define( 'AISALES_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AISALES_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

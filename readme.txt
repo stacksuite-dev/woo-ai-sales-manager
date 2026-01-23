@@ -4,7 +4,7 @@ Tags: woocommerce, ai, product management, content generation, image generation
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 1.2.0
+Stable tag: 1.4.0
 WC requires at least: 8.0
 WC tested up to: 9.0
 License: GPLv2 or later
@@ -114,6 +114,27 @@ By using the AI features, you agree to these terms.
 
 == Changelog ==
 
+= 1.4.0 =
+* Added: `Requires Plugins: woocommerce` header for WordPress 6.5+ plugin dependencies
+* Fixed: Inline scripts now use wp_add_inline_script() per WordPress coding standards
+* Fixed: Removed external placeholder image URLs (via.placeholder.com) - now uses WooCommerce placeholders
+* Improved: Full WordPress Plugin Review compliance for wp.org submission
+* Added: SEO Checker page for store-wide SEO auditing
+* Added: Batch processing page for bulk product operations
+* Added: Widgets & Shortcodes system with social proof, conversion, and discovery widgets
+* Added: Marketing website with multi-language support (EN, ES, FR, DE, PT, ZH-CN, ZH-TW)
+
+= 1.3.0 =
+* Added: Modular AJAX handler architecture for better code organization
+* Added: Mock API system for development and testing (AISALES_MOCK_MODE)
+* Added: Tool catalog for AI agent capabilities
+* Added: Brand settings page for store branding configuration
+* Added: Support ticket system with AI-powered draft analysis
+* Added: Abandoned cart tracking and recovery emails
+* Added: Mail provider configuration (native WP, SMTP, SendGrid, Mailgun, Postmark)
+* Improved: Chat page with wizard-based task selection flow
+* Improved: Entity panels for product and category editing
+
 = 1.2.0 =
 * Changed: Renamed all code prefixes from 'wooai' to 'aisales' for WordPress.org trademark compliance
 * Changed: Renamed class files from 'class-wooai-*' to 'class-aisales-*'
@@ -140,6 +161,12 @@ By using the AI features, you agree to these terms.
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.4.0 =
+WordPress Plugin Review compliance update. Adds SEO Checker, Widgets system, Batch processing, and Marketing Agent capabilities. Fixes inline scripts and external image references for wp.org submission.
+
+= 1.3.0 =
+Major feature update with modular AJAX architecture, abandoned cart recovery, mail provider configuration, and AI-powered support system.
 
 = 1.2.0 =
 Code refactoring for WordPress.org compliance. All 'wooai' prefixes renamed to 'aisales'. No functionality changes - existing settings will need to be reconfigured after update.

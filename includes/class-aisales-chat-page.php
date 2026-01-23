@@ -536,7 +536,52 @@ class AISales_Chat_Page {
 			$product_data = $this->get_product_data( $product_id );
 		}
 
+		// Add inline script data for preselected entities.
+		$this->add_preselected_entity_scripts( $product_data, $category_data );
+
 		include AISALES_PLUGIN_DIR . 'templates/admin-chat-page.php';
+	}
+
+	/**
+	 * Add inline scripts for preselected entity data using wp_add_inline_script
+	 *
+	 * @param array|null $product_data  Preselected product data.
+	 * @param array|null $category_data Preselected category data.
+	 */
+	private function add_preselected_entity_scripts( $product_data, $category_data ) {
+		// Get store context status.
+		$store_context  = get_option( 'aisales_store_context', array() );
+		$context_status = 'missing';
+
+		if ( ! empty( $store_context ) ) {
+			$has_required   = ! empty( $store_context['store_name'] ) || ! empty( $store_context['business_niche'] );
+			$has_optional   = ! empty( $store_context['target_audience'] ) || ! empty( $store_context['brand_tone'] );
+			$context_status = $has_required ? ( $has_optional ? 'configured' : 'partial' ) : 'missing';
+		}
+
+		$inline_script = '';
+
+		// Preselected product data.
+		if ( ! empty( $product_data ) ) {
+			$inline_script .= 'window.aisalesPreselectedProduct = ' . wp_json_encode( $product_data ) . ";\n";
+			$inline_script .= "window.aisalesPreselectedEntityType = 'product';\n";
+		}
+
+		// Preselected category data.
+		if ( ! empty( $category_data ) ) {
+			$inline_script .= 'window.aisalesPreselectedCategory = ' . wp_json_encode( $category_data ) . ";\n";
+			$inline_script .= "window.aisalesPreselectedEntityType = 'category';\n";
+		}
+
+		// Store context status.
+		$inline_script .= 'window.aisalesStoreContext = {';
+		$inline_script .= "status: '" . esc_js( $context_status ) . "',";
+		$inline_script .= 'isConfigured: ' . ( 'configured' === $context_status ? 'true' : 'false' );
+		$inline_script .= '};';
+
+		if ( ! empty( $inline_script ) ) {
+			wp_add_inline_script( 'aisales-chat', $inline_script, 'before' );
+		}
 	}
 
 	/**

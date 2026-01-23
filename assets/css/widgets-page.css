@@ -20,7 +20,6 @@ body.aisales-modal-open {
 .aisales-widgets-wrap {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 var(--aisales-space-4, 12px);
 }
 
 .aisales-widgets-wrap .aisales-notices-anchor {

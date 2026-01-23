@@ -293,7 +293,7 @@ class AISales_API_Mock {
 		self::deduct_tokens( 1203 );
 
 		return array(
-			'image_url'   => 'https://via.placeholder.com/800x800/3498db/ffffff?text=AI+Generated+Image',
+			'image_url'   => self::get_placeholder_image_url(),
 			'tokens_used' => array(
 				'input'  => 200,
 				'output' => 1003,
@@ -312,13 +312,31 @@ class AISales_API_Mock {
 		self::deduct_tokens( 950 );
 
 		return array(
-			'image_url'   => 'https://via.placeholder.com/800x800/2ecc71/ffffff?text=Improved+Image',
+			'image_url'   => self::get_placeholder_image_url(),
 			'tokens_used' => array(
 				'input'  => 500,
 				'output' => 450,
 				'total'  => 950,
 			),
 		);
+	}
+
+	/**
+	 * Get placeholder image URL for mock responses
+	 * Uses WooCommerce placeholder if available, otherwise a data URI placeholder
+	 *
+	 * @return string
+	 */
+	private static function get_placeholder_image_url() {
+		// Use WooCommerce placeholder image if available.
+		if ( function_exists( 'wc_placeholder_img_src' ) ) {
+			return wc_placeholder_img_src( 'woocommerce_single' );
+		}
+
+		// Fallback to inline SVG data URI (no external file needed).
+		// Simple gray placeholder with "AI Generated" text.
+		// phpcs:ignore Generic.Files.LineLength.TooLong
+		return 'data:image/svg+xml;base64,' . base64_encode( '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800"><rect fill="#f0f0f0" width="800" height="800"/><text x="50%" y="50%" font-family="Arial,sans-serif" font-size="32" fill="#999" text-anchor="middle" dy=".3em">Mock Image</text></svg>' );
 	}
 
 	/**
@@ -342,6 +360,242 @@ class AISales_API_Mock {
 				'total'  => 200,
 			),
 		);
+	}
+
+	/**
+	 * Mock generate SEO content response
+	 *
+	 * Supports both old format (type, context) and new API format (fix_type, item, issue).
+	 *
+	 * @param array $data SEO generation data.
+	 * @return array Response matching real API format.
+	 */
+	public static function generate_seo_content( $data ) {
+		// Handle new API format.
+		if ( isset( $data['fix_type'] ) && isset( $data['item'] ) ) {
+			return self::generate_seo_content_v2( $data );
+		}
+
+		// Legacy format support.
+		$type    = isset( $data['type'] ) ? $data['type'] : 'seo_content';
+		$context = isset( $data['context'] ) ? $data['context'] : array();
+		$title   = isset( $context['title'] ) ? $context['title'] : 'Content';
+
+		self::deduct_tokens( 100 );
+
+		// Generate appropriate content based on type.
+		switch ( $type ) {
+			case 'seo_title':
+				$content = self::generate_mock_title( $title, $context );
+				break;
+
+			case 'seo_meta_description':
+				$content = self::generate_mock_meta_description( $title, $context );
+				break;
+
+			case 'seo_content':
+				$content = self::generate_mock_enhanced_content( $title, $context );
+				break;
+
+			case 'seo_keyword':
+				$content = self::generate_mock_keyword( $title, $context );
+				break;
+
+			default:
+				$content = "Optimized content for {$title}";
+		}
+
+		return array(
+			'content'     => $content,
+			'tokens_used' => array(
+				'input'  => 50,
+				'output' => 50,
+				'total'  => 100,
+			),
+		);
+	}
+
+	/**
+	 * Generate SEO content v2 (new API format)
+	 *
+	 * @param array $data Request data with fix_type, item, issue, store_context, requirements.
+	 * @return array Response matching real API format.
+	 */
+	private static function generate_seo_content_v2( $data ) {
+		$fix_type = $data['fix_type'];
+		$item     = $data['item'];
+		$title    = isset( $item['title'] ) ? $item['title'] : 'Content';
+		$type     = isset( $item['type'] ) ? $item['type'] : 'content';
+
+		// Map item types for consistency.
+		if ( 'product_cat' === $type ) {
+			$type = 'category';
+		}
+
+		$context = array( 'type' => $type );
+
+		self::deduct_tokens( 100 );
+
+		// Generate appropriate content based on fix type.
+		switch ( $fix_type ) {
+			case 'title':
+				$suggested_value = self::generate_mock_title( $title, $context );
+				$explanation     = 'This title is optimized for SEO with a compelling hook and proper length (30-60 characters) for search result display.';
+				break;
+
+			case 'meta_description':
+				$suggested_value = self::generate_mock_meta_description( $title, $context );
+				$explanation     = 'This meta description includes a clear value proposition and call-to-action within the optimal 120-160 character range.';
+				break;
+
+			case 'content':
+				$suggested_value = self::generate_mock_enhanced_content( $title, $context );
+				$explanation     = 'This enhanced content includes proper heading structure, relevant keywords, and informative paragraphs that improve SEO and user engagement.';
+				break;
+
+			case 'keyword':
+				$suggested_value = self::generate_mock_keyword( $title, $context );
+				$explanation     = 'This focus keyword is relevant to the content, has good search potential, and can be naturally incorporated into the title and description.';
+				break;
+
+			default:
+				$suggested_value = "Optimized content for {$title}";
+				$explanation     = 'Generated content to address the SEO issue.';
+		}
+
+		// Return response in API format.
+		$balance_info = self::get_balance();
+		$current_balance = isset( $balance_info['balance'] ) ? $balance_info['balance'] : 5000;
+
+		return array(
+			'result'      => array(
+				'suggested_value' => $suggested_value,
+				'explanation'     => $explanation,
+			),
+			'tokens_used' => array(
+				'input'  => 50,
+				'output' => 50,
+				'total'  => 100,
+			),
+			'new_balance' => $current_balance - 100,
+		);
+	}
+
+	/**
+	 * Generate mock SEO title
+	 *
+	 * @param string $title   Original title.
+	 * @param array  $context Context data.
+	 * @return string
+	 */
+	private static function generate_mock_title( $title, $context ) {
+		$type = isset( $context['type'] ) ? $context['type'] : 'content';
+
+		$prefixes = array(
+			'product'  => array( 'Premium', 'Quality', 'Best-Selling', 'Top-Rated' ),
+			'category' => array( 'Shop', 'Explore', 'Discover', 'Browse' ),
+			'page'     => array( 'Learn About', 'Discover', 'Your Guide to', '' ),
+			'post'     => array( 'How to', 'Guide:', 'Tips for', 'Understanding' ),
+		);
+
+		$suffixes = array(
+			'product'  => array( '- Free Shipping', '| Shop Now', '- Best Price', '' ),
+			'category' => array( 'Collection', 'Products', '| Shop Now', '' ),
+			'page'     => array( '', '| Official', '', '' ),
+			'post'     => array( '', '- Complete Guide', '| Tips', '' ),
+		);
+
+		$prefix_list = isset( $prefixes[ $type ] ) ? $prefixes[ $type ] : array( '' );
+		$suffix_list = isset( $suffixes[ $type ] ) ? $suffixes[ $type ] : array( '' );
+
+		$prefix = $prefix_list[ array_rand( $prefix_list ) ];
+		$suffix = $suffix_list[ array_rand( $suffix_list ) ];
+
+		$new_title = trim( "{$prefix} {$title} {$suffix}" );
+
+		// Ensure it's within 30-60 characters.
+		if ( strlen( $new_title ) > 60 ) {
+			$new_title = substr( $new_title, 0, 57 ) . '...';
+		}
+
+		return $new_title;
+	}
+
+	/**
+	 * Generate mock meta description
+	 *
+	 * @param string $title   Original title.
+	 * @param array  $context Context data.
+	 * @return string
+	 */
+	private static function generate_mock_meta_description( $title, $context ) {
+		$type = isset( $context['type'] ) ? $context['type'] : 'content';
+
+		$templates = array(
+			'product'  => "Discover {$title} - premium quality at great prices. Shop now for fast shipping and excellent customer service. Limited time offer!",
+			'category' => "Explore our {$title} collection. Find top-quality products at competitive prices. Free shipping on orders over \$50. Shop now!",
+			'page'     => "Learn everything about {$title}. Comprehensive information and resources to help you make informed decisions. Read more.",
+			'post'     => "Discover insights about {$title}. Expert tips, guides, and advice to help you succeed. Click to read the full article.",
+		);
+
+		$desc = isset( $templates[ $type ] ) ? $templates[ $type ] : "Discover more about {$title}. Quality content and resources for you.";
+
+		// Ensure it's within 120-160 characters.
+		if ( strlen( $desc ) > 160 ) {
+			$desc = substr( $desc, 0, 157 ) . '...';
+		}
+
+		return $desc;
+	}
+
+	/**
+	 * Generate mock enhanced content
+	 *
+	 * @param string $title   Original title.
+	 * @param array  $context Context data.
+	 * @return string
+	 */
+	private static function generate_mock_enhanced_content( $title, $context ) {
+		$type = isset( $context['type'] ) ? $context['type'] : 'content';
+
+		if ( 'product' === $type ) {
+			return "Introducing our exceptional {$title} - a premium choice for discerning customers.\n\n" .
+				"This carefully crafted product combines quality materials with expert craftsmanship to deliver outstanding performance. " .
+				"Whether you're looking for reliability, style, or value, this product exceeds expectations.\n\n" .
+				"Key Features:\n" .
+				"• Premium quality construction\n" .
+				"• Modern, versatile design\n" .
+				"• Exceptional durability\n" .
+				"• Backed by our satisfaction guarantee\n\n" .
+				"Order today and experience the difference quality makes!";
+		}
+
+		return "Welcome to our comprehensive guide about {$title}.\n\n" .
+			"This content has been carefully created to provide you with valuable information and insights. " .
+			"We've compiled expert knowledge and practical advice to help you understand this topic better.\n\n" .
+			"Whether you're a beginner or looking to expand your knowledge, you'll find useful information here. " .
+			"Explore the sections below to learn more about what makes this topic important and how it can benefit you.";
+	}
+
+	/**
+	 * Generate mock focus keyword
+	 *
+	 * @param string $title   Original title.
+	 * @param array  $context Context data.
+	 * @return string
+	 */
+	private static function generate_mock_keyword( $title, $context ) {
+		// Extract key words from title.
+		$words = preg_split( '/\s+/', strtolower( $title ) );
+		$words = array_filter( $words, function( $word ) {
+			return strlen( $word ) > 3 && ! in_array( $word, array( 'the', 'and', 'for', 'with', 'that', 'this', 'from' ), true );
+		} );
+
+		if ( count( $words ) >= 2 ) {
+			return implode( ' ', array_slice( array_values( $words ), 0, 2 ) );
+		}
+
+		return $title;
 	}
 
 	/**

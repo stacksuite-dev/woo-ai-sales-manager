@@ -16,17 +16,25 @@ plugin/
 │   │   ├── class-aisales-ajax-email.php   # Email template handlers
 │   │   ├── class-aisales-ajax-support.php # Support ticket handlers
 │   │   ├── class-aisales-ajax-brand.php   # Brand settings handlers
-│   │   └── class-aisales-ajax-store.php   # Store context handlers
+│   │   ├── class-aisales-ajax-store.php   # Store context handlers
+│   │   └── class-aisales-ajax-seo.php     # SEO checker handlers
+│   ├── seo/                               # SEO checker subsystem
+│   │   ├── class-aisales-seo-checks-local.php  # Free local checks
+│   │   ├── class-aisales-seo-checks-api.php    # API-powered checks
+│   │   └── class-aisales-seo-fixer.php    # AI fix logic
 │   ├── widgets/                           # Widgets subsystem
 │   │   └── class-aisales-widgets-page.php
 │   ├── class-aisales-admin-settings.php
 │   ├── class-aisales-email-page.php
 │   ├── class-aisales-brand-page.php
+│   ├── class-aisales-seo-checker-page.php # SEO checker page
+│   ├── class-aisales-seo-analyzer.php     # SEO analysis engine
 │   └── ...
 ├── templates/                             # PHP templates
 │   ├── admin-widgets-page.php
 │   ├── admin-email-page.php
 │   ├── admin-brand-page.php
+│   ├── admin-seo-checker-page.php         # SEO checker template
 │   └── ...
 ├── assets/
 │   ├── css/                               # Stylesheets
@@ -34,11 +42,13 @@ plugin/
 │   │   ├── shared-components.css          # Reusable components
 │   │   ├── widgets-page.css
 │   │   ├── email-page.css
+│   │   ├── seo-checker-page.css           # SEO checker styles
 │   │   └── chat/                          # Modular chat styles
 │   └── js/                                # JavaScript
 │       ├── admin.js                       # Main admin JS
 │       ├── widgets-page.js
 │       ├── email-page.js
+│       ├── seo-checker-page.js            # SEO checker JS
 │       └── chat/                          # Modular chat JS
 ```
 
@@ -156,6 +166,7 @@ AJAX handlers are organized into domain-specific classes in `includes/ajax/`:
 | `AISales_Ajax_Support` | Support Tickets | draft, submit, list, upload |
 | `AISales_Ajax_Brand` | Brand Settings | save settings, AI analysis |
 | `AISales_Ajax_Store` | Store Context | sync, balance, tool data |
+| `AISales_Ajax_SEO` | SEO Checker | run_scan, generate_fix, apply_fix |
 
 ### Creating New AJAX Handlers
 
@@ -215,6 +226,7 @@ Used for conditional asset loading:
 - `ai-sales-manager_page_ai-sales-emails` - Email Templates
 - `ai-sales-manager_page_ai-sales-brand` - Brand Settings
 - `ai-sales-manager_page_ai-sales-widgets` - Widgets & Shortcodes
+- `ai-sales-manager_page_ai-sales-seo-checker` - SEO Checker
 
 ### Header Pattern
 
@@ -233,3 +245,60 @@ All admin pages follow consistent header structure:
     </div>
 </header>
 ```
+
+## SEO Checker System
+
+The SEO Checker provides comprehensive store-wide SEO auditing.
+
+### Architecture
+
+- **`AISales_SEO_Checker_Page`** - Admin page class (menu priority 26)
+- **`AISales_SEO_Analyzer`** - Core analysis engine coordinating checks
+- **`AISales_SEO_Checks_Local`** - Free local checks (no API tokens)
+- **`AISales_SEO_Checks_API`** - Advanced API-powered checks (uses tokens)
+- **`AISales_SEO_Fixer`** - AI-powered fix generation and application
+
+### Content Types Scanned
+
+- Products (8 checks)
+- Categories (5 checks)
+- Pages (9 checks)
+- Blog Posts (10 checks)
+- Store Settings (6 checks)
+- Homepage (5 checks)
+
+### Local Checks (Free)
+
+| Check | Description |
+|-------|-------------|
+| `title_length` | Title 30-60 characters optimal |
+| `meta_description_missing` | Meta description required |
+| `meta_description_length` | 120-160 characters optimal |
+| `image_alt_missing` | Alt text for accessibility/SEO |
+| `content_thin` | Minimum 100 words |
+| `heading_structure` | H2/H3 for long content |
+| `internal_links` | Link to related content |
+
+### Data Storage
+
+```php
+// Scan results (WordPress options)
+'aisales_seo_scan_results' => [
+    'scan_date'       => '2026-01-22 15:45:00',
+    'overall_score'   => 68,
+    'scores'          => [...],  // Per-category scores
+    'issues'          => [...],  // Issue counts
+    'detailed_issues' => [...],  // Full issue list
+]
+
+// Per-item cache (post/term meta)
+'_aisales_seo_score'      => 85
+'_aisales_seo_last_check' => '2026-01-22 15:45:00'
+```
+
+### Score Colors
+
+- 90-100: `--aisales-success` (Excellent)
+- 70-89: `--aisales-primary` (Good)
+- 50-69: `--aisales-warning` (Needs Work)
+- 0-49: `--aisales-danger` (Critical)

@@ -43,6 +43,7 @@ class AISales_Ajax_Loader {
 		'support'  => 'AISales_Ajax_Support',
 		'brand'    => 'AISales_Ajax_Brand',
 		'store'    => 'AISales_Ajax_Store',
+		'seo'      => 'AISales_Ajax_SEO',
 	);
 
 	/**
@@ -83,6 +84,7 @@ class AISales_Ajax_Loader {
 		require_once $ajax_dir . 'class-aisales-ajax-support.php';
 		require_once $ajax_dir . 'class-aisales-ajax-brand.php';
 		require_once $ajax_dir . 'class-aisales-ajax-store.php';
+		require_once $ajax_dir . 'class-aisales-ajax-seo.php';
 	}
 
 	/**
