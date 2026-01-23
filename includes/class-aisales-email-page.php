@@ -396,10 +396,16 @@ class AISales_Email_Page {
 
 		// Category mapping.
 		$category_map = array(
-			'order_processing' => 'transactional',
-			'order_shipped'    => 'transactional',
-			'order_completed'  => 'transactional',
-			// Future email types will be added here.
+			// Phase 1: Transactional.
+			'order_processing'        => 'transactional',
+			'order_shipped'           => 'transactional',
+			'order_completed'         => 'transactional',
+			// Phase 2: Customer Account.
+			'customer_new_account'    => 'customer',
+			'customer_reset_password' => 'customer',
+			'customer_invoice'        => 'customer',
+			'customer_note'           => 'customer',
+			'customer_refunded_order' => 'customer',
 		);
 
 		foreach ( $templates as $type => $template ) {
@@ -455,13 +461,17 @@ class AISales_Email_Page {
 	 */
 	public static function get_template_icon( $type ) {
 		$icons = array(
-			'order_processing' => 'dashicons-yes-alt',
-			'order_shipped'    => 'dashicons-airplane',
-			'order_completed'  => 'dashicons-awards',
-			// Future types.
+			// Phase 1: Transactional.
+			'order_processing'        => 'dashicons-yes-alt',
+			'order_shipped'           => 'dashicons-airplane',
+			'order_completed'         => 'dashicons-awards',
+			// Phase 2: Customer Account.
 			'customer_new_account'    => 'dashicons-admin-users',
 			'customer_reset_password' => 'dashicons-lock',
+			'customer_invoice'        => 'dashicons-media-text',
 			'customer_note'           => 'dashicons-format-aside',
+			'customer_refunded_order' => 'dashicons-money-alt',
+			// Future types.
 			'new_order_admin'         => 'dashicons-store',
 			'cancelled_order'         => 'dashicons-dismiss',
 			'failed_order'            => 'dashicons-warning',

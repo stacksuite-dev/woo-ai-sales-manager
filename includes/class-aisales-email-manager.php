@@ -34,23 +34,55 @@ class AISales_Email_Manager {
 	 * @var array
 	 */
 	private $template_types = array(
-		'order_processing' => array(
+		// Phase 1: Transactional Emails (MVP).
+		'order_processing'        => array(
 			'label'       => 'Order Processing',
 			'description' => 'Sent when a new order is received and payment is confirmed',
 			'wc_email_id' => 'customer_processing_order',
 			'is_mvp'      => true,
 		),
-		'order_shipped' => array(
+		'order_shipped'           => array(
 			'label'       => 'Order Shipped',
 			'description' => 'Sent when an order is marked as shipped with tracking info',
 			'wc_email_id' => 'customer_note',
 			'is_mvp'      => true,
 		),
-		'order_completed' => array(
+		'order_completed'         => array(
 			'label'       => 'Order Completed',
 			'description' => 'Sent when an order is marked as complete',
 			'wc_email_id' => 'customer_completed_order',
 			'is_mvp'      => true,
+		),
+		// Phase 2: Customer Account Emails.
+		'customer_new_account'    => array(
+			'label'       => 'New Account',
+			'description' => 'Welcome email sent when a customer creates an account',
+			'wc_email_id' => 'customer_new_account',
+			'is_mvp'      => false,
+		),
+		'customer_reset_password' => array(
+			'label'       => 'Password Reset',
+			'description' => 'Sent when a customer requests to reset their password',
+			'wc_email_id' => 'customer_reset_password',
+			'is_mvp'      => false,
+		),
+		'customer_invoice'        => array(
+			'label'       => 'Customer Invoice',
+			'description' => 'Sent to customers with order details and payment link',
+			'wc_email_id' => 'customer_invoice',
+			'is_mvp'      => false,
+		),
+		'customer_note'           => array(
+			'label'       => 'Customer Note',
+			'description' => 'Sent when the store adds a note to the customer order',
+			'wc_email_id' => 'customer_note',
+			'is_mvp'      => false,
+		),
+		'customer_refunded_order' => array(
+			'label'       => 'Order Refunded',
+			'description' => 'Sent when an order is fully or partially refunded',
+			'wc_email_id' => 'customer_refunded_order',
+			'is_mvp'      => false,
 		),
 	);
 
@@ -100,6 +132,17 @@ class AISales_Email_Manager {
 			'{order_items}'       => 'Formatted list of ordered items',
 			'{order_items_table}' => 'HTML table of ordered items',
 		),
+		'account'   => array(
+			'{account_url}'          => 'Link to My Account page',
+			'{password_reset_link}'  => 'Password reset URL',
+			'{customer_note_text}'   => 'Note content added by store',
+			'{invoice_pay_link}'     => 'Link to pay invoice',
+		),
+		'refund'    => array(
+			'{refund_amount}'  => 'Total refund amount',
+			'{refund_reason}'  => 'Reason for refund (if provided)',
+			'{refund_date}'    => 'Date of refund',
+		),
 	);
 
 	/**
@@ -126,20 +169,34 @@ class AISales_Email_Manager {
 	 * Initialize WooCommerce email hooks
 	 */
 	public function init_email_hooks() {
-		// Only hook if WooCommerce is active and we have templates enabled
+		// Only hook if WooCommerce is active and we have templates enabled.
 		if ( ! class_exists( 'WooCommerce' ) ) {
 			return;
 		}
 
-		// Subject filters
+		// Phase 1: Transactional emails - Subject filters.
 		add_filter( 'woocommerce_email_subject_customer_processing_order', array( $this, 'filter_processing_subject' ), 10, 2 );
 		add_filter( 'woocommerce_email_subject_customer_completed_order', array( $this, 'filter_completed_subject' ), 10, 2 );
 
-		// Heading filters
+		// Phase 1: Transactional emails - Heading filters.
 		add_filter( 'woocommerce_email_heading_customer_processing_order', array( $this, 'filter_processing_heading' ), 10, 2 );
 		add_filter( 'woocommerce_email_heading_customer_completed_order', array( $this, 'filter_completed_heading' ), 10, 2 );
 
-		// Content hooks - inject custom content before order table
+		// Phase 2: Customer account emails - Subject filters.
+		add_filter( 'woocommerce_email_subject_customer_new_account', array( $this, 'filter_new_account_subject' ), 10, 2 );
+		add_filter( 'woocommerce_email_subject_customer_reset_password', array( $this, 'filter_reset_password_subject' ), 10, 2 );
+		add_filter( 'woocommerce_email_subject_customer_invoice', array( $this, 'filter_invoice_subject' ), 10, 2 );
+		add_filter( 'woocommerce_email_subject_customer_note', array( $this, 'filter_customer_note_subject' ), 10, 2 );
+		add_filter( 'woocommerce_email_subject_customer_refunded_order', array( $this, 'filter_refunded_order_subject' ), 10, 2 );
+
+		// Phase 2: Customer account emails - Heading filters.
+		add_filter( 'woocommerce_email_heading_customer_new_account', array( $this, 'filter_new_account_heading' ), 10, 2 );
+		add_filter( 'woocommerce_email_heading_customer_reset_password', array( $this, 'filter_reset_password_heading' ), 10, 2 );
+		add_filter( 'woocommerce_email_heading_customer_invoice', array( $this, 'filter_invoice_heading' ), 10, 2 );
+		add_filter( 'woocommerce_email_heading_customer_note', array( $this, 'filter_customer_note_heading' ), 10, 2 );
+		add_filter( 'woocommerce_email_heading_customer_refunded_order', array( $this, 'filter_refunded_order_heading' ), 10, 2 );
+
+		// Content hooks - inject custom content before order table.
 		add_action( 'woocommerce_email_before_order_table', array( $this, 'inject_custom_content' ), 10, 4 );
 	}
 
@@ -312,20 +369,30 @@ class AISales_Email_Manager {
 			'{shipping_first_name}'  => $order->get_shipping_first_name(),
 			'{shipping_last_name}'   => $order->get_shipping_last_name(),
 
-			// Tracking (from extra or empty)
+			// Tracking (from extra or empty).
 			'{tracking_number}' => isset( $extra['tracking_number'] ) ? $extra['tracking_number'] : '',
 			'{tracking_url}'    => isset( $extra['tracking_url'] ) ? $extra['tracking_url'] : '',
 			'{carrier_name}'    => isset( $extra['carrier_name'] ) ? $extra['carrier_name'] : '',
 
-			// Store
+			// Store.
 			'{store_name}'  => get_bloginfo( 'name' ),
 			'{store_url}'   => home_url(),
 			'{store_email}' => get_option( 'woocommerce_email_from_address' ),
 			'{store_phone}' => get_option( 'woocommerce_store_phone', '' ),
 
-			// Content
+			// Content.
 			'{order_items}'       => $this->get_order_items_text( $order ),
 			'{order_items_table}' => $this->get_order_items_table( $order ),
+
+			// Account (Phase 2).
+			'{account_url}'         => wc_get_page_permalink( 'myaccount' ),
+			'{invoice_pay_link}'    => $order->get_checkout_payment_url(),
+			'{customer_note_text}'  => isset( $extra['customer_note_text'] ) ? $extra['customer_note_text'] : '',
+
+			// Refund (Phase 2).
+			'{refund_amount}' => isset( $extra['refund_amount'] ) ? wc_price( $extra['refund_amount'] ) : '',
+			'{refund_reason}' => isset( $extra['refund_reason'] ) ? $extra['refund_reason'] : '',
+			'{refund_date}'   => isset( $extra['refund_date'] ) ? $extra['refund_date'] : wp_date( get_option( 'date_format' ) ),
 		);
 
 		// Merge with any extra values
@@ -442,12 +509,218 @@ class AISales_Email_Manager {
 	 */
 	public function filter_completed_heading( $heading, $order ) {
 		$template = $this->get_active_template( 'order_completed' );
-		
+
 		if ( $template && ! empty( $template['heading'] ) ) {
 			return $this->replace_placeholders( $template['heading'], $order );
 		}
 
 		return $heading;
+	}
+
+	/**
+	 * Filter new account email subject
+	 *
+	 * @param string  $subject Default subject.
+	 * @param WP_User $user    User object.
+	 * @return string Filtered subject.
+	 */
+	public function filter_new_account_subject( $subject, $user ) {
+		$template = $this->get_active_template( 'customer_new_account' );
+
+		if ( $template && ! empty( $template['subject'] ) ) {
+			return $this->replace_user_placeholders( $template['subject'], $user );
+		}
+
+		return $subject;
+	}
+
+	/**
+	 * Filter new account email heading
+	 *
+	 * @param string  $heading Default heading.
+	 * @param WP_User $user    User object.
+	 * @return string Filtered heading.
+	 */
+	public function filter_new_account_heading( $heading, $user ) {
+		$template = $this->get_active_template( 'customer_new_account' );
+
+		if ( $template && ! empty( $template['heading'] ) ) {
+			return $this->replace_user_placeholders( $template['heading'], $user );
+		}
+
+		return $heading;
+	}
+
+	/**
+	 * Filter reset password email subject
+	 *
+	 * @param string  $subject Default subject.
+	 * @param WP_User $user    User object.
+	 * @return string Filtered subject.
+	 */
+	public function filter_reset_password_subject( $subject, $user ) {
+		$template = $this->get_active_template( 'customer_reset_password' );
+
+		if ( $template && ! empty( $template['subject'] ) ) {
+			return $this->replace_user_placeholders( $template['subject'], $user );
+		}
+
+		return $subject;
+	}
+
+	/**
+	 * Filter reset password email heading
+	 *
+	 * @param string  $heading Default heading.
+	 * @param WP_User $user    User object.
+	 * @return string Filtered heading.
+	 */
+	public function filter_reset_password_heading( $heading, $user ) {
+		$template = $this->get_active_template( 'customer_reset_password' );
+
+		if ( $template && ! empty( $template['heading'] ) ) {
+			return $this->replace_user_placeholders( $template['heading'], $user );
+		}
+
+		return $heading;
+	}
+
+	/**
+	 * Filter invoice email subject
+	 *
+	 * @param string   $subject Default subject.
+	 * @param WC_Order $order   Order object.
+	 * @return string Filtered subject.
+	 */
+	public function filter_invoice_subject( $subject, $order ) {
+		$template = $this->get_active_template( 'customer_invoice' );
+
+		if ( $template && ! empty( $template['subject'] ) ) {
+			return $this->replace_placeholders( $template['subject'], $order );
+		}
+
+		return $subject;
+	}
+
+	/**
+	 * Filter invoice email heading
+	 *
+	 * @param string   $heading Default heading.
+	 * @param WC_Order $order   Order object.
+	 * @return string Filtered heading.
+	 */
+	public function filter_invoice_heading( $heading, $order ) {
+		$template = $this->get_active_template( 'customer_invoice' );
+
+		if ( $template && ! empty( $template['heading'] ) ) {
+			return $this->replace_placeholders( $template['heading'], $order );
+		}
+
+		return $heading;
+	}
+
+	/**
+	 * Filter customer note email subject
+	 *
+	 * @param string   $subject Default subject.
+	 * @param WC_Order $order   Order object.
+	 * @return string Filtered subject.
+	 */
+	public function filter_customer_note_subject( $subject, $order ) {
+		$template = $this->get_active_template( 'customer_note' );
+
+		if ( $template && ! empty( $template['subject'] ) ) {
+			return $this->replace_placeholders( $template['subject'], $order );
+		}
+
+		return $subject;
+	}
+
+	/**
+	 * Filter customer note email heading
+	 *
+	 * @param string   $heading Default heading.
+	 * @param WC_Order $order   Order object.
+	 * @return string Filtered heading.
+	 */
+	public function filter_customer_note_heading( $heading, $order ) {
+		$template = $this->get_active_template( 'customer_note' );
+
+		if ( $template && ! empty( $template['heading'] ) ) {
+			return $this->replace_placeholders( $template['heading'], $order );
+		}
+
+		return $heading;
+	}
+
+	/**
+	 * Filter refunded order email subject
+	 *
+	 * @param string   $subject Default subject.
+	 * @param WC_Order $order   Order object.
+	 * @return string Filtered subject.
+	 */
+	public function filter_refunded_order_subject( $subject, $order ) {
+		$template = $this->get_active_template( 'customer_refunded_order' );
+
+		if ( $template && ! empty( $template['subject'] ) ) {
+			return $this->replace_placeholders( $template['subject'], $order );
+		}
+
+		return $subject;
+	}
+
+	/**
+	 * Filter refunded order email heading
+	 *
+	 * @param string   $heading Default heading.
+	 * @param WC_Order $order   Order object.
+	 * @return string Filtered heading.
+	 */
+	public function filter_refunded_order_heading( $heading, $order ) {
+		$template = $this->get_active_template( 'customer_refunded_order' );
+
+		if ( $template && ! empty( $template['heading'] ) ) {
+			return $this->replace_placeholders( $template['heading'], $order );
+		}
+
+		return $heading;
+	}
+
+	/**
+	 * Replace placeholders for user-based emails (no order context)
+	 *
+	 * @param string  $template The template string with placeholders.
+	 * @param WP_User $user     The WordPress user object.
+	 * @param array   $extra    Extra placeholder values.
+	 * @return string Template with placeholders replaced.
+	 */
+	public function replace_user_placeholders( $template, $user, $extra = array() ) {
+		$values = array(
+			// Customer.
+			'{customer_name}'       => $user->display_name,
+			'{customer_first_name}' => $user->first_name ?: $user->display_name,
+			'{customer_last_name}'  => $user->last_name,
+			'{customer_email}'      => $user->user_email,
+
+			// Account.
+			'{account_url}'         => wc_get_page_permalink( 'myaccount' ),
+
+			// Store.
+			'{store_name}'  => get_bloginfo( 'name' ),
+			'{store_url}'   => home_url(),
+			'{store_email}' => get_option( 'woocommerce_email_from_address' ),
+			'{store_phone}' => get_option( 'woocommerce_store_phone', '' ),
+		);
+
+		// Merge with any extra values.
+		$values = array_merge( $values, $extra );
+
+		foreach ( $values as $placeholder => $value ) {
+			$template = str_replace( $placeholder, $value, $template );
+		}
+
+		return $template;
 	}
 
 	/**
@@ -459,19 +732,23 @@ class AISales_Email_Manager {
 	 * @param WC_Email $email         Email object.
 	 */
 	public function inject_custom_content( $order, $sent_to_admin, $plain_text, $email ) {
-		// Only apply to customer emails
+		// Only apply to customer emails.
 		if ( $sent_to_admin ) {
 			return;
 		}
 
-		// Determine template type based on email ID
-		$template_type = null;
-		
-		if ( 'customer_processing_order' === $email->id ) {
-			$template_type = 'order_processing';
-		} elseif ( 'customer_completed_order' === $email->id ) {
-			$template_type = 'order_completed';
-		}
+		// Map WooCommerce email IDs to our template types.
+		$email_type_map = array(
+			// Phase 1: Transactional.
+			'customer_processing_order' => 'order_processing',
+			'customer_completed_order'  => 'order_completed',
+			// Phase 2: Customer account (order-related).
+			'customer_invoice'          => 'customer_invoice',
+			'customer_note'             => 'customer_note',
+			'customer_refunded_order'   => 'customer_refunded_order',
+		);
+
+		$template_type = isset( $email_type_map[ $email->id ] ) ? $email_type_map[ $email->id ] : null;
 
 		if ( ! $template_type ) {
 			return;
@@ -483,9 +760,15 @@ class AISales_Email_Manager {
 			return;
 		}
 
-		$content = $this->replace_placeholders( $template['content'], $order );
+		// Get extra context for specific email types.
+		$extra = array();
+		if ( 'customer_note' === $template_type && isset( $email->customer_note ) ) {
+			$extra['customer_note_text'] = $email->customer_note;
+		}
 
-		// Convert line breaks to HTML for HTML emails
+		$content = $this->replace_placeholders( $template['content'], $order, $extra );
+
+		// Convert line breaks to HTML for HTML emails.
 		if ( ! $plain_text ) {
 			$content = wpautop( $content );
 		}
@@ -553,6 +836,17 @@ class AISales_Email_Manager {
 			'{store_phone}'          => get_option( 'woocommerce_store_phone', '(555) 123-4567' ),
 			'{order_items}'          => '1x Wireless Bluetooth Headphones ($79.99), 1x Phone Case - Black ($29.99)',
 			'{order_items_table}'    => $this->get_sample_order_items_table(),
+
+			// Account placeholders (Phase 2).
+			'{account_url}'          => wc_get_page_permalink( 'myaccount' ) ?: home_url( '/my-account/' ),
+			'{password_reset_link}'  => home_url( '/my-account/lost-password/?key=abc123&id=1' ),
+			'{customer_note_text}'   => 'Thank you for your order! We wanted to let you know that your package will be shipped via express delivery.',
+			'{invoice_pay_link}'     => home_url( '/checkout/order-pay/1234/?key=wc_order_abc123' ),
+
+			// Refund placeholders (Phase 2).
+			'{refund_amount}'        => wc_price( 45.00 ),
+			'{refund_reason}'        => 'Item returned - customer preference',
+			'{refund_date}'          => wp_date( get_option( 'date_format' ) ),
 		);
 	}
 
