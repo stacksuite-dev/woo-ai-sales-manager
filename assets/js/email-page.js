@@ -18,8 +18,8 @@
 		isDirty: false,
 		isLoading: false,
 		previewDebounceTimer: null,
-		templates: window.aisalesEmailData?.templates || {},
-		placeholders: window.aisalesEmailData?.placeholders || {},
+		templates: window.aisalesEmail?.templates || {},
+		placeholders: window.aisalesEmail?.placeholders || {},
 	};
 
 	// DOM elements cache

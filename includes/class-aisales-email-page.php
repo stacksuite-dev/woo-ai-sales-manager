@@ -111,6 +111,7 @@ class AISales_Email_Page {
 				'apiKey'       => $api_key,
 				'balance'      => get_option( 'aisales_balance', 0 ),
 				'storeContext' => get_option( 'aisales_store_context', array() ),
+				'templates'    => $email_manager->get_templates_overview(),
 				'placeholders' => $email_manager->get_placeholders(),
 				'adminEmail'   => get_option( 'admin_email' ),
 				'i18n'         => $this->get_i18n_strings(),

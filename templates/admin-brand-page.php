@@ -473,11 +473,8 @@ $current_font            = $store_context['font_family'] ?? $detected_branding['
 	<?php endif; ?>
 </div>
 
-<!-- Store Analysis Context for JavaScript -->
-<script type="text/javascript">
-	window.aisalesBrandData = {
-		detectedBranding: <?php echo wp_json_encode( $detected_branding ); ?>,
-		industries: <?php echo wp_json_encode( $industries ); ?>,
-		tones: <?php echo wp_json_encode( $tones ); ?>
-	};
-</script>
+<?php
+// Note: Brand data (detectedBranding, industries, tones) is passed via wp_localize_script()
+// in AISales_Brand_Page::enqueue_scripts() as the 'aisalesBrand' object.
+// This ensures compliance with WordPress plugin guidelines for proper script enqueuing.
+?>

@@ -423,10 +423,8 @@ defined( 'ABSPATH' ) || exit;
 	<?php endif; ?>
 </div>
 
-<!-- Template Data for JavaScript -->
-<script type="text/javascript">
-	window.aisalesEmailData = {
-		templates: <?php echo wp_json_encode( $templates ); ?>,
-		placeholders: <?php echo wp_json_encode( $placeholders ); ?>
-	};
-</script>
+<?php
+// Note: Template data (templates, placeholders) is passed via wp_localize_script()
+// in AISales_Email_Page::enqueue_scripts() as the 'aisalesEmail' object.
+// This ensures compliance with WordPress plugin guidelines for proper script enqueuing.
+?>
