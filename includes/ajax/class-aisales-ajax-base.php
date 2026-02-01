@@ -101,27 +101,25 @@ abstract class AISales_Ajax_Base {
 			return $default;
 		}
 
-		$value = wp_unslash( $_POST[ $key ] );
-
 		switch ( $type ) {
 			case 'text':
-				return sanitize_text_field( $value );
+				return sanitize_text_field( wp_unslash( $_POST[ $key ] ) );
 			case 'email':
-				return sanitize_email( $value );
+				return sanitize_email( wp_unslash( $_POST[ $key ] ) );
 			case 'int':
-				return absint( $value );
+				return absint( wp_unslash( $_POST[ $key ] ) );
 			case 'bool':
-				return filter_var( $value, FILTER_VALIDATE_BOOLEAN );
+				return filter_var( sanitize_text_field( wp_unslash( $_POST[ $key ] ) ), FILTER_VALIDATE_BOOLEAN );
 			case 'key':
-				return sanitize_key( $value );
+				return sanitize_key( wp_unslash( $_POST[ $key ] ) );
 			case 'textarea':
-				return sanitize_textarea_field( $value );
+				return sanitize_textarea_field( wp_unslash( $_POST[ $key ] ) );
 			case 'url':
-				return esc_url_raw( $value );
+				return esc_url_raw( wp_unslash( $_POST[ $key ] ) );
 			case 'raw':
-				return $value;
+				return wp_kses_post( wp_unslash( $_POST[ $key ] ) );
 			default:
-				return sanitize_text_field( $value );
+				return sanitize_text_field( wp_unslash( $_POST[ $key ] ) );
 		}
 	}
 
