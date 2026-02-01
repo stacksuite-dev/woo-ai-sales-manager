@@ -4,7 +4,7 @@ Tags: woocommerce, ai, product management, content generation, image generation
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 WC requires at least: 8.0
 WC tested up to: 9.0
 License: GPLv2 or later
@@ -114,6 +114,15 @@ By using the AI features, you agree to these terms.
 
 == Changelog ==
 
+= 1.4.1 =
+* Fixed: All output now properly escaped (esc_html, esc_attr, wp_kses_post) across templates and classes
+* Fixed: Translatable strings use ordered sprintf placeholders for translator clarity
+* Fixed: Template variables prefixed with aisales_ to avoid global namespace collisions
+* Fixed: Replaced direct $wpdb DELETE with delete_metadata() API in SEO checker cleanup
+* Fixed: Remaining inline scripts moved to wp_add_inline_script() on brand and email pages
+* Improved: Added transient caching for abandoned cart report queries
+* Improved: PHPCS ignore annotations for justified custom-table direct queries
+
 = 1.4.0 =
 * Added: `Requires Plugins: woocommerce` header for WordPress 6.5+ plugin dependencies
 * Fixed: Inline scripts now use wp_add_inline_script() per WordPress coding standards
@@ -161,6 +170,9 @@ By using the AI features, you agree to these terms.
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.4.1 =
+Compliance patch resolving remaining WordPress Plugin Check errors and warnings — output escaping, i18n placeholders, variable prefixing, and API usage.
 
 = 1.4.0 =
 WordPress Plugin Review compliance update. Adds SEO Checker, Widgets system, Batch processing, and Marketing Agent capabilities. Fixes inline scripts and external image references for wp.org submission.
