@@ -68,7 +68,7 @@ class AISales_Chat_Page {
 	 */
 	public function add_submenu_page() {
 		add_submenu_page(
-			'ai-sales-manager',
+			null,
 			__( 'AI Agent', 'stacksuite-sales-manager-for-woocommerce' ),
 			__( 'AI Agent', 'stacksuite-sales-manager-for-woocommerce' ),
 			'manage_woocommerce',
