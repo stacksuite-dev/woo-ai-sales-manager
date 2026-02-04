@@ -163,10 +163,20 @@ class AISales_API_Client {
 			return AISales_API_Mock::connect( $email, $domain );
 		}
 
-		return $this->request( '/auth/connect', 'POST', array(
+		$result = $this->request( '/auth/connect', 'POST', array(
 			'email'  => $email,
 			'domain' => $domain,
 		) );
+
+		// Retry once on transient failures (e.g. cold start).
+		if ( is_wp_error( $result ) ) {
+			$result = $this->request( '/auth/connect', 'POST', array(
+				'email'  => $email,
+				'domain' => $domain,
+			) );
+		}
+
+		return $result;
 	}
 
 	/**

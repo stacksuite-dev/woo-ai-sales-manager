@@ -81,6 +81,7 @@ class AISales_Ajax_Auth extends AISales_Ajax_Base {
 			'welcome_bonus' => $welcome_bonus,
 			'balance'       => $result['balance_tokens'],
 			'email'         => $result['email'],
+			'redirect'      => admin_url( 'admin.php?page=ai-sales-manager' ),
 		) );
 	}
 

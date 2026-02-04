@@ -162,6 +162,10 @@
                             setTimeout(function() {
                                 window.location.href = response.data.redirect;
                             }, action === 'aisales_connect' ? 1500 : 0);
+                        } else if (action === 'aisales_connect') {
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 1500);
                         }
                     } else {
                         self.showAuthMessage('error', response.data.message);

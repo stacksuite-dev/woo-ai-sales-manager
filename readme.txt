@@ -4,7 +4,7 @@ Tags: woocommerce, ai, product management, content generation, image generation
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 1.5.3
+Stable tag: 1.5.4
 WC requires at least: 8.0
 WC tested up to: 9.0
 License: GPLv2 or later
@@ -113,6 +113,11 @@ By using the AI features, you agree to these terms.
 7. Store context configuration
 
 == Changelog ==
+
+= 1.5.4 =
+* Fixed: Connect flow now redirects to dashboard after successful registration
+* Fixed: Added retry for transient API connection failures (cold start handling)
+* Fixed: AISALES_VERSION constant synced with plugin header version
 
 = 1.5.3 =
 * Improved: Hide submenu items until user connects account
