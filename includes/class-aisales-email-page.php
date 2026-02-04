@@ -61,7 +61,8 @@ class AISales_Email_Page {
 	 * @param string $hook The current admin page.
 	 */
 	public function enqueue_scripts( $hook ) {
-		if ( 'ai-sales-manager_page_ai-sales-emails' !== $hook ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! isset( $_GET['page'] ) || 'ai-sales-emails' !== $_GET['page'] ) {
 			return;
 		}
 

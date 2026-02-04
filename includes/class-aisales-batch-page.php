@@ -59,7 +59,8 @@ class AISales_Batch_Page {
 	 * @param string $hook The current admin page.
 	 */
 	public function enqueue_scripts( $hook ) {
-		if ( 'ai-sales-manager_page_ai-sales-bulk' !== $hook ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! isset( $_GET['page'] ) || 'ai-sales-bulk' !== $_GET['page'] ) {
 			return;
 		}
 

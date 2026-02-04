@@ -218,15 +218,21 @@ wp_localize_script( 'aisales-widgets-page', 'aisalesWidgets', array(
 
 ## Admin Pages
 
-### Page Hook Names
+### Page Detection
 
-Used for conditional asset loading:
-- `toplevel_page_ai-sales-manager` - Main settings
-- `ai-sales-manager_page_ai-sales-agent` - AI Agent/Chat
-- `ai-sales-manager_page_ai-sales-emails` - Email Templates
-- `ai-sales-manager_page_ai-sales-brand` - Brand Settings
-- `ai-sales-manager_page_ai-sales-widgets` - Widgets & Shortcodes
-- `ai-sales-manager_page_ai-sales-seo-checker` - SEO Checker
+Asset loading uses `$_GET['page']` slug checks (not hook names) for robustness:
+- `ai-sales-manager` - Main settings (dashboard)
+- `ai-sales-agent` - AI Agent/Chat
+- `ai-sales-emails` - Email Templates
+- `ai-sales-brand` - Brand Settings
+- `ai-sales-widgets` - Widgets & Shortcodes
+- `ai-sales-seo-checker` - SEO Checker
+- `ai-sales-bulk` - Manage Catalog
+- `ai-sales-abandoned-carts` - Abandoned Carts
+- `ai-sales-support` - Support Center
+- `ai-sales-email-delivery` - Mail Provider (embedded in Email Templates)
+
+All plugin pages get the `aisales-plugin-page` body class for CSS targeting.
 
 ### Header Pattern
 

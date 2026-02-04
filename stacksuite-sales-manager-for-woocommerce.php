@@ -3,7 +3,7 @@
  * Plugin Name: StackSuite Sales Manager for WooCommerce
  * Plugin URI: https://github.com/stacksuite-dev/woo-ai-sales-manager
  * Description: AI-powered product catalog management for WooCommerce. Generate content, suggest tags/categories, and create/improve product images using Google Gemini.
- * Version: 1.5.4
+ * Version: 1.5.5
  * Author: StackSuite
  * Author URI: https://stacksuite.dev
  * License: GPL v2 or later
@@ -26,7 +26,7 @@ register_activation_hook( __FILE__, 'aisales_activate' );
 register_deactivation_hook( __FILE__, 'aisales_deactivate' );
 
 // Plugin constants
-define( 'AISALES_VERSION', '1.5.4' );
+define( 'AISALES_VERSION', '1.5.5' );
 define( 'AISALES_PLUGIN_FILE', __FILE__ );
 define( 'AISALES_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AISALES_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -145,6 +145,7 @@ final class AISales_Sales_Manager {
 	private function init_hooks() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 		add_filter( 'plugin_action_links_' . AISALES_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ) );
+		add_filter( 'admin_body_class', array( $this, 'add_plugin_body_class' ) );
 
 		// Initialize components
 		AISales_Admin_Settings::instance();
@@ -270,14 +271,43 @@ final class AISales_Sales_Manager {
 	}
 
 	/**
+	 * Plugin page slugs used for asset loading and body class detection.
+	 *
+	 * @var array
+	 */
+	private static $plugin_page_slugs = array(
+		'ai-sales-manager',
+		'ai-sales-agent',
+		'ai-sales-emails',
+		'ai-sales-support',
+		'ai-sales-brand',
+		'ai-sales-widgets',
+		'ai-sales-abandoned-carts',
+		'ai-sales-abandoned-cart-settings',
+		'ai-sales-bulk',
+		'ai-sales-seo-checker',
+		'ai-sales-email-delivery',
+	);
+
+	/**
+	 * Check if the current admin page belongs to this plugin.
+	 *
+	 * @return bool
+	 */
+	private static function is_plugin_page() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return isset( $_GET['page'] ) && in_array( $_GET['page'], self::$plugin_page_slugs, true );
+	}
+
+	/**
 	 * Check if admin assets should be loaded on the current page
 	 *
 	 * @param string $hook Current admin page hook.
 	 * @return bool
 	 */
 	private function should_load_admin_assets( $hook ) {
-		// Plugin pages.
-		if ( in_array( $hook, array( 'toplevel_page_ai-sales-manager', 'ai-sales-manager_page_ai-sales-agent', 'ai-sales-manager_page_ai-sales-emails', 'ai-sales-manager_page_ai-sales-support', 'ai-sales-manager_page_ai-sales-brand', 'ai-sales-manager_page_ai-sales-widgets', 'ai-sales-manager_page_ai-sales-abandoned-carts', 'ai-sales-manager_page_ai-sales-abandoned-cart-settings', 'ai-sales-manager_page_ai-sales-bulk', 'ai-sales-manager_page_ai-sales-seo-checker' ), true ) ) {
+		// Plugin pages — check by slug which is stable regardless of menu title.
+		if ( self::is_plugin_page() ) {
 			return true;
 		}
 
@@ -296,6 +326,19 @@ final class AISales_Sales_Manager {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Add a common body class to all plugin admin pages for CSS targeting.
+	 *
+	 * @param string $classes Space-separated body classes.
+	 * @return string
+	 */
+	public function add_plugin_body_class( $classes ) {
+		if ( self::is_plugin_page() ) {
+			$classes .= ' aisales-plugin-page';
+		}
+		return $classes;
 	}
 
 	/**

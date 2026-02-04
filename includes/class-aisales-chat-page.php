@@ -83,7 +83,8 @@ class AISales_Chat_Page {
 	 * @param string $hook The current admin page.
 	 */
 	public function enqueue_scripts( $hook ) {
-		if ( 'ai-sales-manager_page_ai-sales-agent' !== $hook ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! isset( $_GET['page'] ) || 'ai-sales-agent' !== $_GET['page'] ) {
 			return;
 		}
 

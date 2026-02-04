@@ -122,7 +122,8 @@ class AISales_SEO_Checker_Page {
 	 * @param string $hook The current admin page.
 	 */
 	public function enqueue_scripts( $hook ) {
-		if ( 'ai-sales-manager_page_ai-sales-seo-checker' !== $hook ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! isset( $_GET['page'] ) || 'ai-sales-seo-checker' !== $_GET['page'] ) {
 			return;
 		}
 

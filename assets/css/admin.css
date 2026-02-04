@@ -6029,29 +6029,15 @@ td.aisales-table__col--date {
    ========================================= */
 
 /* Hide other plugin notices on AI Sales Manager pages */
-.toplevel_page_ai-sales-manager .notice:not(.aisales-alert),
-.ai-sales-manager_page_ai-sales-chat .notice:not(.aisales-alert),
-.ai-sales-manager_page_ai-sales-bulk .notice:not(.aisales-alert),
-.ai-sales-manager_page_ai-sales-email .notice:not(.aisales-alert),
-.ai-sales-manager_page_ai-sales-brand .notice:not(.aisales-alert),
-.ai-sales-manager_page_ai-sales-widgets .notice:not(.aisales-alert),
-.ai-sales-manager_page_ai-sales-abandoned-carts .notice:not(.aisales-alert),
-.ai-sales-manager_page_ai-sales-support .notice:not(.aisales-alert) {
+.aisales-plugin-page .notice:not(.aisales-alert) {
   display: none !important;
 }
 
 /* Also hide the update-nag and other common admin notices */
-.toplevel_page_ai-sales-manager .update-nag,
-.toplevel_page_ai-sales-manager #tptn-admin-notice,
-.toplevel_page_ai-sales-manager .wpforms-review-notice,
-.toplevel_page_ai-sales-manager [class*="wpseo-"],
-.ai-sales-manager_page_ai-sales-chat .update-nag,
-.ai-sales-manager_page_ai-sales-bulk .update-nag,
-.ai-sales-manager_page_ai-sales-email .update-nag,
-.ai-sales-manager_page_ai-sales-brand .update-nag,
-.ai-sales-manager_page_ai-sales-widgets .update-nag,
-.ai-sales-manager_page_ai-sales-abandoned-carts .update-nag,
-.ai-sales-manager_page_ai-sales-support .update-nag {
+.aisales-plugin-page .update-nag,
+.aisales-plugin-page #tptn-admin-notice,
+.aisales-plugin-page .wpforms-review-notice,
+.aisales-plugin-page [class*="wpseo-"] {
   display: none !important;
 }
 
