@@ -299,7 +299,11 @@ final class AISales_Sales_Manager {
 	}
 
 	/**
-	 * Ensure Support Center appears last in submenu
+	 * Reorder submenu items and hide them when not connected.
+	 *
+	 * When the user has not connected their account, only the main
+	 * settings page is shown. All other submenu items are hidden
+	 * but remain registered so direct URLs still work.
 	 */
 	public function reorder_submenu_items() {
 		global $submenu;
@@ -308,6 +312,20 @@ final class AISales_Sales_Manager {
 			return;
 		}
 
+		// Hide all submenu items except the main settings page when not connected.
+		if ( ! AISales_API_Client::instance()->is_connected() ) {
+			$main_item = null;
+			foreach ( $submenu['ai-sales-manager'] as $item ) {
+				if ( isset( $item[2] ) && 'ai-sales-manager' === $item[2] ) {
+					$main_item = $item;
+					break;
+				}
+			}
+			$submenu['ai-sales-manager'] = $main_item ? array( $main_item ) : array();
+			return;
+		}
+
+		// When connected, ensure Support Center appears last.
 		$items = $submenu['ai-sales-manager'];
 		$support_item = null;
 
