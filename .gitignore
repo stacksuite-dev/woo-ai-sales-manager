@@ -36,3 +36,6 @@ composer.lock
 
 # Source maps (keep in dev, excluded from build)
 # *.map
+
+# SVN working copies
+.svn/

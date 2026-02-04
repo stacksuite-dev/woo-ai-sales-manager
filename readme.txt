@@ -1,5 +1,5 @@
 === StackSuite Sales Manager for WooCommerce ===
-Contributors: stacksuite
+Contributors: deepwork
 Tags: woocommerce, ai, product management, content generation, image generation
 Requires at least: 6.2
 Tested up to: 6.9
