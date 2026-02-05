@@ -3,7 +3,7 @@
  * Plugin Name: StackSuite Sales Manager for WooCommerce
  * Plugin URI: https://github.com/stacksuite-dev/woo-ai-sales-manager
  * Description: AI-powered product catalog management for WooCommerce. Generate content, suggest tags/categories, and create/improve product images using Google Gemini.
- * Version: 1.6.2
+ * Version: 1.6.3
  * Author: StackSuite
  * Author URI: https://stacksuite.dev
  * License: GPL v2 or later
@@ -26,7 +26,7 @@ register_activation_hook( __FILE__, 'aisales_activate' );
 register_deactivation_hook( __FILE__, 'aisales_deactivate' );
 
 // Plugin constants
-define( 'AISALES_VERSION', '1.6.2' );
+define( 'AISALES_VERSION', '1.6.3' );
 define( 'AISALES_PLUGIN_FILE', __FILE__ );
 define( 'AISALES_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AISALES_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -129,7 +129,6 @@ final class AISales_Sales_Manager {
 			require_once AISALES_PLUGIN_DIR . 'includes/widgets/class-aisales-widgets-page.php';
 			require_once AISALES_PLUGIN_DIR . 'includes/class-aisales-batch-page.php';
 			require_once AISALES_PLUGIN_DIR . 'includes/class-aisales-seo-checker-page.php';
-			require_once AISALES_PLUGIN_DIR . 'includes/class-aisales-design-studio.php';
 		}
 
 		// Frontend shortcodes (load on both admin and frontend for preview support)
@@ -171,7 +170,6 @@ final class AISales_Sales_Manager {
 			AISales_Widgets_Page::instance();
 			AISales_Batch_Page::instance();
 			AISales_SEO_Checker_Page::instance();
-			AISales_Design_Studio::instance();
 		}
 
 		add_action( 'admin_menu', array( $this, 'reorder_submenu_items' ), 999 );
