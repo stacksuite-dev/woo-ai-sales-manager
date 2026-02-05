@@ -18,6 +18,7 @@ $aisales_get = function ( $arr, $key, $default = '' ) {
 
 // Extract provider settings with defaults.
 $aisales_provider = $aisales_get( $aisales_mail_settings, 'provider', 'default' );
+$aisales_enabled  = ! empty( $aisales_mail_settings['enabled'] );
 $aisales_smtp     = is_array( $aisales_get( $aisales_mail_settings, 'smtp' ) ) ? $aisales_mail_settings['smtp'] : array();
 $aisales_sendgrid = is_array( $aisales_get( $aisales_mail_settings, 'sendgrid' ) ) ? $aisales_mail_settings['sendgrid'] : array();
 $aisales_resend   = is_array( $aisales_get( $aisales_mail_settings, 'resend' ) ) ? $aisales_mail_settings['resend'] : array();
@@ -75,6 +76,20 @@ $aisales_ses_from_name  = $aisales_get( $aisales_ses, 'from_name' );
 			</p>
 		</div>
 
+		<div class="aisales-form-group aisales-mail-provider-toggle">
+			<label class="aisales-toggle-label">
+				<span class="aisales-toggle">
+					<input type="checkbox" id="aisales-mail-provider-enabled" <?php checked( $aisales_enabled ); ?>>
+					<span class="aisales-toggle__slider"></span>
+				</span>
+				<span class="aisales-toggle-label__text">
+					<strong><?php esc_html_e( 'Enable Custom Mail Provider', 'stacksuite-sales-manager-for-woocommerce' ); ?></strong>
+					<span class="aisales-text-muted"><?php esc_html_e( 'When disabled, WordPress uses its default mail configuration.', 'stacksuite-sales-manager-for-woocommerce' ); ?></span>
+				</span>
+			</label>
+		</div>
+
+		<div class="aisales-mail-provider-settings<?php echo $aisales_enabled ? '' : ' is-disabled'; ?>" id="aisales-mail-provider-settings">
 		<div class="aisales-form-group">
 			<label class="aisales-label">
 				<?php esc_html_e( 'Mail Provider', 'stacksuite-sales-manager-for-woocommerce' ); ?>
@@ -353,6 +368,7 @@ $aisales_ses_from_name  = $aisales_get( $aisales_ses, 'from_name' );
 				</div>
 			</div>
 		</div>
+		</div><!-- .aisales-mail-provider-settings -->
 
 		<div class="aisales-mail-provider-actions">
 			<button type="button" class="aisales-btn aisales-btn--primary" id="aisales-mail-provider-save">

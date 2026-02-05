@@ -15,6 +15,8 @@
 		},
 
 		cacheElements: function() {
+			this.$enabledToggle = $('#aisales-mail-provider-enabled');
+			this.$settingsWrapper = $('#aisales-mail-provider-settings');
 			this.$providerInputs = $('input[name="aisales-mail-provider"]');
 			this.$panels = $('.aisales-mail-provider-panel');
 			this.$authToggle = $('#aisales-mail-provider-auth');
@@ -63,6 +65,7 @@
 		},
 
 		bindEvents: function() {
+			this.$enabledToggle.on('change', this.syncEnabledState.bind(this));
 			this.$providerInputs.on('change', this.syncProviderState.bind(this));
 			this.$providerInputs.on('change', this.applyProviderSelection.bind(this));
 			this.$authToggle.on('change', this.syncAuthState.bind(this));
@@ -79,6 +82,11 @@
 					this.closeTestModal();
 				}
 			});
+		},
+
+		syncEnabledState: function() {
+			const enabled = this.$enabledToggle.is(':checked');
+			this.$settingsWrapper.toggleClass('is-disabled', !enabled);
 		},
 
 		syncProviderState: function() {
@@ -105,6 +113,7 @@
 
 		getSettingsPayload: function() {
 			return {
+				enabled: this.$enabledToggle.is(':checked'),
 				provider: this.getProvider(),
 				smtp: {
 					host: this.$host.val().trim(),

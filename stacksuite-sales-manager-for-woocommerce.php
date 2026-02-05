@@ -3,7 +3,7 @@
  * Plugin Name: StackSuite Sales Manager for WooCommerce
  * Plugin URI: https://github.com/stacksuite-dev/woo-ai-sales-manager
  * Description: AI-powered product catalog management for WooCommerce. Generate content, suggest tags/categories, and create/improve product images using Google Gemini.
- * Version: 1.6.0
+ * Version: 1.6.1
  * Author: StackSuite
  * Author URI: https://stacksuite.dev
  * License: GPL v2 or later
@@ -26,7 +26,7 @@ register_activation_hook( __FILE__, 'aisales_activate' );
 register_deactivation_hook( __FILE__, 'aisales_deactivate' );
 
 // Plugin constants
-define( 'AISALES_VERSION', '1.6.0' );
+define( 'AISALES_VERSION', '1.6.1' );
 define( 'AISALES_PLUGIN_FILE', __FILE__ );
 define( 'AISALES_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AISALES_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -121,7 +121,6 @@ final class AISales_Sales_Manager {
 			require_once AISALES_PLUGIN_DIR . 'includes/class-aisales-category-metabox.php';
 			require_once AISALES_PLUGIN_DIR . 'includes/class-aisales-chat-page.php';
 			require_once AISALES_PLUGIN_DIR . 'includes/class-aisales-email-page.php';
-			require_once AISALES_PLUGIN_DIR . 'includes/class-aisales-mail-provider-page.php';
 			require_once AISALES_PLUGIN_DIR . 'includes/class-aisales-abandoned-cart-settings-page.php';
 			require_once AISALES_PLUGIN_DIR . 'includes/class-aisales-abandoned-cart-report-page.php';
 			require_once AISALES_PLUGIN_DIR . 'includes/class-aisales-support-page.php';
@@ -164,7 +163,6 @@ final class AISales_Sales_Manager {
 			AISales_Category_Metabox::instance();
 			AISales_Chat_Page::instance();
 			AISales_Email_Page::instance();
-			AISales_Mail_Provider_Page::instance();
 			AISales_Abandoned_Cart_Settings_Page::instance();
 			AISales_Abandoned_Cart_Report_Page::instance();
 			AISales_Support_Page::instance();
@@ -289,7 +287,6 @@ final class AISales_Sales_Manager {
 		'ai-sales-abandoned-cart-settings',
 		'ai-sales-bulk',
 		'ai-sales-seo-checker',
-		'ai-sales-email-delivery',
 		'ai-sales-design-studio',
 	);
 

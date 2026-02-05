@@ -167,6 +167,50 @@
 	margin: 0 0 var(--aisales-space-1);
 }
 
+/* Toggle for enabling/disabling mail provider */
+.aisales-mail-provider-toggle {
+	padding: var(--aisales-space-4);
+	margin-bottom: var(--aisales-space-5);
+	background: var(--aisales-bg-subtle);
+	border: 1px solid var(--aisales-border-light);
+	border-radius: var(--aisales-radius-lg);
+}
+
+.aisales-toggle-label {
+	display: flex;
+	align-items: center;
+	gap: var(--aisales-space-4);
+	cursor: pointer;
+}
+
+.aisales-toggle-label__text {
+	display: flex;
+	flex-direction: column;
+	gap: var(--aisales-space-1);
+}
+
+.aisales-toggle-label__text strong {
+	font-weight: var(--aisales-font-weight-semibold);
+	color: var(--aisales-text-primary);
+}
+
+.aisales-toggle-label__text .aisales-text-muted {
+	font-size: var(--aisales-font-sm);
+}
+
+/* Disabled state for provider settings */
+.aisales-mail-provider-settings.is-disabled {
+	opacity: 0.5;
+	pointer-events: none;
+	user-select: none;
+}
+
+.aisales-mail-provider-settings.is-disabled .aisales-mail-provider-option,
+.aisales-mail-provider-settings.is-disabled .aisales-input,
+.aisales-mail-provider-settings.is-disabled .aisales-select {
+	cursor: not-allowed;
+}
+
 
 @media (max-width: 782px) {
 	.aisales-mail-provider-page__header {

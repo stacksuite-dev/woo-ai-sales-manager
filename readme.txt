@@ -4,7 +4,7 @@ Tags: woocommerce, ai, product management, content generation, image generation
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 1.6.0
+Stable tag: 1.6.1
 WC requires at least: 8.0
 WC tested up to: 9.0
 License: GPLv2 or later
@@ -113,6 +113,11 @@ By using the AI features, you agree to these terms.
 7. Store context configuration
 
 == Changelog ==
+
+= 1.6.1 =
+* Added: Opt-in toggle for Mail Provider - email delivery now only activates when explicitly enabled
+* Removed: Legacy standalone Mail Provider page (settings now accessible via Email Templates → Settings tab)
+* Improved: Mail Provider backward compatibility - existing configured providers auto-enable on upgrade
 
 = 1.6.0 =
 * Added: Enhanced language detection for brand analysis - AI now auto-detects store language from content

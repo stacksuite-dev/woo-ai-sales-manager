@@ -44,7 +44,32 @@ class AISales_Mail_Provider {
 	 * Constructor.
 	 */
 	private function __construct() {
-		add_action( 'phpmailer_init', array( $this, 'configure_phpmailer' ) );
+		// Only hook into phpmailer if explicitly enabled.
+		if ( $this->is_enabled() ) {
+			add_action( 'phpmailer_init', array( $this, 'configure_phpmailer' ) );
+		}
+	}
+
+	/**
+	 * Check if the mail provider feature is enabled.
+	 *
+	 * For backward compatibility: if a non-default provider is already configured,
+	 * treat it as enabled even if the enabled flag isn't set.
+	 *
+	 * @return bool
+	 */
+	public function is_enabled() {
+		$settings = get_option( self::OPTION_KEY, array() );
+
+		// Explicit enabled flag takes precedence.
+		if ( isset( $settings['enabled'] ) ) {
+			return (bool) $settings['enabled'];
+		}
+
+		// Backward compatibility: if a provider other than 'default' is configured,
+		// treat as enabled to avoid breaking existing setups.
+		$provider = $settings['provider'] ?? 'default';
+		return 'default' !== $provider;
 	}
 
 	/**
@@ -264,6 +289,7 @@ class AISales_Mail_Provider {
 	 */
 	private function get_default_settings() {
 		return array(
+			'enabled'    => false,
 			'provider'   => 'default',
 			'smtp'       => array(
 				'host'       => '',
@@ -331,6 +357,7 @@ class AISales_Mail_Provider {
 		}
 
 		return array(
+			'enabled'    => ! empty( $settings['enabled'] ),
 			'provider'   => $provider,
 			'smtp'       => $this->sanitize_smtp_settings( $smtp, $defaults['smtp'], $encryption ),
 			'sendgrid'   => $this->sanitize_provider_settings( $settings['sendgrid'] ?? array(), array( 'api_key' ) ),
