@@ -146,6 +146,7 @@ final class AISales_Sales_Manager {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 		add_filter( 'plugin_action_links_' . AISALES_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ) );
 		add_filter( 'admin_body_class', array( $this, 'add_plugin_body_class' ) );
+		add_action( 'admin_notices', array( $this, 'maybe_show_update_notice' ) );
 
 		// Initialize components
 		AISales_Admin_Settings::instance();
@@ -399,6 +400,63 @@ final class AISales_Sales_Manager {
 			'<a href="' . admin_url( 'admin.php?page=ai-sales-manager' ) . '">' . __( 'Settings', 'stacksuite-sales-manager-for-woocommerce' ) . '</a>',
 		);
 		return array_merge( $plugin_links, $links );
+	}
+
+	/**
+	 * Show update notice on plugin pages if an update is available
+	 *
+	 * Reads from WordPress's existing update transient (no extra API calls).
+	 */
+	public function maybe_show_update_notice() {
+		// Only show on plugin pages.
+		if ( ! self::is_plugin_page() ) {
+			return;
+		}
+
+		// Check WordPress's update transient.
+		$update_plugins = get_site_transient( 'update_plugins' );
+		if ( empty( $update_plugins->response ) ) {
+			return;
+		}
+
+		$plugin_file = AISALES_PLUGIN_BASENAME;
+		if ( ! isset( $update_plugins->response[ $plugin_file ] ) ) {
+			return;
+		}
+
+		$update_info   = $update_plugins->response[ $plugin_file ];
+		$new_version   = isset( $update_info->new_version ) ? $update_info->new_version : '';
+		$update_url    = admin_url( 'plugins.php' );
+		$changelog_url = isset( $update_info->url ) ? $update_info->url : 'https://wordpress.org/plugins/stacksuite-sales-manager-for-woocommerce/#developers';
+
+		if ( empty( $new_version ) ) {
+			return;
+		}
+
+		?>
+		<div class="notice notice-warning aisales-update-notice" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px;">
+			<span class="dashicons dashicons-update" style="font-size: 24px; width: 24px; height: 24px; color: #dba617;"></span>
+			<div style="flex: 1;">
+				<strong><?php esc_html_e( 'StackSuite Sales Manager Update Available', 'stacksuite-sales-manager-for-woocommerce' ); ?></strong>
+				<p style="margin: 4px 0 0;">
+					<?php
+					printf(
+						/* translators: %1$s: current version, %2$s: new version */
+						esc_html__( 'Version %1$s is available. You are running %2$s.', 'stacksuite-sales-manager-for-woocommerce' ),
+						'<strong>' . esc_html( $new_version ) . '</strong>',
+						esc_html( AISALES_VERSION )
+					);
+					?>
+				</p>
+			</div>
+			<a href="<?php echo esc_url( $changelog_url ); ?>" class="button button-secondary" target="_blank" rel="noopener">
+				<?php esc_html_e( 'View Changelog', 'stacksuite-sales-manager-for-woocommerce' ); ?>
+			</a>
+			<a href="<?php echo esc_url( $update_url ); ?>" class="button button-primary">
+				<?php esc_html_e( 'Update Now', 'stacksuite-sales-manager-for-woocommerce' ); ?>
+			</a>
+		</div>
+		<?php
 	}
 
 	/**

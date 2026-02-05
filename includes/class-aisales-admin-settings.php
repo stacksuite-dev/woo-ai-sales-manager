@@ -52,6 +52,7 @@ class AISales_Admin_Settings {
 		add_action( 'admin_menu', array( $this, 'add_menu_page' ) );
 		add_action( 'admin_init', array( $this, 'handle_actions' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_toast_script' ), 20 );
+		add_action( 'admin_init', array( $this, 'maybe_check_for_updates' ) );
 	}
 
 	/**
@@ -1001,5 +1002,34 @@ class AISales_Admin_Settings {
 		);
 
 		return isset( $labels[ $operation ] ) ? $labels[ $operation ] : $operation;
+	}
+
+	/**
+	 * Check for plugin updates on dashboard page load (every 6 hours)
+	 *
+	 * This triggers WordPress's plugin update check mechanism to ensure
+	 * users see fresh update information when visiting the plugin dashboard.
+	 */
+	public function maybe_check_for_updates() {
+		// Only run on our main dashboard page.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! isset( $_GET['page'] ) || 'ai-sales-manager' !== $_GET['page'] ) {
+			return;
+		}
+
+		$last_check = get_option( 'aisales_last_update_check', 0 );
+		$interval   = 6 * HOUR_IN_SECONDS;
+
+		// Only check if more than 6 hours since last check.
+		if ( time() - $last_check < $interval ) {
+			return;
+		}
+
+		// Update last check time first to prevent multiple checks.
+		update_option( 'aisales_last_update_check', time(), false );
+
+		// Clear the update transient and trigger a fresh check.
+		delete_site_transient( 'update_plugins' );
+		wp_update_plugins();
 	}
 }
