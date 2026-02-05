@@ -690,6 +690,7 @@
 			suggestions.store_name && buildSuggestionItem('Store Name', suggestions.store_name),
 			suggestions.tagline && buildSuggestionItem('Tagline', suggestions.tagline, 'tagline'),
 			suggestions.business_niche && buildSuggestionItem('Business Niche', suggestions.business_niche),
+			suggestions.language && buildSuggestionItem('Content Language', suggestions.language, 'language'),
 			suggestions.target_audience && buildSuggestionItem('Target Audience', suggestions.target_audience),
 		].filter(Boolean).join('');
 
@@ -937,6 +938,9 @@
 		}
 		if (suggestions.business_niche) {
 			$('#aisales-industry').val(suggestions.business_niche);
+		}
+		if (suggestions.language) {
+			$('#aisales-language').val(suggestions.language);
 		}
 
 		// Audience & Positioning

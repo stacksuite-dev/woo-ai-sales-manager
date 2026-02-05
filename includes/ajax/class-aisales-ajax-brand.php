@@ -39,6 +39,7 @@ class AISales_Ajax_Brand extends AISales_Ajax_Base {
 			'store_name'       => $this->get_post( 'store_name', 'text' ),
 			'tagline'          => $this->get_post( 'tagline', 'text' ),
 			'business_niche'   => $this->get_post( 'business_niche', 'key' ),
+			'language'         => $this->get_post( 'language', 'text' ),
 
 			// Audience & Positioning
 			'target_audience'  => $this->get_post( 'target_audience', 'textarea' ),

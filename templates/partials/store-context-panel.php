@@ -123,21 +123,14 @@ if ( ! isset( $aisales_store_context ) ) {
 					<label for="aisales-language"><?php esc_html_e( 'Content Language', 'stacksuite-sales-manager-for-woocommerce' ); ?></label>
 					<select id="aisales-language" name="language">
 						<?php
-						$aisales_languages = array(
-							'English'    => __( 'English', 'stacksuite-sales-manager-for-woocommerce' ),
-							'Spanish'    => __( 'Spanish', 'stacksuite-sales-manager-for-woocommerce' ),
-							'French'     => __( 'French', 'stacksuite-sales-manager-for-woocommerce' ),
-							'German'     => __( 'German', 'stacksuite-sales-manager-for-woocommerce' ),
-							'Italian'    => __( 'Italian', 'stacksuite-sales-manager-for-woocommerce' ),
-							'Portuguese' => __( 'Portuguese', 'stacksuite-sales-manager-for-woocommerce' ),
-							'Dutch'      => __( 'Dutch', 'stacksuite-sales-manager-for-woocommerce' ),
-							'Japanese'   => __( 'Japanese', 'stacksuite-sales-manager-for-woocommerce' ),
-							'Chinese'    => __( 'Chinese', 'stacksuite-sales-manager-for-woocommerce' ),
-							'Korean'     => __( 'Korean', 'stacksuite-sales-manager-for-woocommerce' ),
-							'Thai'       => __( 'Thai', 'stacksuite-sales-manager-for-woocommerce' ),
-						);
-						$aisales_current_lang = isset( $aisales_store_context['language'] ) ? $aisales_store_context['language'] : 'English';
+						// Use shared language list from Brand Page (excludes Auto-detect option here).
+						$aisales_languages    = AISales_Brand_Page::get_supported_languages();
+						$aisales_current_lang = isset( $aisales_store_context['language'] ) ? $aisales_store_context['language'] : '';
 						foreach ( $aisales_languages as $aisales_value => $aisales_label ) :
+							// Skip auto-detect option (empty key) in store context panel - user must pick explicitly.
+							if ( '' === $aisales_value ) {
+								continue;
+							}
 						?>
 							<option value="<?php echo esc_attr( $aisales_value ); ?>" <?php selected( $aisales_current_lang, $aisales_value ); ?>><?php echo esc_html( $aisales_label ); ?></option>
 						<?php endforeach; ?>

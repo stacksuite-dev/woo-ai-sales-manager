@@ -121,6 +121,7 @@ class AISales_Brand_Page {
 				'detectedBranding' => $detected_branding,
 				'safeFonts'        => $branding_extractor->get_safe_fonts(),
 				'industries'       => $this->get_industries(),
+				'languages'        => self::get_supported_languages(),
 				'tones'            => $this->get_brand_tones(),
 				'pricePositions'   => $this->get_price_positions(),
 				'promotionStyles'  => $this->get_promotion_styles(),
@@ -298,6 +299,8 @@ class AISales_Brand_Page {
 			// Fields.
 			'storeName'            => __( 'Store Name', 'stacksuite-sales-manager-for-woocommerce' ),
 			'industry'             => __( 'Industry', 'stacksuite-sales-manager-for-woocommerce' ),
+			'language'             => __( 'Language', 'stacksuite-sales-manager-for-woocommerce' ),
+			'languageHint'         => __( 'Language for AI-generated content. Leave on Auto-detect to let AI determine from your store content.', 'stacksuite-sales-manager-for-woocommerce' ),
 			'targetAudience'       => __( 'Target Audience', 'stacksuite-sales-manager-for-woocommerce' ),
 			'targetAudiencePlaceholder' => __( 'e.g., Young professionals aged 25-35 interested in sustainable fashion', 'stacksuite-sales-manager-for-woocommerce' ),
 			'brandTone'            => __( 'Brand Tone', 'stacksuite-sales-manager-for-woocommerce' ),
@@ -313,6 +316,41 @@ class AISales_Brand_Page {
 	}
 
 	/**
+	 * Get supported languages for AI content generation
+	 *
+	 * This list must match the API's SUPPORTED_LANGUAGES.
+	 * Used by both Brand Settings and Store Context Panel.
+	 *
+	 * @return array Associative array of language code => language name.
+	 */
+	public static function get_supported_languages() {
+		return array(
+			''                     => __( 'Auto-detect', 'stacksuite-sales-manager-for-woocommerce' ),
+			'English'              => __( 'English', 'stacksuite-sales-manager-for-woocommerce' ),
+			'Spanish'              => __( 'Spanish', 'stacksuite-sales-manager-for-woocommerce' ),
+			'French'               => __( 'French', 'stacksuite-sales-manager-for-woocommerce' ),
+			'German'               => __( 'German', 'stacksuite-sales-manager-for-woocommerce' ),
+			'Italian'              => __( 'Italian', 'stacksuite-sales-manager-for-woocommerce' ),
+			'Portuguese'           => __( 'Portuguese', 'stacksuite-sales-manager-for-woocommerce' ),
+			'Dutch'                => __( 'Dutch', 'stacksuite-sales-manager-for-woocommerce' ),
+			'Japanese'             => __( 'Japanese', 'stacksuite-sales-manager-for-woocommerce' ),
+			'Chinese (Simplified)' => __( 'Chinese (Simplified)', 'stacksuite-sales-manager-for-woocommerce' ),
+			'Chinese (Traditional)' => __( 'Chinese (Traditional)', 'stacksuite-sales-manager-for-woocommerce' ),
+			'Korean'               => __( 'Korean', 'stacksuite-sales-manager-for-woocommerce' ),
+			'Thai'                 => __( 'Thai', 'stacksuite-sales-manager-for-woocommerce' ),
+			'Vietnamese'           => __( 'Vietnamese', 'stacksuite-sales-manager-for-woocommerce' ),
+			'Indonesian'           => __( 'Indonesian', 'stacksuite-sales-manager-for-woocommerce' ),
+			'Arabic'               => __( 'Arabic', 'stacksuite-sales-manager-for-woocommerce' ),
+			'Russian'              => __( 'Russian', 'stacksuite-sales-manager-for-woocommerce' ),
+			'Polish'               => __( 'Polish', 'stacksuite-sales-manager-for-woocommerce' ),
+			'Turkish'              => __( 'Turkish', 'stacksuite-sales-manager-for-woocommerce' ),
+			'Hindi'                => __( 'Hindi', 'stacksuite-sales-manager-for-woocommerce' ),
+			'Swedish'              => __( 'Swedish', 'stacksuite-sales-manager-for-woocommerce' ),
+			'Norwegian'            => __( 'Norwegian', 'stacksuite-sales-manager-for-woocommerce' ),
+		);
+	}
+
+	/**
 	 * Get analysis context from WordPress
 	 *
 	 * @return array Data to send for AI analysis.
@@ -324,13 +362,31 @@ class AISales_Brand_Page {
 			'store_url'         => home_url(),
 		);
 
-		// Get language from store context, falling back to WordPress locale.
+		// Get language from store context.
+		// If not set, check WordPress locale mapping.
+		// If still not found, leave empty for AI auto-detection.
 		$store_context = get_option( 'aisales_store_context', array() );
 		if ( ! empty( $store_context['language'] ) ) {
 			$context['language'] = sanitize_text_field( $store_context['language'] );
 		} else {
-			// Map WordPress locale to supported language.
-			$context['language'] = $this->get_language_from_locale( get_locale() );
+			// Map WordPress locale to supported language (may return empty for auto-detect).
+			$locale_language = $this->get_language_from_locale( get_locale() );
+			if ( ! empty( $locale_language ) ) {
+				$context['language'] = $locale_language;
+			}
+			// If empty, don't set 'language' key - API will auto-detect.
+		}
+
+		// Get homepage content for better language detection.
+		$homepage_id = get_option( 'page_on_front' );
+		if ( $homepage_id ) {
+			$homepage = get_post( $homepage_id );
+			if ( $homepage && ! empty( $homepage->post_content ) ) {
+				// Strip HTML and shortcodes, limit to reasonable size.
+				$content = wp_strip_all_tags( strip_shortcodes( $homepage->post_content ) );
+				$content = preg_replace( '/\s+/', ' ', $content ); // Normalize whitespace.
+				$context['homepage_content'] = mb_substr( trim( $content ), 0, 3000 );
+			}
 		}
 
 		// Get product categories.
@@ -389,11 +445,19 @@ class AISales_Brand_Page {
 	 * Map WordPress locale to supported language
 	 *
 	 * @param string $locale WordPress locale (e.g., 'es_ES', 'fr_FR').
-	 * @return string Supported language name.
+	 * @return string Supported language name, or empty string for auto-detect.
 	 */
 	private function get_language_from_locale( $locale ) {
 		// Extract primary language code from locale (e.g., 'es_ES' -> 'es').
 		$lang_code = substr( $locale, 0, 2 );
+
+		// Handle Chinese variants specially (zh_CN vs zh_TW).
+		if ( 'zh' === $lang_code ) {
+			if ( strpos( $locale, 'TW' ) !== false || strpos( $locale, 'HK' ) !== false ) {
+				return 'Chinese (Traditional)';
+			}
+			return 'Chinese (Simplified)';
+		}
 
 		$locale_map = array(
 			'en' => 'English',
@@ -402,11 +466,25 @@ class AISales_Brand_Page {
 			'de' => 'German',
 			'it' => 'Italian',
 			'pt' => 'Portuguese',
-			'zh' => 'Chinese',
+			'nl' => 'Dutch',
 			'ja' => 'Japanese',
+			'ko' => 'Korean',
+			'th' => 'Thai',
+			'vi' => 'Vietnamese',
+			'id' => 'Indonesian',
+			'ar' => 'Arabic',
+			'ru' => 'Russian',
+			'pl' => 'Polish',
+			'tr' => 'Turkish',
+			'hi' => 'Hindi',
+			'sv' => 'Swedish',
+			'nb' => 'Norwegian',
+			'nn' => 'Norwegian',
+			'no' => 'Norwegian',
 		);
 
-		return isset( $locale_map[ $lang_code ] ) ? $locale_map[ $lang_code ] : 'English';
+		// Return empty string (auto-detect) if locale not in map.
+		return isset( $locale_map[ $lang_code ] ) ? $locale_map[ $lang_code ] : '';
 	}
 
 	/**

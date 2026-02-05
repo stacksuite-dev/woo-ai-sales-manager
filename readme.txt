@@ -4,7 +4,7 @@ Tags: woocommerce, ai, product management, content generation, image generation
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 1.5.9
+Stable tag: 1.6.0
 WC requires at least: 8.0
 WC tested up to: 9.0
 License: GPLv2 or later
@@ -113,6 +113,14 @@ By using the AI features, you agree to these terms.
 7. Store context configuration
 
 == Changelog ==
+
+= 1.6.0 =
+* Added: Enhanced language detection for brand analysis - AI now auto-detects store language from content
+* Added: Support for 21 languages (up from 8): English, Spanish, French, German, Italian, Portuguese, Dutch, Japanese, Chinese (Simplified), Chinese (Traditional), Korean, Thai, Vietnamese, Indonesian, Arabic, Russian, Polish, Turkish, Hindi, Swedish, Norwegian
+* Added: Language dropdown in Brand Settings page with Auto-detect option
+* Added: Homepage content analysis for better brand context and language detection
+* Improved: Store Context Panel now uses the same expanded language list
+* Improved: Locale-to-language mapping expanded to cover more WordPress locales
 
 = 1.5.9 =
 * Fixed: JSON parsing in batch apply now handles HTML content with escaped quotes correctly

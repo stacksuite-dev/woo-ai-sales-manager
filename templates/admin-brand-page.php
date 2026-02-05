@@ -26,6 +26,7 @@ defined( 'ABSPATH' ) || exit;
 $aisales_current_store_name      = $aisales_store_context['store_name'] ?? get_bloginfo( 'name' );
 $aisales_current_tagline         = $aisales_store_context['tagline'] ?? get_bloginfo( 'description' );
 $aisales_current_industry        = $aisales_store_context['business_niche'] ?? '';
+$aisales_current_language        = $aisales_store_context['language'] ?? '';
 $aisales_current_target_audience = $aisales_store_context['target_audience'] ?? '';
 $aisales_current_price_position  = $aisales_store_context['price_position'] ?? '';
 $aisales_current_differentiator  = $aisales_store_context['differentiator'] ?? '';
@@ -37,6 +38,9 @@ $aisales_current_primary_color   = $aisales_store_context['primary_color'] ?? $a
 $aisales_current_text_color      = $aisales_store_context['text_color'] ?? $aisales_detected_branding['colors']['text'] ?? '#3c3c3c';
 $aisales_current_bg_color        = $aisales_store_context['bg_color'] ?? $aisales_detected_branding['colors']['background'] ?? '#f7f7f7';
 $aisales_current_font            = $aisales_store_context['font_family'] ?? $aisales_detected_branding['fonts']['body_slug'] ?? 'system';
+
+// Get supported languages.
+$aisales_languages = AISales_Brand_Page::get_supported_languages();
 ?>
 
 <div class="wrap aisales-admin-wrap aisales-brand-page">
@@ -231,6 +235,21 @@ $aisales_current_font            = $aisales_store_context['font_family'] ?? $ais
 										</option>
 									<?php endforeach; ?>
 								</select>
+							</div>
+
+							<!-- Language -->
+							<div class="aisales-form-group">
+								<label for="aisales-language" class="aisales-form-label">
+									<?php esc_html_e( 'Content Language', 'stacksuite-sales-manager-for-woocommerce' ); ?>
+								</label>
+								<select id="aisales-language" name="language" class="aisales-form-select">
+									<?php foreach ( $aisales_languages as $aisales_value => $aisales_label ) : ?>
+										<option value="<?php echo esc_attr( $aisales_value ); ?>" <?php selected( $aisales_current_language, $aisales_value ); ?>>
+											<?php echo esc_html( $aisales_label ); ?>
+										</option>
+									<?php endforeach; ?>
+								</select>
+								<p class="aisales-form-help"><?php esc_html_e( 'Language for AI-generated content. Leave on Auto-detect to let AI determine from your store content.', 'stacksuite-sales-manager-for-woocommerce' ); ?></p>
 							</div>
 						</div>
 					</div>
