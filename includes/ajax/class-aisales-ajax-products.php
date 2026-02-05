@@ -349,10 +349,39 @@ class AISales_Ajax_Products extends AISales_Ajax_Base {
 
 	/**
 	 * Handle apply batch result
+	 *
+	 * Accepts two formats:
+	 * 1. New format (from batch.js): product_id + suggestions JSON
+	 * 2. Legacy format: entity_type + entity_id + fields
 	 */
 	public function handle_apply_batch_result() {
 		$this->verify_request();
 
+		// Check for new format (product_id + suggestions).
+		$product_id  = $this->get_post( 'product_id', 'int' );
+		$suggestions = $this->get_json_post( 'suggestions', true, array() );
+
+		if ( $product_id && ! empty( $suggestions ) ) {
+			// New format: convert suggestions to fields.
+			$fields = $this->convert_suggestions_to_fields( $suggestions );
+
+			if ( empty( $fields ) ) {
+				$this->error( __( 'No valid fields to update.', 'stacksuite-sales-manager-for-woocommerce' ) );
+			}
+
+			$result = $this->apply_batch_to_product( $product_id, $fields );
+
+			if ( is_wp_error( $result ) ) {
+				$this->error( $result->get_error_message() );
+			}
+
+			$this->success( array(
+				'message' => __( 'Changes applied successfully.', 'stacksuite-sales-manager-for-woocommerce' ),
+			) );
+			return;
+		}
+
+		// Legacy format: entity_type + entity_id + fields.
 		$entity_type = $this->require_post( 'entity_type', 'key' );
 		$entity_id   = $this->require_post( 'entity_id', 'int' );
 		$fields      = $this->get_json_post( 'fields', true, array() );
@@ -383,6 +412,30 @@ class AISales_Ajax_Products extends AISales_Ajax_Base {
 		$this->success( array(
 			'message' => __( 'Changes applied successfully.', 'stacksuite-sales-manager-for-woocommerce' ),
 		) );
+	}
+
+	/**
+	 * Convert batch suggestions format to simple field => value array
+	 *
+	 * Suggestions format: { "description": { "current": "...", "suggested": "..." }, ... }
+	 * Fields format: { "description": "suggested value", ... }
+	 *
+	 * @param array $suggestions Suggestions array from batch job.
+	 * @return array Fields array for apply_batch_to_product.
+	 */
+	private function convert_suggestions_to_fields( $suggestions ) {
+		$fields = array();
+
+		foreach ( $suggestions as $field => $data ) {
+			// Handle both formats: { suggested: "value" } or just "value".
+			if ( is_array( $data ) && isset( $data['suggested'] ) ) {
+				$fields[ $field ] = $data['suggested'];
+			} elseif ( is_string( $data ) ) {
+				$fields[ $field ] = $data;
+			}
+		}
+
+		return $fields;
 	}
 
 	/**
