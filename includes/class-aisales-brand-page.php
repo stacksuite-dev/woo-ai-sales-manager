@@ -324,6 +324,15 @@ class AISales_Brand_Page {
 			'store_url'         => home_url(),
 		);
 
+		// Get language from store context, falling back to WordPress locale.
+		$store_context = get_option( 'aisales_store_context', array() );
+		if ( ! empty( $store_context['language'] ) ) {
+			$context['language'] = sanitize_text_field( $store_context['language'] );
+		} else {
+			// Map WordPress locale to supported language.
+			$context['language'] = $this->get_language_from_locale( get_locale() );
+		}
+
 		// Get product categories.
 		$terms = get_terms(
 			array(
@@ -374,6 +383,30 @@ class AISales_Brand_Page {
 		}
 
 		return $context;
+	}
+
+	/**
+	 * Map WordPress locale to supported language
+	 *
+	 * @param string $locale WordPress locale (e.g., 'es_ES', 'fr_FR').
+	 * @return string Supported language name.
+	 */
+	private function get_language_from_locale( $locale ) {
+		// Extract primary language code from locale (e.g., 'es_ES' -> 'es').
+		$lang_code = substr( $locale, 0, 2 );
+
+		$locale_map = array(
+			'en' => 'English',
+			'es' => 'Spanish',
+			'fr' => 'French',
+			'de' => 'German',
+			'it' => 'Italian',
+			'pt' => 'Portuguese',
+			'zh' => 'Chinese',
+			'ja' => 'Japanese',
+		);
+
+		return isset( $locale_map[ $lang_code ] ) ? $locale_map[ $lang_code ] : 'English';
 	}
 
 	/**

@@ -539,11 +539,21 @@ class AISales_SEO_Analyzer {
 	 */
 	private function is_issue_fixable( $check_type ) {
 		$fixable_checks = array(
+			// Title fixes.
 			'title_length',
+			// Meta description fixes.
 			'meta_description_missing',
 			'meta_description_length',
+			// Content fixes.
 			'content_thin',
 			'focus_keyword',
+			// Category description fixes.
+			'description_missing',
+			'description_short',
+			// Image alt text fixes.
+			'image_alt_missing',
+			// Heading structure fixes (regenerate content with proper headings).
+			'heading_structure',
 		);
 
 		return in_array( $check_type, $fixable_checks, true );

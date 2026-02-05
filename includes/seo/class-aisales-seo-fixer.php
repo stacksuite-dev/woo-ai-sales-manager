@@ -71,11 +71,21 @@ class AISales_SEO_Fixer {
 	 */
 	private function get_fix_type( $check ) {
 		$mapping = array(
+			// Title fixes.
 			'title_length'             => 'title',
+			// Meta description fixes.
 			'meta_description_missing' => 'meta_description',
 			'meta_description_length'  => 'meta_description',
+			// Content fixes.
 			'content_thin'             => 'content',
 			'focus_keyword'            => 'keyword',
+			// Category description fixes.
+			'description_missing'      => 'description',
+			'description_short'        => 'description',
+			// Image alt text fixes.
+			'image_alt_missing'        => 'image_alt',
+			// Heading structure fixes (regenerate content with proper structure).
+			'heading_structure'        => 'content_with_headings',
 		);
 
 		return isset( $mapping[ $check ] ) ? $mapping[ $check ] : false;
@@ -192,6 +202,13 @@ class AISales_SEO_Fixer {
 			}
 		}
 
+		// Get product image URL for alt text generation.
+		$image_url = '';
+		$image_id  = $product->get_image_id();
+		if ( $image_id ) {
+			$image_url = wp_get_attachment_url( $image_id );
+		}
+
 		return array(
 			'type'              => 'product',
 			'id'                => $product_id,
@@ -199,6 +216,7 @@ class AISales_SEO_Fixer {
 			'description'       => $product->get_description(),
 			'short_description' => $product->get_short_description(),
 			'url'               => $product->get_permalink(),
+			'image_url'         => $image_url,
 			'price'             => $product->get_price(),
 			'regular_price'     => $product->get_regular_price(),
 			'sale_price'        => $product->get_sale_price(),
@@ -363,6 +381,28 @@ class AISales_SEO_Fixer {
 				'word_count'  => '2-4 words',
 				'relevant'    => true,
 				'searchable'  => true,
+			),
+			'description' => array(
+				'min_words'   => 50,
+				'max_words'   => 200,
+				'seo_friendly' => true,
+				'include_keywords' => true,
+				'describe_category_contents' => true,
+			),
+			'image_alt' => array(
+				'max_length'  => 125,
+				'descriptive' => true,
+				'include_product_name' => true,
+				'avoid_keyword_stuffing' => true,
+				'describe_image_content' => true,
+			),
+			'content_with_headings' => array(
+				'min_words'   => 150,
+				'use_h2_h3'   => true,
+				'logical_sections' => true,
+				'natural_keywords' => true,
+				'engaging'    => true,
+				'preserve_key_information' => true,
 			),
 		);
 
@@ -563,6 +603,13 @@ class AISales_SEO_Fixer {
 					$value = substr( $value, 0, 157 ) . '...';
 				}
 				break;
+
+			case 'image_alt':
+				// Ensure alt text is within recommended bounds (125 chars).
+				if ( strlen( $value ) > 125 ) {
+					$value = substr( $value, 0, 122 ) . '...';
+				}
+				break;
 		}
 
 		return $value;
@@ -576,7 +623,8 @@ class AISales_SEO_Fixer {
 	 * @return string Field name.
 	 */
 	private function get_field_for_fix_type( $fix_type, $item_type ) {
-		if ( 'content' === $fix_type ) {
+		// Content and content_with_headings both update the description/content field.
+		if ( 'content' === $fix_type || 'content_with_headings' === $fix_type ) {
 			return 'product' === $item_type ? 'description' : 'content';
 		}
 
@@ -637,6 +685,14 @@ class AISales_SEO_Fixer {
 			case 'description':
 				$product->set_description( $fix['suggested_value'] );
 				$product->save();
+				break;
+
+			case 'image_alt':
+				$attachment_id = $product->get_image_id();
+				if ( ! $attachment_id ) {
+					return new WP_Error( 'no_image', __( 'Product has no image to add alt text to.', 'stacksuite-sales-manager-for-woocommerce' ) );
+				}
+				update_post_meta( $attachment_id, '_wp_attachment_image_alt', sanitize_text_field( $fix['suggested_value'] ) );
 				break;
 
 			default:
