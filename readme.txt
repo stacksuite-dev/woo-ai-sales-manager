@@ -4,7 +4,7 @@ Tags: woocommerce, ai, product management, content generation, image generation
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 1.5.6
+Stable tag: 1.5.7
 WC requires at least: 8.0
 WC tested up to: 9.0
 License: GPLv2 or later
@@ -113,6 +113,13 @@ By using the AI features, you agree to these terms.
 7. Store context configuration
 
 == Changelog ==
+
+= 1.5.7 =
+* Added: AI Fix support for category descriptions, image alt text, and heading structure in SEO Checker
+* Added: Language context support for Brand Settings AI analysis
+* Fixed: Batch apply results now works correctly with the batch.js format
+* Fixed: Email Templates link in Features section now points to correct page
+* Fixed: Removed AI Agent from Features section (accessible via menu)
 
 = 1.5.6 =
 * Fixed: CSS not loading on submenu admin pages
