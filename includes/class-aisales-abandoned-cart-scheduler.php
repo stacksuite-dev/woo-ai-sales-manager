@@ -151,6 +151,6 @@ class AISales_Abandoned_Cart_Scheduler {
 	 * @return string
 	 */
 	private function get_cutoff_time( $value, $unit_seconds ) {
-		return gmdate( 'Y-m-d H:i:s', time() - ( $value * $unit_seconds ) );
+		return gmdate( 'Y-m-d H:i:s', current_time( 'timestamp' ) - ( $value * $unit_seconds ) );
 	}
 }

@@ -23,6 +23,26 @@ class AISales_Abandoned_Cart_Tracker {
 	const COOKIE_NAME = 'aisales_cart_token';
 
 	/**
+	 * Token generated during current request.
+	 *
+	 * Prevents duplicate records when multiple hooks fire in the same request,
+	 * since wc_setcookie() sets an HTTP header but does not update $_COOKIE.
+	 *
+	 * @var string|null
+	 */
+	private $current_token = null;
+
+	/**
+	 * Whether we already tracked a cart change in this request.
+	 *
+	 * Prevents redundant DB writes when both woocommerce_add_to_cart
+	 * and woocommerce_cart_updated fire in the same request.
+	 *
+	 * @var bool
+	 */
+	private $tracked_this_request = false;
+
+	/**
 	 * Get instance.
 	 *
 	 * @return AISales_Abandoned_Cart_Tracker
@@ -49,7 +69,7 @@ class AISales_Abandoned_Cart_Tracker {
 	 * Handle cart change events.
 	 */
 	public function handle_cart_change() {
-		if ( is_admin() ) {
+		if ( $this->tracked_this_request || is_admin() ) {
 			return;
 		}
 
@@ -58,6 +78,7 @@ class AISales_Abandoned_Cart_Tracker {
 			return;
 		}
 
+		$this->tracked_this_request = true;
 		$this->upsert_cart_record();
 	}
 
@@ -250,9 +271,14 @@ class AISales_Abandoned_Cart_Tracker {
 	 * @return string|null
 	 */
 	private function get_cart_token( $create = false ) {
+		if ( $this->current_token ) {
+			return $this->current_token;
+		}
+
 		$token = isset( $_COOKIE[ self::COOKIE_NAME ] ) ? sanitize_text_field( wp_unslash( $_COOKIE[ self::COOKIE_NAME ] ) ) : '';
 
 		if ( $token ) {
+			$this->current_token = $token;
 			return $token;
 		}
 
@@ -262,6 +288,7 @@ class AISales_Abandoned_Cart_Tracker {
 
 		$token = wp_generate_password( 32, false, false );
 		wc_setcookie( self::COOKIE_NAME, $token, time() + DAY_IN_SECONDS * 30 );
+		$this->current_token = $token;
 		return $token;
 	}
 

@@ -4,7 +4,7 @@ Tags: woocommerce, ai, product management, content generation, image generation
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 1.6.3
+Stable tag: 1.6.4
 WC requires at least: 8.0
 WC tested up to: 9.0
 License: GPLv2 or later
@@ -113,6 +113,11 @@ By using the AI features, you agree to these terms.
 7. Store context configuration
 
 == Changelog ==
+
+= 1.6.4 =
+* Fixed: Abandoned cart duplicate records created on first add-to-cart (cookie token not cached within request)
+* Fixed: Redundant database writes when multiple cart hooks fire in the same request
+* Fixed: Abandoned cart scheduler timezone mismatch causing incorrect abandonment timing
 
 = 1.6.3 =
 * Fixed: Fatal error from unreleased Design Studio code reference in v1.6.2
